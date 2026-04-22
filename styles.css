@@ -345,3 +345,5 @@ menu {
   .section-head.compact { align-items: flex-start; }
   .section-head.compact .primary-btn { margin-top: 8px; }
 }
+
+.release-badge { display: inline-flex; margin-top: 12px; padding: 8px 12px; border-radius: 999px; background: linear-gradient(135deg, rgba(125,211,252,0.18), rgba(139,92,246,0.18)); border: 1px solid rgba(125,211,252,0.22); color: #eaf6ff; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
