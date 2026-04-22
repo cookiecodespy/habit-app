@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0f172a">
+  <title>Boss Mode</title>
+  <meta name="description" content="App minimalista de hábitos, recordatorios y foco para Tomas.">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar glass">
+      <div>
+        <p class="eyebrow">Boss Mode</p>
+        <h1>Tu sistema diario</h1>
+      </div>
+      <button id="seedBtn" class="ghost-btn">Cargar presets</button>
+    </header>
+
+    <main class="content">
+      <section class="hero card gradient">
+        <div>
+          <p class="eyebrow">Hoy</p>
+          <h2 id="todayDate"></h2>
+          <p id="dailySummary" class="muted"></p>
+        </div>
+        <div class="hero-stats">
+          <div class="stat-pill">
+            <span>Puntos</span>
+            <strong id="pointsValue">0</strong>
+          </div>
+          <div class="stat-pill">
+            <span>Racha top</span>
+            <strong id="bestStreakValue">0</strong>
+          </div>
+        </div>
+      </section>
+
+      <nav class="tabs glass" aria-label="Secciones">
+        <button class="tab active" data-tab="today">Hoy</button>
+        <button class="tab" data-tab="reminders">Recordatorios</button>
+        <button class="tab" data-tab="habits">Hábitos</button>
+        <button class="tab" data-tab="rewards">Premios</button>
+      </nav>
+
+      <section id="today" class="tab-panel active stack">
+        <div class="card">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">En foco</p>
+              <h3>Tareas de hoy</h3>
+            </div>
+            <button id="addTodayTodoBtn" class="primary-btn">+ Nueva tarea</button>
+          </div>
+          <div id="todayTodos" class="list"></div>
+        </div>
+
+        <div class="card">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Tu norte</p>
+              <h3>Áreas importantes</h3>
+            </div>
+          </div>
+          <div class="chips" id="categoryChips"></div>
+        </div>
+      </section>
+
+      <section id="reminders" class="tab-panel stack">
+        <div class="card">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Captura rápida</p>
+              <h3>Recordatorios</h3>
+            </div>
+          </div>
+          <form id="reminderForm" class="form-grid">
+            <input id="reminderTitle" type="text" placeholder="Ej: subir skill a OpenClaw" required>
+            <select id="reminderCategory"></select>
+            <input id="reminderReward" type="number" min="5" step="5" value="15" title="Puntos al completar">
+            <button class="primary-btn" type="submit">Guardar recordatorio</button>
+          </form>
+          <p class="muted tiny">Los recordatorios se transforman en TODOs cuando los activas.</p>
+          <div id="remindersList" class="list spaced"></div>
+        </div>
+      </section>
+
+      <section id="habits" class="tab-panel stack">
+        <div class="card">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Constancia</p>
+              <h3>Hábitos y rachas</h3>
+            </div>
+          </div>
+          <form id="habitForm" class="form-grid">
+            <input id="habitTitle" type="text" placeholder="Ej: leer 20 min" required>
+            <select id="habitCategory"></select>
+            <input id="habitReward" type="number" min="5" step="5" value="20" title="Puntos por cumplir">
+            <button class="primary-btn" type="submit">Crear hábito</button>
+          </form>
+          <div id="habitsList" class="list spaced"></div>
+        </div>
+      </section>
+
+      <section id="rewards" class="tab-panel stack">
+        <div class="card">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Motivación</p>
+              <h3>Premios</h3>
+            </div>
+          </div>
+          <form id="rewardForm" class="form-grid">
+            <input id="rewardTitle" type="text" placeholder="Ej: pedir algo rico o una pausa larga" required>
+            <input id="rewardCost" type="number" min="20" step="5" value="60" title="Costo en puntos">
+            <button class="primary-btn" type="submit">Crear premio</button>
+          </form>
+          <div id="rewardsList" class="list spaced"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="todoDialog" class="todo-dialog">
+    <form method="dialog" id="todoForm" class="dialog-body">
+      <div>
+        <p class="eyebrow">Nueva tarea</p>
+        <h3>Agregar TODO</h3>
+      </div>
+      <input id="todoTitle" type="text" placeholder="Ej: repasar cálculo antes de salir" required>
+      <select id="todoCategory"></select>
+      <input id="todoReward" type="number" min="5" step="5" value="10">
+      <menu>
+        <button value="cancel" class="ghost-btn">Cancelar</button>
+        <button id="saveTodoBtn" value="default" class="primary-btn">Guardar</button>
+      </menu>
+    </form>
+  </dialog>
+
+  <script src="app.js"></script>
+</body>
+</html>

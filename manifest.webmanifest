@@ -1,0 +1,17 @@
+{
+  "name": "Boss Mode",
+  "short_name": "Boss Mode",
+  "description": "Hábitos, TODOs y recompensas para el día a día.",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#0f172a",
+  "icons": [
+    {
+      "src": "assets/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
