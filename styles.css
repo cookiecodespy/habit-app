@@ -306,3 +306,24 @@ menu {
     grid-template-columns: 2fr 1fr 1fr;
   }
 }
+.topbar-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.danger-btn { border-color: rgba(255, 107, 107, 0.18); }
+.two-col { display: grid; gap: 16px; }
+.progress-block { margin-top: 18px; display: grid; gap: 8px; }
+.progress-copy { display: flex; justify-content: space-between; gap: 10px; color: var(--muted); }
+.progress-copy strong { color: var(--text); }
+.progress-line.large { height: 10px; }
+.insight-grid { display: grid; gap: 10px; }
+.mini-card {
+  padding: 14px;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.mini-card strong { line-height: 1.4; }
+.small { font-size: 0.62rem; }
+.compact-list { gap: 8px; }
+.item.compact { padding: 12px 14px; }
+@media (min-width: 720px) {
+  .two-col { grid-template-columns: 1.2fr .8fr; align-items: start; }
+}

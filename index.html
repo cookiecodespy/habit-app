@@ -17,7 +17,10 @@
         <p class="eyebrow">Boss Mode</p>
         <h1>Tu sistema diario</h1>
       </div>
-      <button id="seedBtn" class="ghost-btn">Cargar presets</button>
+      <div class="topbar-actions">
+        <button id="seedBtn" class="ghost-btn">Cargar presets</button>
+        <button id="resetDayBtn" class="ghost-btn danger-btn">Reset diario</button>
+      </div>
     </header>
 
     <main class="content">
@@ -26,6 +29,13 @@
           <p class="eyebrow">Hoy</p>
           <h2 id="todayDate"></h2>
           <p id="dailySummary" class="muted"></p>
+          <div class="progress-block">
+            <div class="progress-copy">
+              <span>Progreso del día</span>
+              <strong id="todayProgressLabel">0%</strong>
+            </div>
+            <div class="progress-line large"><span id="todayProgressBar" style="width:0%"></span></div>
+          </div>
         </div>
         <div class="hero-stats">
           <div class="stat-pill">
@@ -35,6 +45,14 @@
           <div class="stat-pill">
             <span>Racha top</span>
             <strong id="bestStreakValue">0</strong>
+          </div>
+          <div class="stat-pill">
+            <span>Completadas hoy</span>
+            <strong id="doneTodayValue">0</strong>
+          </div>
+          <div class="stat-pill">
+            <span>Premios canjeados</span>
+            <strong id="redeemedCountValue">0</strong>
           </div>
         </div>
       </section>
@@ -47,25 +65,47 @@
       </nav>
 
       <section id="today" class="tab-panel active stack">
-        <div class="card">
-          <div class="section-head">
-            <div>
-              <p class="eyebrow">En foco</p>
-              <h3>Tareas de hoy</h3>
+        <div class="card two-col">
+          <div>
+            <div class="section-head compact">
+              <div>
+                <p class="eyebrow">En foco</p>
+                <h3>Tareas de hoy</h3>
+              </div>
+              <button id="addTodayTodoBtn" class="primary-btn">+ Nueva tarea</button>
             </div>
-            <button id="addTodayTodoBtn" class="primary-btn">+ Nueva tarea</button>
+            <div id="todayTodos" class="list"></div>
           </div>
-          <div id="todayTodos" class="list"></div>
+          <div>
+            <div class="section-head compact">
+              <div>
+                <p class="eyebrow">Radar</p>
+                <h3>Resumen útil</h3>
+              </div>
+            </div>
+            <div id="insightCards" class="insight-grid"></div>
+          </div>
         </div>
 
-        <div class="card">
-          <div class="section-head">
-            <div>
-              <p class="eyebrow">Tu norte</p>
-              <h3>Áreas importantes</h3>
+        <div class="card two-col">
+          <div>
+            <div class="section-head compact">
+              <div>
+                <p class="eyebrow">Tu norte</p>
+                <h3>Áreas importantes</h3>
+              </div>
             </div>
+            <div class="chips" id="categoryChips"></div>
           </div>
-          <div class="chips" id="categoryChips"></div>
+          <div>
+            <div class="section-head compact">
+              <div>
+                <p class="eyebrow">Historial</p>
+                <h3>Últimos logros</h3>
+              </div>
+            </div>
+            <div id="recentActivity" class="list compact-list"></div>
+          </div>
         </div>
       </section>
 
@@ -83,7 +123,7 @@
             <input id="reminderReward" type="number" min="5" step="5" value="15" title="Puntos al completar">
             <button class="primary-btn" type="submit">Guardar recordatorio</button>
           </form>
-          <p class="muted tiny">Los recordatorios se transforman en TODOs cuando los activas.</p>
+          <p class="muted tiny">Úsalos como bandeja de entrada. Después los pasas al día correcto.</p>
           <div id="remindersList" class="list spaced"></div>
         </div>
       </section>
@@ -107,19 +147,30 @@
       </section>
 
       <section id="rewards" class="tab-panel stack">
-        <div class="card">
-          <div class="section-head">
-            <div>
-              <p class="eyebrow">Motivación</p>
-              <h3>Premios</h3>
+        <div class="card two-col">
+          <div>
+            <div class="section-head">
+              <div>
+                <p class="eyebrow">Motivación</p>
+                <h3>Premios</h3>
+              </div>
             </div>
+            <form id="rewardForm" class="form-grid">
+              <input id="rewardTitle" type="text" placeholder="Ej: pedir algo rico o una pausa larga" required>
+              <input id="rewardCost" type="number" min="20" step="5" value="60" title="Costo en puntos">
+              <button class="primary-btn" type="submit">Crear premio</button>
+            </form>
+            <div id="rewardsList" class="list spaced"></div>
           </div>
-          <form id="rewardForm" class="form-grid">
-            <input id="rewardTitle" type="text" placeholder="Ej: pedir algo rico o una pausa larga" required>
-            <input id="rewardCost" type="number" min="20" step="5" value="60" title="Costo en puntos">
-            <button class="primary-btn" type="submit">Crear premio</button>
-          </form>
-          <div id="rewardsList" class="list spaced"></div>
+          <div>
+            <div class="section-head compact">
+              <div>
+                <p class="eyebrow">Canjes</p>
+                <h3>Historial de premios</h3>
+              </div>
+            </div>
+            <div id="redeemedRewardsList" class="list compact-list"></div>
+          </div>
         </div>
       </section>
     </main>
