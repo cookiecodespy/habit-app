@@ -1,4 +1,4 @@
-const STORAGE_KEY = 'boss-mode-v2';
+const STORAGE_KEY = 'boss-mode-v4';
 const todayKey = new Date().toISOString().slice(0, 10);
 const yesterdayKey = (() => {
   const d = new Date();
@@ -36,13 +36,25 @@ const presetData = {
   ]
 };
 
+const leagueTiers = [
+  { name: 'Bronce', min: 0, icon: '🥉' },
+  { name: 'Plata', min: 120, icon: '🥈' },
+  { name: 'Oro', min: 260, icon: '🥇' },
+  { name: 'Platino', min: 450, icon: '💎' },
+  { name: 'Legendario', min: 700, icon: '👑' }
+];
+
 const els = {
   todayDate: document.getElementById('todayDate'),
   dailySummary: document.getElementById('dailySummary'),
   pointsValue: document.getElementById('pointsValue'),
   bestStreakValue: document.getElementById('bestStreakValue'),
   doneTodayValue: document.getElementById('doneTodayValue'),
-  redeemedCountValue: document.getElementById('redeemedCountValue'),
+  leagueValue: document.getElementById('leagueValue'),
+  levelValue: document.getElementById('levelValue'),
+  xpNextValue: document.getElementById('xpNextValue'),
+  profileName: document.getElementById('profileName'),
+  profileMood: document.getElementById('profileMood'),
   todayProgressLabel: document.getElementById('todayProgressLabel'),
   todayProgressBar: document.getElementById('todayProgressBar'),
   tabs: [...document.querySelectorAll('.tab')],
@@ -55,6 +67,8 @@ const els = {
   todayTodos: document.getElementById('todayTodos'),
   insightCards: document.getElementById('insightCards'),
   recentActivity: document.getElementById('recentActivity'),
+  leaguePanel: document.getElementById('leaguePanel'),
+  socialPreview: document.getElementById('socialPreview'),
   reminderForm: document.getElementById('reminderForm'),
   habitForm: document.getElementById('habitForm'),
   rewardForm: document.getElementById('rewardForm'),
@@ -66,6 +80,20 @@ const els = {
 };
 
 const baseState = {
+  profile: {
+    name: 'Boss',
+    mood: 'Construyendo consistencia con estilo.',
+    xp: 0,
+    level: 1
+  },
+  social: {
+    enabled: false,
+    league: 'solo',
+    rivals: [
+      { id: 'karina', name: 'Karina', streak: 4, points: 180, note: 'Rival amistosa futura 💜' },
+      { id: 'nico', name: 'Nico', streak: 2, points: 95, note: 'Placeholder para retos compartidos' }
+    ]
+  },
   categories: defaultCategories,
   reminders: [],
   todos: [],
@@ -91,10 +119,27 @@ const saveState = () => localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
 const getCategory = (id) => state.categories.find(cat => cat.id === id) || state.categories[0];
 const formatDate = () => new Intl.DateTimeFormat('es-CL', { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date());
 const formatActivityDate = value => new Intl.DateTimeFormat('es-CL', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }).format(new Date(value));
-const escapeHtml = value => value.replace(/[&<>"]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m]));
+const escapeHtml = value => value.replace(/[&<>\"]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m]));
+
+function getLeague(points) {
+  return [...leagueTiers].reverse().find(tier => points >= tier.min) || leagueTiers[0];
+}
+
+function getLevelFromXp(xp) {
+  return Math.floor(xp / 100) + 1;
+}
+
+function xpToNextLevel(xp) {
+  return 100 - (xp % 100 || 0);
+}
 
 function addActivity(text) {
   state.activity = [{ id: crypto.randomUUID(), text, at: new Date().toISOString() }, ...(state.activity || [])].slice(0, 20);
+}
+
+function grantXp(amount) {
+  state.profile.xp += amount;
+  state.profile.level = getLevelFromXp(state.profile.xp);
 }
 
 function fillCategorySelects() {
@@ -127,12 +172,17 @@ function renderSummary() {
   const done = getDoneTodayCount();
   const streaks = state.habits.map(h => h.bestStreak || 0);
   const progress = getTodayProgress();
+  const league = getLeague(state.points || 0);
   els.todayDate.textContent = formatDate();
   els.dailySummary.textContent = `${done}/${todayTodos.length || 0} tareas listas hoy · ${state.habits.length} hábitos activos · ${state.reminders.length} recordatorios pendientes`;
   els.pointsValue.textContent = state.points || 0;
   els.bestStreakValue.textContent = streaks.length ? Math.max(...streaks) : 0;
   els.doneTodayValue.textContent = done;
-  els.redeemedCountValue.textContent = (state.redeemedRewards || []).length;
+  els.leagueValue.textContent = `${league.icon} ${league.name}`;
+  els.levelValue.textContent = state.profile.level;
+  els.xpNextValue.textContent = xpToNextLevel(state.profile.xp);
+  els.profileName.textContent = state.profile.name;
+  els.profileMood.textContent = state.profile.mood;
   els.todayProgressLabel.textContent = `${progress}%`;
   els.todayProgressBar.style.width = `${progress}%`;
 }
@@ -141,23 +191,13 @@ function renderInsights() {
   const topHabit = [...state.habits].sort((a, b) => (b.streak || 0) - (a.streak || 0))[0];
   const cheapestReward = [...state.rewards].sort((a, b) => a.cost - b.cost)[0];
   const dueReminders = state.reminders.length;
+  const league = getLeague(state.points || 0);
   const cards = [
-    {
-      title: 'Siguiente foco',
-      body: getTodayTodos().find(todo => !todo.done)?.title || 'Vas al día, agrega otra tarea si quieres seguir con impulso.'
-    },
-    {
-      title: 'Mejor racha activa',
-      body: topHabit ? `${topHabit.title} · ${topHabit.streak} día(s)` : 'Aún no hay hábitos activos.'
-    },
-    {
-      title: 'Premio más cercano',
-      body: cheapestReward ? `${cheapestReward.title} por ${cheapestReward.cost} pts` : 'Crea un premio que te motive.'
-    },
-    {
-      title: 'Bandeja pendiente',
-      body: dueReminders ? `${dueReminders} recordatorio(s) esperando pasar a acción.` : 'Tu bandeja está limpia.'
-    }
+    { title: 'Siguiente foco', body: getTodayTodos().find(todo => !todo.done)?.title || 'Vas al día, agrega otra tarea si quieres seguir con impulso.' },
+    { title: 'Mejor racha activa', body: topHabit ? `${topHabit.title} · ${topHabit.streak} día(s)` : 'Aún no hay hábitos activos.' },
+    { title: 'Premio más cercano', body: cheapestReward ? `${cheapestReward.title} por ${cheapestReward.cost} pts` : 'Crea un premio que te motive.' },
+    { title: 'Liga actual', body: `${league.icon} ${league.name} · sigue empujando para subir.` },
+    { title: 'Bandeja pendiente', body: dueReminders ? `${dueReminders} recordatorio(s) esperando pasar a acción.` : 'Tu bandeja está limpia.' }
   ];
   els.insightCards.innerHTML = cards.map(card => `
     <article class="mini-card">
@@ -179,6 +219,47 @@ function renderRecentActivity() {
       <p class="muted tiny">${formatActivityDate(item.at)}</p>
     </article>
   `).join('');
+}
+
+function renderLeaguePanel() {
+  const league = getLeague(state.points || 0);
+  const nextLeague = leagueTiers.find(t => t.min > (state.points || 0));
+  els.leaguePanel.innerHTML = `
+    <div class="league-card">
+      <div class="league-badge">${league.icon}</div>
+      <div>
+        <strong>${league.name}</strong>
+        <p class="muted">Tu progreso ya se siente como juego. Mantén la racha para seguir subiendo.</p>
+      </div>
+    </div>
+    <div class="league-next">
+      <span>Siguiente meta</span>
+      <strong>${nextLeague ? `${nextLeague.icon} ${nextLeague.name} a ${nextLeague.min} pts` : 'Ya estás en la cima 👑'}</strong>
+    </div>
+  `;
+}
+
+function renderSocialPreview() {
+  const rivals = state.social.rivals || [];
+  els.socialPreview.innerHTML = `
+    <div class="social-card">
+      <p class="muted">Base lista para desafíos compartidos, ranking y streak battle con tu polola u otras personas.</p>
+      <div class="rival-list">
+        ${rivals.map(rival => `
+          <div class="rival-row">
+            <div>
+              <strong>${escapeHtml(rival.name)}</strong>
+              <p class="muted tiny">${escapeHtml(rival.note)}</p>
+            </div>
+            <div class="rival-stats">
+              <span>🔥 ${rival.streak}</span>
+              <span>⭐ ${rival.points}</span>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
 }
 
 function renderTodos() {
@@ -299,6 +380,8 @@ function renderAll() {
   renderSummary();
   renderInsights();
   renderRecentActivity();
+  renderLeaguePanel();
+  renderSocialPreview();
   renderTodos();
   renderReminders();
   renderHabits();
@@ -309,6 +392,7 @@ function renderAll() {
 
 function addPoints(points) {
   state.points += points;
+  grantXp(points);
 }
 
 function seedData() {
@@ -332,13 +416,7 @@ els.reminderForm.addEventListener('submit', e => {
   e.preventDefault();
   const title = reminderTitle.value.trim();
   if (!title) return;
-  state.reminders.unshift({
-    id: crypto.randomUUID(),
-    title,
-    category: reminderCategory.value,
-    reward: Number(reminderReward.value) || 10,
-    createdAt: todayKey
-  });
+  state.reminders.unshift({ id: crypto.randomUUID(), title, category: reminderCategory.value, reward: Number(reminderReward.value) || 10, createdAt: todayKey });
   addActivity(`Nuevo recordatorio: ${title}`);
   e.target.reset();
   reminderReward.value = 15;
@@ -349,16 +427,7 @@ els.habitForm.addEventListener('submit', e => {
   e.preventDefault();
   const title = habitTitle.value.trim();
   if (!title) return;
-  state.habits.unshift({
-    id: crypto.randomUUID(),
-    title,
-    category: habitCategory.value,
-    reward: Number(habitReward.value) || 20,
-    streak: 0,
-    bestStreak: 0,
-    lastCompletedDate: null,
-    completions: []
-  });
+  state.habits.unshift({ id: crypto.randomUUID(), title, category: habitCategory.value, reward: Number(habitReward.value) || 20, streak: 0, bestStreak: 0, lastCompletedDate: null, completions: [] });
   addActivity(`Nuevo hábito: ${title}`);
   e.target.reset();
   habitReward.value = 20;
@@ -369,11 +438,7 @@ els.rewardForm.addEventListener('submit', e => {
   e.preventDefault();
   const title = rewardTitle.value.trim();
   if (!title) return;
-  state.rewards.unshift({
-    id: crypto.randomUUID(),
-    title,
-    cost: Number(rewardCost.value) || 60
-  });
+  state.rewards.unshift({ id: crypto.randomUUID(), title, cost: Number(rewardCost.value) || 60 });
   addActivity(`Nuevo premio: ${title}`);
   e.target.reset();
   rewardCost.value = 60;
@@ -385,15 +450,7 @@ els.todoForm.addEventListener('submit', e => {
   e.preventDefault();
   const title = todoTitle.value.trim();
   if (!title) return;
-  state.todos.unshift({
-    id: crypto.randomUUID(),
-    title,
-    category: todoCategory.value,
-    reward: Number(todoReward.value) || 10,
-    done: false,
-    date: todayKey,
-    createdAt: new Date().toISOString()
-  });
+  state.todos.unshift({ id: crypto.randomUUID(), title, category: todoCategory.value, reward: Number(todoReward.value) || 10, done: false, date: todayKey, createdAt: new Date().toISOString() });
   addActivity(`Nueva tarea para hoy: ${title}`);
   els.todoDialog.close();
   e.target.reset();
@@ -449,13 +506,7 @@ document.addEventListener('click', e => {
       const bestStreak = Math.max(habit.bestStreak || 0, streak);
       addPoints(habit.reward);
       addActivity(`Hábito completado: ${habit.title}`);
-      return {
-        ...habit,
-        streak,
-        bestStreak,
-        lastCompletedDate: todayKey,
-        completions: [...(habit.completions || []), todayKey].slice(-30)
-      };
+      return { ...habit, streak, bestStreak, lastCompletedDate: todayKey, completions: [...(habit.completions || []), todayKey].slice(-30) };
     });
   }
 

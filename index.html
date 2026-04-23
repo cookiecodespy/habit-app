@@ -14,9 +14,9 @@
   <div class="app-shell">
     <header class="topbar glass">
       <div>
-        <p class="eyebrow">Boss Mode v2.2</p>
+        <p class="eyebrow">Boss Mode v4.0</p>
         <h1>Tu sistema diario</h1>
-        <div class="release-badge">NEW BUILD · v3.1</div>
+        <div class="release-badge">NEW BUILD · v4.0</div>
       </div>
       <div class="topbar-actions">
         <button id="seedBtn" class="ghost-btn">Cargar presets</button>
@@ -30,9 +30,7 @@
           <p class="eyebrow">Hoy</p>
           <h2 id="todayDate"></h2>
           <p id="dailySummary" class="muted"></p>
-          <div class="hero-callout">Ahora con radar diario, historial y caché corregido.</div>
-          <div class="ios-note">Diseño más oscuro y pulido tipo iPhone.
-          <br>Visual refresh audit passed.</div>
+          <div class="hero-callout">Ahora con modo liga, perfil y ganchos para competir en el futuro.</div>
           <div class="progress-block">
             <div class="progress-copy">
               <span>Progreso del día</span>
@@ -55,8 +53,26 @@
             <strong id="doneTodayValue">0</strong>
           </div>
           <div class="stat-pill">
-            <span>Premios canjeados</span>
-            <strong id="redeemedCountValue">0</strong>
+            <span>Liga actual</span>
+            <strong id="leagueValue">Bronce</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="card profile-strip">
+        <div>
+          <p class="eyebrow">Perfil</p>
+          <h3 id="profileName">Boss</h3>
+          <p class="muted" id="profileMood">Construyendo consistencia con estilo.</p>
+        </div>
+        <div class="profile-meta">
+          <div class="mini-stat">
+            <span>Nivel</span>
+            <strong id="levelValue">1</strong>
+          </div>
+          <div class="mini-stat">
+            <span>XP a siguiente</span>
+            <strong id="xpNextValue">100</strong>
           </div>
         </div>
       </section>
@@ -109,6 +125,27 @@
               </div>
             </div>
             <div id="recentActivity" class="list compact-list"></div>
+          </div>
+        </div>
+
+        <div class="card two-col">
+          <div>
+            <div class="section-head compact">
+              <div>
+                <p class="eyebrow">Momentum</p>
+                <h3>Tu liga y motivación</h3>
+              </div>
+            </div>
+            <div id="leaguePanel" class="league-panel"></div>
+          </div>
+          <div>
+            <div class="section-head compact">
+              <div>
+                <p class="eyebrow">Versus</p>
+                <h3>Futuro multiplayer</h3>
+              </div>
+            </div>
+            <div id="socialPreview" class="social-preview"></div>
           </div>
         </div>
       </section>
