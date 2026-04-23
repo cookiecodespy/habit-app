@@ -1,383 +1,385 @@
-const STORAGE_KEY = 'boss-mode-v5';
+const STORAGE_KEY = 'boss-mode-v3';
 const todayKey = new Date().toISOString().slice(0, 10);
-const yesterdayKey = (() => {
-  const d = new Date();
-  d.setDate(d.getDate() - 1);
-  return d.toISOString().slice(0, 10);
-})();
-
-const defaultCategories = [
-  { id: 'universidad', name: 'Universidad', emoji: '🎓' },
-  { id: 'trabajo', name: 'Trabajo', emoji: '💼' },
-  { id: 'openclaw', name: 'OpenClaw', emoji: '🦞' },
-  { id: 'skills', name: 'Skills', emoji: '🛠️' },
-  { id: 'salud', name: 'Salud', emoji: '🌿' }
-];
-
-const presetData = {
-  reminders: [
-    { id: crypto.randomUUID(), title: 'Repasar cálculo antes de salir', category: 'universidad', createdAt: todayKey },
-    { id: crypto.randomUUID(), title: 'Dejar lista una mejora chica en OpenClaw', category: 'openclaw', createdAt: todayKey }
-  ],
-  todos: [
-    { id: crypto.randomUUID(), title: 'Prepararme para la próxima clase', category: 'universidad', done: false, date: todayKey },
-    { id: crypto.randomUUID(), title: 'Revisar pendientes importantes', category: 'trabajo', done: false, date: todayKey }
-  ],
-  habits: [
-    { id: crypto.randomUUID(), title: 'Leer 20 min', category: 'salud', streak: 0, bestStreak: 0, lastCompletedDate: null, completions: [] },
-    { id: crypto.randomUUID(), title: 'Avanzar 1 mejora a OpenClaw', category: 'openclaw', streak: 0, bestStreak: 0, lastCompletedDate: null, completions: [] }
-  ],
-  goals: [
-    { id: crypto.randomUUID(), title: 'Aprobar cálculo', progress: 3, target: 10, category: 'universidad', active: true },
-    { id: crypto.randomUUID(), title: 'Cerrar una skill útil', progress: 1, target: 5, category: 'skills', active: true }
-  ]
-};
-
-const els = {
-  todayDate: document.getElementById('todayDate'),
-  dailySummary: document.getElementById('dailySummary'),
-  bestStreakValue: document.getElementById('bestStreakValue'),
-  doneTodayValue: document.getElementById('doneTodayValue'),
-  habitCountValue: document.getElementById('habitCountValue'),
-  goalCountValue: document.getElementById('goalCountValue'),
-  todayProgressLabel: document.getElementById('todayProgressLabel'),
-  todayProgressBar: document.getElementById('todayProgressBar'),
-  tabs: [...document.querySelectorAll('.tab')],
-  panels: [...document.querySelectorAll('.tab-panel')],
-  remindersList: document.getElementById('remindersList'),
-  habitsList: document.getElementById('habitsList'),
-  goalsList: document.getElementById('goalsList'),
-  todayTodos: document.getElementById('todayTodos'),
-  recentActivity: document.getElementById('recentActivity'),
-  habitHeatmap: document.getElementById('habitHeatmap'),
-  reminderForm: document.getElementById('reminderForm'),
-  habitForm: document.getElementById('habitForm'),
-  goalForm: document.getElementById('goalForm'),
-  todoDialog: document.getElementById('todoDialog'),
-  todoForm: document.getElementById('todoForm'),
-  addTodayTodoBtn: document.getElementById('addTodayTodoBtn'),
-  seedBtn: document.getElementById('seedBtn'),
-  resetDayBtn: document.getElementById('resetDayBtn')
-};
-
-const baseState = {
-  categories: defaultCategories,
-  reminders: [],
-  todos: [],
+const categories = ['universidad', 'trabajo', 'openclaw', 'skills', 'salud', 'personal', 'focus'];
+const defaultState = {
   habits: [],
-  goals: [],
-  activity: []
+  tasks: [],
+  events: [],
+  journal: [],
+  focus: { intent: '', totalMinutes: 0, sessions: 0, timerSecondsLeft: 1500, isRunning: false, lastTickAt: null },
 };
-
-const loadState = () => {
-  const saved = localStorage.getItem(STORAGE_KEY);
-  if (!saved) return structuredClone(baseState);
-  try {
-    return { ...structuredClone(baseState), ...JSON.parse(saved) };
-  } catch {
-    return structuredClone(baseState);
-  }
+const presets = {
+  habits: [
+    { text: 'Leer 20 minutos', category: 'salud', frequency: 'daily' },
+    { text: 'No fumar hoy', category: 'salud', frequency: 'daily' },
+    { text: 'Revisar una tarea de la U', category: 'universidad', frequency: 'daily' },
+  ],
+  tasks: [
+    { text: 'Cerrar pendiente urgente de universidad', category: 'universidad', priority: 'high', dueDate: todayKey },
+    { text: 'Mover barbershop una etapa más', category: 'trabajo', priority: 'high', dueDate: todayKey },
+    { text: 'Pulir una mejora de OpenClaw', category: 'openclaw', priority: 'medium', dueDate: '' },
+  ],
 };
-
+const els = {
+  screens: document.querySelectorAll('.screen'),
+  navBtns: document.querySelectorAll('.nav-btn'),
+  todayLabel: document.querySelector('#todayLabel'),
+  todayMessage: document.querySelector('#todayMessage'),
+  dailyScore: document.querySelector('#dailyScore'),
+  pendingCount: document.querySelector('#pendingCount'),
+  doneHabitsCount: document.querySelector('#doneHabitsCount'),
+  focusMinutesToday: document.querySelector('#focusMinutesToday'),
+  todaySummary: document.querySelector('#todaySummary'),
+  calendarPreview: document.querySelector('#calendarPreview'),
+  habitForm: document.querySelector('#habitForm'),
+  habitInput: document.querySelector('#habitInput'),
+  habitCategory: document.querySelector('#habitCategory'),
+  habitFrequency: document.querySelector('#habitFrequency'),
+  habitList: document.querySelector('#habitList'),
+  seedHabitsBtn: document.querySelector('#seedHabitsBtn'),
+  taskForm: document.querySelector('#taskForm'),
+  taskInput: document.querySelector('#taskInput'),
+  taskCategory: document.querySelector('#taskCategory'),
+  taskPriority: document.querySelector('#taskPriority'),
+  taskDate: document.querySelector('#taskDate'),
+  taskList: document.querySelector('#taskList'),
+  seedTasksBtn: document.querySelector('#seedTasksBtn'),
+  eventForm: document.querySelector('#eventForm'),
+  eventTitle: document.querySelector('#eventTitle'),
+  eventTime: document.querySelector('#eventTime'),
+  eventTag: document.querySelector('#eventTag'),
+  eventList: document.querySelector('#eventList'),
+  focusIntent: document.querySelector('#focusIntent'),
+  focusTimerLabel: document.querySelector('#focusTimerLabel'),
+  focusStateLabel: document.querySelector('#focusStateLabel'),
+  startFocusBtn: document.querySelector('#startFocusBtn'),
+  pauseFocusBtn: document.querySelector('#pauseFocusBtn'),
+  resetFocusBtn: document.querySelector('#resetFocusBtn'),
+  focusSessionsCount: document.querySelector('#focusSessionsCount'),
+  focusMinutesTotal: document.querySelector('#focusMinutesTotal'),
+  journalForm: document.querySelector('#journalForm'),
+  journalMood: document.querySelector('#journalMood'),
+  journalWins: document.querySelector('#journalWins'),
+  journalNotes: document.querySelector('#journalNotes'),
+  journalList: document.querySelector('#journalList'),
+  insightTaskRate: document.querySelector('#insightTaskRate'),
+  insightHabitRate: document.querySelector('#insightHabitRate'),
+  insightFocusRate: document.querySelector('#insightFocusRate'),
+  insightJournalCount: document.querySelector('#insightJournalCount'),
+  insightHighlights: document.querySelector('#insightHighlights'),
+  installBtn: document.querySelector('#installBtn'),
+};
 let state = loadState();
-const saveState = () => localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-const getCategory = (id) => state.categories.find(cat => cat.id === id) || state.categories[0];
-const formatDate = () => new Intl.DateTimeFormat('es-CL', { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date());
-const formatActivityDate = value => new Intl.DateTimeFormat('es-CL', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }).format(new Date(value));
-const escapeHtml = value => value.replace(/[&<>\"]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m]));
+let deferredPrompt;
+let focusInterval = null;
 
-function addActivity(text) {
-  state.activity = [{ id: crypto.randomUUID(), text, at: new Date().toISOString() }, ...(state.activity || [])].slice(0, 20);
+function uid() {
+  return Math.random().toString(36).slice(2, 10);
 }
-
-function fillCategorySelects() {
-  const options = state.categories.map(cat => `<option value="${cat.id}">${cat.emoji} ${cat.name}</option>`).join('');
-  ['reminderCategory', 'habitCategory', 'todoCategory'].forEach(id => {
-    document.getElementById(id).innerHTML = options;
-  });
-}
-
-function getTodayTodos() {
-  return state.todos.filter(todo => todo.date === todayKey);
-}
-
-function getDoneTodayCount() {
-  return getTodayTodos().filter(todo => todo.done).length;
-}
-
-function getTodayProgress() {
-  const todos = getTodayTodos();
-  if (!todos.length) return 0;
-  return Math.round((todos.filter(todo => todo.done).length / todos.length) * 100);
-}
-
-function renderSummary() {
-  const todayTodos = getTodayTodos();
-  const done = getDoneTodayCount();
-  const streaks = state.habits.map(h => h.bestStreak || 0);
-  const progress = getTodayProgress();
-  const activeGoals = state.goals.filter(goal => goal.active).length;
-  els.todayDate.textContent = formatDate();
-  els.dailySummary.textContent = `${done}/${todayTodos.length || 0} tareas hechas hoy · ${state.reminders.length} recordatorios pendientes`;
-  els.bestStreakValue.textContent = streaks.length ? Math.max(...streaks) : 0;
-  els.doneTodayValue.textContent = done;
-  els.habitCountValue.textContent = state.habits.length;
-  els.goalCountValue.textContent = activeGoals;
-  els.todayProgressLabel.textContent = `${progress}%`;
-  els.todayProgressBar.style.width = `${progress}%`;
-}
-
-function renderRecentActivity() {
-  const activity = state.activity || [];
-  if (!activity.length) {
-    els.recentActivity.innerHTML = `<div class="item compact"><p class="muted">Todavía no hay actividad. Cuando avances, aparecerá aquí.</p></div>`;
-    return;
+function loadState() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    return saved ? { ...structuredClone(defaultState), ...saved, focus: { ...defaultState.focus, ...(saved.focus || {}) } } : structuredClone(defaultState);
+  } catch {
+    return structuredClone(defaultState);
   }
-  els.recentActivity.innerHTML = activity.slice(0, 6).map(item => `
-    <article class="item compact">
-      <strong>${escapeHtml(item.text)}</strong>
-      <p class="muted tiny">${formatActivityDate(item.at)}</p>
-    </article>
-  `).join('');
 }
-
-function renderTodos() {
-  const todayTodos = getTodayTodos();
-  if (!todayTodos.length) {
-    els.todayTodos.innerHTML = `<div class="item"><p class="muted">No tienes tareas para hoy. Agrega una y parte por ahí.</p></div>`;
-    return;
-  }
-  els.todayTodos.innerHTML = todayTodos.map(todo => {
-    const cat = getCategory(todo.category);
-    return `
-      <article class="item">
-        <div class="item-top">
-          <label class="checkbox-row">
-            <input type="checkbox" ${todo.done ? 'checked' : ''} data-action="toggle-todo" data-id="${todo.id}">
-            <span class="${todo.done ? 'strike' : ''}">${escapeHtml(todo.title)}</span>
-          </label>
-          <span class="chip">${cat.emoji} ${cat.name}</span>
-        </div>
-      </article>`;
-  }).join('');
+function saveState() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
-
-function renderReminders() {
-  if (!state.reminders.length) {
-    els.remindersList.innerHTML = `<div class="item"><p class="muted">Sin recordatorios. Bien.</p></div>`;
-    return;
-  }
-  els.remindersList.innerHTML = state.reminders.map(reminder => {
-    const cat = getCategory(reminder.category);
-    return `
-      <article class="item compact">
-        <div class="item-top">
-          <div>
-            <strong>${escapeHtml(reminder.title)}</strong>
-            <p class="muted tiny">${cat.emoji} ${cat.name}</p>
-          </div>
-          <button class="ghost-btn" data-action="promote-reminder" data-id="${reminder.id}">Hoy</button>
-        </div>
-      </article>`;
-  }).join('');
+function formatToday() {
+  els.todayLabel.textContent = new Intl.DateTimeFormat('es-CL', { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date());
 }
+function escapeHtml(text) {
+  return text.replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
+}
+function emptyCard(text) {
+  return `<div class="empty">${text}</div>`;
+}
+function renderToday() {
+  const pendingTasks = state.tasks.filter((task) => !task.done);
+  const doneHabits = state.habits.filter((habit) => habit.doneDates?.includes(todayKey));
+  const focusToday = state.focus.totalMinutes;
+  const score = pendingTasks.length === 0 ? 92 : Math.max(35, 100 - pendingTasks.length * 9 + doneHabits.length * 6 + Math.floor(focusToday / 10));
+  els.dailyScore.textContent = score;
+  els.pendingCount.textContent = pendingTasks.length;
+  els.doneHabitsCount.textContent = doneHabits.length;
+  els.focusMinutesToday.textContent = focusToday;
+  els.todayMessage.textContent = pendingTasks.length ? `Tienes ${pendingTasks.length} frentes activos. Si eliges uno bien, ya ganaste el día.` : 'Buen ritmo. Hoy se ve despejado y ordenado.';
 
+  const summaryItems = [
+    pendingTasks[0] ? `Prioridad: ${pendingTasks[0].text}` : 'No hay tareas urgentes cargadas.',
+    doneHabits[0] ? `Hábito marcado: ${doneHabits[0].text}` : 'Todavía no marcas hábitos hoy.',
+    state.focus.intent ? `Foco actual: ${state.focus.intent}` : 'Define una intención antes de tu siguiente bloque.',
+  ];
+  els.todaySummary.innerHTML = summaryItems.map((item) => `<article class="stack-item"><p>${escapeHtml(item)}</p></article>`).join('');
+
+  const nextEvents = [...state.events].sort((a, b) => a.time.localeCompare(b.time)).slice(0, 3);
+  els.calendarPreview.innerHTML = nextEvents.length
+    ? nextEvents.map((event) => `<article class="stack-item"><div class="row-inline"><strong>${escapeHtml(event.title)}</strong><span class="badge">${event.time}</span></div><div class="badges"><span class="badge">${event.tag}</span></div></article>`).join('')
+    : emptyCard('No tienes bloques cargados todavía.');
+}
 function renderHabits() {
   if (!state.habits.length) {
-    els.habitsList.innerHTML = `<div class="item"><p class="muted">Aún no tienes hábitos. Crea uno pequeño y sostenible.</p></div>`;
+    els.habitList.innerHTML = emptyCard('Sin hábitos aún.');
     return;
   }
-  els.habitsList.innerHTML = state.habits.map(habit => {
-    const cat = getCategory(habit.category);
-    const completedToday = habit.lastCompletedDate === todayKey;
-    return `
-      <article class="item">
-        <div class="item-top">
-          <div>
-            <strong>${escapeHtml(habit.title)}</strong>
-            <p class="muted tiny">${cat.emoji} ${cat.name}</p>
-          </div>
-          <span class="badge">🔥 ${habit.streak}</span>
-        </div>
-        <div class="item-actions">
-          <button class="primary-btn" data-action="complete-habit" data-id="${habit.id}" ${completedToday ? 'disabled' : ''}>${completedToday ? 'Hecho hoy' : 'Marcar hoy'}</button>
-        </div>
-      </article>`;
+  els.habitList.innerHTML = state.habits.map((habit) => {
+    const doneToday = (habit.doneDates || []).includes(todayKey);
+    return `<article class="stack-item">
+      <div class="stack-item-top"><strong>${escapeHtml(habit.text)}</strong><span class="badge">${habit.frequency === 'daily' ? 'Diario' : 'Semanal'}</span></div>
+      <div class="badges"><span class="badge">${habit.category}</span><span class="badge">🔥 ${habit.streak || 0} días</span><span class="badge">${doneToday ? 'hecho hoy' : 'pendiente'}</span></div>
+      <div class="item-actions">
+        <button type="button" class="ghost" data-action="toggle-habit" data-id="${habit.id}">${doneToday ? 'Desmarcar' : 'Marcar'}</button>
+        <button type="button" class="ghost" data-action="edit-habit" data-id="${habit.id}">Editar</button>
+        <button type="button" class="danger" data-action="delete-habit" data-id="${habit.id}">Borrar</button>
+      </div>
+    </article>`;
   }).join('');
 }
-
-function renderHeatmap() {
-  const last14 = [];
-  for (let i = 13; i >= 0; i--) {
-    const d = new Date();
-    d.setDate(d.getDate() - i);
-    last14.push(d.toISOString().slice(0, 10));
+function renderTasks() {
+  if (!state.tasks.length) {
+    els.taskList.innerHTML = emptyCard('No hay tareas cargadas todavía.');
+    return;
   }
-  const completionSet = new Set(state.habits.flatMap(habit => habit.completions || []));
-  els.habitHeatmap.innerHTML = `
-    <div class="heatmap-grid">
-      ${last14.map(day => `<div class="heat-cell ${completionSet.has(day) ? 'active' : ''}"></div>`).join('')}
+  const sorted = [...state.tasks].sort((a, b) => Number(a.done) - Number(b.done) || ({ high: 0, medium: 1, low: 2 }[a.priority] - { high: 0, medium: 1, low: 2 }[b.priority]));
+  els.taskList.innerHTML = sorted.map((task) => `<article class="stack-item">
+    <div class="stack-item-top"><strong>${escapeHtml(task.text)}</strong><span class="badge priority-${task.priority}">${task.priority}</span></div>
+    <div class="badges"><span class="badge">${task.category}</span>${task.dueDate ? `<span class="badge">${task.dueDate}</span>` : ''}<span class="badge">${task.done ? 'done' : 'active'}</span></div>
+    <div class="item-actions">
+      <button type="button" class="ghost" data-action="toggle-task" data-id="${task.id}">${task.done ? 'Reabrir' : 'Completar'}</button>
+      <button type="button" class="ghost" data-action="edit-task" data-id="${task.id}">Editar</button>
+      <button type="button" class="danger" data-action="delete-task" data-id="${task.id}">Borrar</button>
     </div>
-    <p class="muted tiny">Últimos 14 días de consistencia.</p>
-  `;
+  </article>`).join('');
 }
-
-function renderGoals() {
-  if (!state.goals.length) {
-    els.goalsList.innerHTML = `<div class="item"><p class="muted">Aún no tienes objetivos. Agrega una meta importante.</p></div>`;
+function renderEvents() {
+  if (!state.events.length) {
+    els.eventList.innerHTML = emptyCard('Sin eventos todavía.');
     return;
   }
-  els.goalsList.innerHTML = state.goals.map(goal => {
-    const pct = Math.min(Math.round((goal.progress / goal.target) * 100), 100);
-    const cat = getCategory(goal.category);
-    return `
-      <article class="item">
-        <div class="item-top">
-          <div>
-            <strong>${escapeHtml(goal.title)}</strong>
-            <p class="muted tiny">${cat.emoji} ${cat.name}</p>
-          </div>
-          <span class="badge">${pct}%</span>
-        </div>
-        <div class="progress-line"><span style="width:${pct}%"></span></div>
-        <div class="item-actions">
-          <button class="ghost-btn" data-action="goal-minus" data-id="${goal.id}">-</button>
-          <button class="primary-btn" data-action="goal-plus" data-id="${goal.id}">Actualizar</button>
-        </div>
-      </article>`;
-  }).join('');
+  els.eventList.innerHTML = [...state.events].sort((a, b) => a.time.localeCompare(b.time)).map((event) => `<article class="stack-item">
+    <div class="stack-item-top"><strong>${escapeHtml(event.title)}</strong><span class="badge">${event.time}</span></div>
+    <div class="badges"><span class="badge">${event.tag}</span></div>
+    <div class="item-actions">
+      <button type="button" class="ghost" data-action="delete-event" data-id="${event.id}">Borrar</button>
+    </div>
+  </article>`).join('');
 }
+function renderJournal() {
+  if (!state.journal.length) {
+    els.journalList.innerHTML = emptyCard('Tu journal está vacío por ahora.');
+    return;
+  }
+  els.journalList.innerHTML = [...state.journal].reverse().map((entry) => `<article class="stack-item">
+    <div class="stack-item-top"><strong>${escapeHtml(entry.mood)}</strong><span class="badge">${entry.date}</span></div>
+    <p>${escapeHtml(entry.wins || 'Sin wins anotados.')}</p>
+    <p class="subtitle">${escapeHtml(entry.notes || 'Sin notas extra.')}</p>
+  </article>`).join('');
+}
+function renderInsights() {
+  const totalTasks = state.tasks.length;
+  const doneTasks = state.tasks.filter((task) => task.done).length;
+  const totalHabits = state.habits.length;
+  const doneHabits = state.habits.filter((habit) => habit.doneDates?.includes(todayKey)).length;
+  els.insightTaskRate.textContent = totalTasks ? `${Math.round((doneTasks / totalTasks) * 100)}%` : '0%';
+  els.insightHabitRate.textContent = totalHabits ? `${Math.round((doneHabits / totalHabits) * 100)}%` : '0%';
+  els.insightFocusRate.textContent = state.focus.totalMinutes;
+  els.insightJournalCount.textContent = state.journal.length;
 
-function renderAll() {
-  fillCategorySelects();
-  renderSummary();
-  renderTodos();
-  renderReminders();
+  const highlights = [
+    doneTasks ? `Has completado ${doneTasks} tarea${doneTasks === 1 ? '' : 's'}.` : 'Todavía no completas tareas.',
+    doneHabits ? `Llevas ${doneHabits} hábito${doneHabits === 1 ? '' : 's'} marcados hoy.` : 'Te falta activar los hábitos de hoy.',
+    state.focus.sessions ? `Ya hiciste ${state.focus.sessions} sesión${state.focus.sessions === 1 ? '' : 'es'} de foco.` : 'Todavía no haces una sesión de foco.',
+  ];
+  els.insightHighlights.innerHTML = highlights.map((item) => `<article class="stack-item"><p>${escapeHtml(item)}</p></article>`).join('');
+}
+function renderFocus() {
+  const mins = Math.floor(state.focus.timerSecondsLeft / 60).toString().padStart(2, '0');
+  const secs = (state.focus.timerSecondsLeft % 60).toString().padStart(2, '0');
+  els.focusTimerLabel.textContent = `${mins}:${secs}`;
+  els.focusStateLabel.textContent = state.focus.isRunning ? `En curso: ${state.focus.intent || 'bloque de foco'}` : (state.focus.intent ? `Listo para: ${state.focus.intent}` : 'Sesión lista');
+  els.focusIntent.value = state.focus.intent || '';
+  els.focusSessionsCount.textContent = state.focus.sessions || 0;
+  els.focusMinutesTotal.textContent = state.focus.totalMinutes || 0;
+}
+function render() {
+  renderToday();
   renderHabits();
-  renderHeatmap();
-  renderGoals();
-  renderRecentActivity();
+  renderTasks();
+  renderEvents();
+  renderFocus();
+  renderJournal();
+  renderInsights();
   saveState();
 }
-
-els.tabs.forEach(tab => tab.addEventListener('click', () => {
-  els.tabs.forEach(t => t.classList.toggle('active', t === tab));
-  els.panels.forEach(panel => panel.classList.toggle('active', panel.id === tab.dataset.tab));
-}));
-
-els.reminderForm.addEventListener('submit', e => {
-  e.preventDefault();
-  const title = reminderTitle.value.trim();
-  if (!title) return;
-  state.reminders.unshift({ id: crypto.randomUUID(), title, category: reminderCategory.value, createdAt: todayKey });
-  addActivity(`Nuevo recordatorio: ${title}`);
-  e.target.reset();
-  renderAll();
-});
-
-els.habitForm.addEventListener('submit', e => {
-  e.preventDefault();
-  const title = habitTitle.value.trim();
-  if (!title) return;
-  state.habits.unshift({ id: crypto.randomUUID(), title, category: habitCategory.value, streak: 0, bestStreak: 0, lastCompletedDate: null, completions: [] });
-  addActivity(`Nuevo hábito: ${title}`);
-  e.target.reset();
-  renderAll();
-});
-
-els.goalForm.addEventListener('submit', e => {
-  e.preventDefault();
-  const title = goalTitle.value.trim();
-  if (!title) return;
-  state.goals.unshift({ id: crypto.randomUUID(), title, progress: 0, target: Number(goalTarget.value) || 10, category: 'trabajo', active: true });
-  addActivity(`Nuevo objetivo: ${title}`);
-  e.target.reset();
-  goalTarget.value = 10;
-  renderAll();
-});
-
-els.addTodayTodoBtn.addEventListener('click', () => els.todoDialog.showModal());
-els.todoForm.addEventListener('submit', e => {
-  e.preventDefault();
-  const title = todoTitle.value.trim();
-  if (!title) return;
-  state.todos.unshift({ id: crypto.randomUUID(), title, category: todoCategory.value, done: false, date: todayKey });
-  addActivity(`Nueva tarea: ${title}`);
-  els.todoDialog.close();
-  e.target.reset();
-  renderAll();
-});
-
-els.seedBtn.addEventListener('click', () => {
-  state = {
-    ...state,
-    reminders: [...state.reminders, ...presetData.reminders],
-    todos: [...state.todos, ...presetData.todos],
-    habits: [...state.habits, ...presetData.habits],
-    goals: [...state.goals, ...presetData.goals]
-  };
-  addActivity('Se cargaron presets iniciales');
-  renderAll();
-});
-
-els.resetDayBtn.addEventListener('click', () => {
-  state.todos = state.todos.map(todo => todo.date === todayKey ? { ...todo, done: false } : todo);
-  addActivity('Se reseteó el estado del día');
-  renderAll();
-});
-
-document.addEventListener('click', e => {
-  const btn = e.target.closest('[data-action]');
-  if (!btn) return;
-  const { action, id } = btn.dataset;
-
-  if (action === 'promote-reminder') {
-    const reminder = state.reminders.find(item => item.id === id);
-    if (reminder) {
-      state.reminders = state.reminders.filter(item => item.id !== id);
-      state.todos.unshift({ id: crypto.randomUUID(), title: reminder.title, category: reminder.category, done: false, date: todayKey });
-      addActivity(`Recordatorio pasado a hoy: ${reminder.title}`);
-    }
-  }
-
-  if (action === 'complete-habit') {
-    state.habits = state.habits.map(habit => {
-      if (habit.id !== id) return habit;
-      const streak = habit.lastCompletedDate === yesterdayKey ? habit.streak + 1 : habit.lastCompletedDate === todayKey ? habit.streak : 1;
-      const bestStreak = Math.max(habit.bestStreak || 0, streak);
-      addActivity(`Hábito completado: ${habit.title}`);
-      return { ...habit, streak, bestStreak, lastCompletedDate: todayKey, completions: [...(habit.completions || []), todayKey].slice(-60) };
-    });
-  }
-
-  if (action === 'goal-plus') {
-    state.goals = state.goals.map(goal => goal.id === id ? { ...goal, progress: Math.min(goal.progress + 1, goal.target) } : goal);
-    addActivity('Objetivo actualizado');
-  }
-
-  if (action === 'goal-minus') {
-    state.goals = state.goals.map(goal => goal.id === id ? { ...goal, progress: Math.max(goal.progress - 1, 0) } : goal);
-  }
-
-  renderAll();
-});
-
-document.addEventListener('change', e => {
-  const checkbox = e.target.closest('[data-action="toggle-todo"]');
-  if (!checkbox) return;
-  state.todos = state.todos.map(todo => {
-    if (todo.id !== checkbox.dataset.id) return todo;
-    const nextDone = checkbox.checked;
-    if (nextDone && !todo.done) addActivity(`Tarea completada: ${todo.title}`);
-    return { ...todo, done: nextDone };
-  });
-  renderAll();
-});
-
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.getRegistrations().then(registrations => {
-    registrations.forEach(registration => registration.unregister());
-  }).catch(() => {});
+function addHabit(text, category, frequency) {
+  state.habits.unshift({ id: uid(), text, category, frequency, streak: 0, doneDates: [] });
+  render();
 }
-
-renderAll();
+function addTask(text, category, priority, dueDate) {
+  state.tasks.unshift({ id: uid(), text, category, priority, dueDate, done: false });
+  render();
+}
+function addEvent(title, time, tag) {
+  state.events.push({ id: uid(), title, time, tag });
+  render();
+}
+function addJournal(mood, wins, notes) {
+  state.journal.push({ id: uid(), date: todayKey, mood, wins, notes });
+  render();
+}
+function seed(kind) {
+  presets[kind].forEach((item) => {
+    if (kind === 'habits' && !state.habits.some((habit) => habit.text === item.text)) addHabit(item.text, item.category, item.frequency);
+    if (kind === 'tasks' && !state.tasks.some((task) => task.text === item.text)) addTask(item.text, item.category, item.priority, item.dueDate);
+  });
+}
+function toggleHabit(id) {
+  state.habits = state.habits.map((habit) => {
+    if (habit.id !== id) return habit;
+    const doneDates = new Set(habit.doneDates || []);
+    if (doneDates.has(todayKey)) {
+      doneDates.delete(todayKey);
+      return { ...habit, doneDates: [...doneDates] };
+    }
+    const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+    const continued = doneDates.has(yesterday);
+    doneDates.add(todayKey);
+    return { ...habit, doneDates: [...doneDates], streak: continued ? (habit.streak || 0) + 1 : 1 };
+  });
+  render();
+}
+function toggleTask(id) {
+  state.tasks = state.tasks.map((task) => task.id === id ? { ...task, done: !task.done } : task);
+  render();
+}
+function deleteBy(collection, id) {
+  state[collection] = state[collection].filter((item) => item.id !== id);
+  render();
+}
+function editEntity(collection, id, fields) {
+  const item = state[collection].find((entry) => entry.id === id);
+  if (!item) return;
+  const updated = { ...item };
+  fields.forEach(({ key, label }) => {
+    const nextValue = window.prompt(label, updated[key] || '');
+    if (nextValue === null) return;
+    updated[key] = nextValue.trim();
+  });
+  state[collection] = state[collection].map((entry) => entry.id === id ? updated : entry);
+  render();
+}
+function handleListClick(event) {
+  const action = event.target.dataset.action;
+  const id = event.target.dataset.id;
+  if (!action || !id) return;
+  if (action === 'toggle-habit') return toggleHabit(id);
+  if (action === 'delete-habit') return deleteBy('habits', id);
+  if (action === 'edit-habit') return editEntity('habits', id, [{ key: 'text', label: 'Editar hábito' }, { key: 'category', label: 'Categoría' }]);
+  if (action === 'toggle-task') return toggleTask(id);
+  if (action === 'delete-task') return deleteBy('tasks', id);
+  if (action === 'edit-task') return editEntity('tasks', id, [{ key: 'text', label: 'Editar tarea' }, { key: 'priority', label: 'Prioridad (high/medium/low)' }, { key: 'dueDate', label: 'Fecha (YYYY-MM-DD)' }]);
+  if (action === 'delete-event') return deleteBy('events', id);
+}
+function setupNavigation() {
+  els.navBtns.forEach((btn) => btn.addEventListener('click', () => {
+    els.navBtns.forEach((item) => item.classList.toggle('active', item === btn));
+    els.screens.forEach((screen) => screen.classList.toggle('active', screen.id === btn.dataset.screen));
+  }));
+}
+function setupForms() {
+  els.habitForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    addHabit(els.habitInput.value.trim(), els.habitCategory.value, els.habitFrequency.value);
+    els.habitForm.reset();
+  });
+  els.taskForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    addTask(els.taskInput.value.trim(), els.taskCategory.value, els.taskPriority.value, els.taskDate.value);
+    els.taskForm.reset();
+  });
+  els.eventForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    addEvent(els.eventTitle.value.trim(), els.eventTime.value, els.eventTag.value);
+    els.eventForm.reset();
+  });
+  els.journalForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    addJournal(els.journalMood.value, els.journalWins.value.trim(), els.journalNotes.value.trim());
+    els.journalForm.reset();
+  });
+}
+function tickFocus() {
+  if (!state.focus.isRunning) return;
+  if (state.focus.timerSecondsLeft <= 0) {
+    state.focus.isRunning = false;
+    state.focus.sessions += 1;
+    state.focus.totalMinutes += 25;
+    state.focus.timerSecondsLeft = 1500;
+    clearInterval(focusInterval);
+    focusInterval = null;
+    render();
+    return;
+  }
+  state.focus.timerSecondsLeft -= 1;
+  renderFocus();
+  saveState();
+}
+function setupFocus() {
+  els.focusIntent.addEventListener('input', (event) => {
+    state.focus.intent = event.target.value;
+    saveState();
+    renderFocus();
+  });
+  els.startFocusBtn.addEventListener('click', () => {
+    if (state.focus.isRunning) return;
+    state.focus.isRunning = true;
+    if (focusInterval) clearInterval(focusInterval);
+    focusInterval = setInterval(tickFocus, 1000);
+    renderFocus();
+    saveState();
+  });
+  els.pauseFocusBtn.addEventListener('click', () => {
+    state.focus.isRunning = false;
+    if (focusInterval) clearInterval(focusInterval);
+    focusInterval = null;
+    renderFocus();
+    saveState();
+  });
+  els.resetFocusBtn.addEventListener('click', () => {
+    state.focus.isRunning = false;
+    state.focus.timerSecondsLeft = 1500;
+    if (focusInterval) clearInterval(focusInterval);
+    focusInterval = null;
+    renderFocus();
+    saveState();
+  });
+}
+function setupPresets() {
+  els.seedHabitsBtn.addEventListener('click', () => seed('habits'));
+  els.seedTasksBtn.addEventListener('click', () => seed('tasks'));
+  [els.habitList, els.taskList, els.eventList].forEach((list) => list.addEventListener('click', handleListClick));
+}
+function setupPWA() {
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js');
+  window.addEventListener('beforeinstallprompt', (event) => {
+    event.preventDefault();
+    deferredPrompt = event;
+    els.installBtn.classList.remove('hidden');
+  });
+  els.installBtn.addEventListener('click', async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    els.installBtn.classList.add('hidden');
+  });
+}
+formatToday();
+setupNavigation();
+setupForms();
+setupFocus();
+setupPresets();
+setupPWA();
+render();

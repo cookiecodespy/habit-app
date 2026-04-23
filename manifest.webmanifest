@@ -1,14 +1,15 @@
 {
   "name": "Boss Mode",
   "short_name": "Boss Mode",
-  "description": "Hábitos, TODOs y recompensas para el día a día.",
+  "description": "Tu Life OS personal para tareas, hábitos, foco y claridad.",
   "start_url": ".",
   "display": "standalone",
-  "background_color": "#020617",
-  "theme_color": "#0f172a",
+  "background_color": "#eef2ff",
+  "theme_color": "#f5f7fb",
+  "lang": "es-CL",
   "icons": [
     {
-      "src": "assets/icons/icon.svg",
+      "src": "assets/icon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"

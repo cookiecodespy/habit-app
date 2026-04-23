@@ -1,41 +1,33 @@
-# Boss Mode
+# Tomas Flow
 
-App web minimalista, mobile-first, pensada para Tomas. Sirve como sistema diario con recordatorios, TODOs, hábitos con racha y premios.
+App web estática, mobile-first y lista para GitHub Pages.
 
-## Qué incluye
-- Recordatorios que se convierten en TODOs del día
-- TODOs con checkbox y puntos
-- Hábitos con racha actual y mejor racha
-- Premios canjeables con puntos
-- Categorías base: Universidad, Trabajo, OpenClaw, Skills y Salud
-- Persistencia local con `localStorage`
-- PWA básica: manifest + service worker
+## Incluye
+- recordatorios convertidos en TODOs con checkbox
+- hábitos con racha diaria
+- premios simples canjeables por puntos
+- presets para universidad, trabajo, OpenClaw, skills y salud
+- persistencia local con `localStorage`
+- PWA básica con `manifest.webmanifest` y `service worker`
 
-## Cómo abrir local
-Como es un sitio estático, puedes abrir `index.html` o servirlo con un server simple:
+## Abrir localmente
+- Simple: abre `index.html` en el navegador
+- Recomendado para probar PWA: `python3 -m http.server 8000` y luego `http://localhost:8000`
 
-```bash
-cd /home/tomas/habit-app
-python3 -m http.server 4173
-```
+## Deploy en GitHub Pages
+1. Crea un repo nuevo en GitHub.
+2. Sube el contenido de esta carpeta al branch `main`.
+3. Ve a **Settings → Pages**.
+4. Elige **Deploy from a branch**.
+5. Selecciona `main` y `/ (root)`.
+6. Guarda y espera la URL publicada.
 
-Luego abrir `http://localhost:4173`
+## Estructura
+- `index.html`
+- `styles.css`
+- `app.js`
+- `manifest.webmanifest`
+- `sw.js`
+- `assets/icon.svg`
 
-## Deploy recomendado
-### Opción recomendada: Cloudflare Pages
-1. Subir esta carpeta a un repo GitHub privado o público.
-2. Conectar el repo a Cloudflare Pages.
-3. Framework preset: None.
-4. Build command: vacío.
-5. Output directory: `/`
-6. Proteger acceso con Cloudflare Access si quieres que sea solo para ti.
-
-## GitHub Pages
-También funciona en GitHub Pages, pero no es ideal si quieres acceso privado.
-
-## Próximas mejoras sugeridas
-- Vista semanal
-- Modo dejar de fumar con contador de días y ahorro estimado
-- Recordatorios por hora
-- Exportar/importar datos
-- Sincronización futura
+Los datos se guardan sólo en el navegador del dispositivo usando `localStorage`.

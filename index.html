@@ -1,171 +1,233 @@
 <!doctype html>
 <html lang="es">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#0f172a">
-  <title>Boss Mode</title>
-  <meta name="description" content="Tu sistema diario para hábitos, tareas y objetivos.">
-  <link rel="manifest" href="manifest.webmanifest">
-  <link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-  <div class="app-shell">
-    <header class="topbar glass">
-      <div>
-        <p class="eyebrow">Boss Mode v5.0</p>
-        <h1>Simple, claro, diario</h1>
-        <div class="release-badge">Refined build · v5.0</div>
-      </div>
-      <div class="topbar-actions">
-        <button id="seedBtn" class="ghost-btn">Presets</button>
-        <button id="resetDayBtn" class="ghost-btn danger-btn">Reset</button>
-      </div>
-    </header>
-
-    <main class="content">
-      <section class="hero card gradient">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#f5f7fb" />
+    <meta name="description" content="Boss Mode, tu Life OS personal para hábitos, foco, tareas y claridad diaria." />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" href="assets/icon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="styles.css" />
+    <title>Boss Mode</title>
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="app-header glass">
         <div>
-          <p class="eyebrow">Hoy</p>
-          <h2 id="todayDate"></h2>
-          <p id="dailySummary" class="muted"></p>
-          <div class="progress-block">
-            <div class="progress-copy">
-              <span>Progreso diario</span>
-              <strong id="todayProgressLabel">0%</strong>
-            </div>
-            <div class="progress-line large"><span id="todayProgressBar" style="width:0%"></span></div>
-          </div>
+          <p class="eyebrow">Boss Mode</p>
+          <h1>Tu sistema personal</h1>
+          <p class="subtitle" id="todayLabel"></p>
         </div>
-        <div class="hero-stats">
-          <div class="stat-pill">
-            <span>Hechas hoy</span>
-            <strong id="doneTodayValue">0</strong>
-          </div>
-          <div class="stat-pill">
-            <span>Hábitos activos</span>
-            <strong id="habitCountValue">0</strong>
-          </div>
-          <div class="stat-pill">
-            <span>Mejor racha</span>
-            <strong id="bestStreakValue">0</strong>
-          </div>
-          <div class="stat-pill">
-            <span>Objetivos activos</span>
-            <strong id="goalCountValue">0</strong>
-          </div>
-        </div>
-      </section>
+        <button id="installBtn" class="ghost hidden">Instalar</button>
+      </header>
 
-      <nav class="tabs glass" aria-label="Secciones">
-        <button class="tab active" data-tab="today">Hoy</button>
-        <button class="tab" data-tab="habits">Hábitos</button>
-        <button class="tab" data-tab="goals">Objetivos</button>
+      <main class="phone-frame">
+        <section class="screen active" id="today">
+          <div class="hero-card gradient-card">
+            <div>
+              <p class="section-kicker">Today</p>
+              <h2>Buenos impulsos, menos fricción</h2>
+              <p id="todayMessage" class="body-copy"></p>
+            </div>
+            <div class="hero-score">
+              <span id="dailyScore">0</span>
+              <small>score diario</small>
+            </div>
+          </div>
+
+          <div class="stat-row">
+            <article class="mini-card glass"><span id="pendingCount">0</span><small>Pendientes</small></article>
+            <article class="mini-card glass"><span id="doneHabitsCount">0</span><small>Hábitos</small></article>
+            <article class="mini-card glass"><span id="focusMinutesToday">0</span><small>Focus min</small></article>
+          </div>
+
+          <section class="glass section-card">
+            <div class="section-head">
+              <div>
+                <p class="section-kicker">Radar</p>
+                <h3>Lo importante de hoy</h3>
+              </div>
+            </div>
+            <div id="todaySummary" class="stack-list"></div>
+          </section>
+
+          <section class="glass section-card">
+            <div class="section-head">
+              <div>
+                <p class="section-kicker">Próximo</p>
+                <h3>Agenda rápida</h3>
+              </div>
+            </div>
+            <div id="calendarPreview" class="stack-list"></div>
+          </section>
+        </section>
+
+        <section class="screen" id="habits">
+          <section class="glass section-card">
+            <div class="section-head">
+              <div>
+                <p class="section-kicker">Habits</p>
+                <h3>Ritmo y consistencia</h3>
+              </div>
+              <button id="seedHabitsBtn" class="ghost">Presets</button>
+            </div>
+            <form id="habitForm" class="stack-form">
+              <input id="habitInput" type="text" placeholder="Nuevo hábito" maxlength="120" required />
+              <div class="grid-2">
+                <select id="habitCategory">
+                  <option value="salud">Salud</option>
+                  <option value="universidad">Universidad</option>
+                  <option value="trabajo">Trabajo</option>
+                  <option value="openclaw">OpenClaw</option>
+                  <option value="skills">Skills</option>
+                </select>
+                <select id="habitFrequency">
+                  <option value="daily">Diario</option>
+                  <option value="weekly">Semanal</option>
+                </select>
+              </div>
+              <button type="submit">Guardar hábito</button>
+            </form>
+            <div id="habitList" class="stack-list"></div>
+          </section>
+        </section>
+
+        <section class="screen" id="tasks">
+          <section class="glass section-card">
+            <div class="section-head">
+              <div>
+                <p class="section-kicker">Tasks</p>
+                <h3>Inbox con prioridad</h3>
+              </div>
+              <button id="seedTasksBtn" class="ghost">Presets</button>
+            </div>
+            <form id="taskForm" class="stack-form">
+              <input id="taskInput" type="text" placeholder="Nueva tarea" maxlength="120" required />
+              <div class="grid-3">
+                <select id="taskCategory">
+                  <option value="universidad">Universidad</option>
+                  <option value="trabajo">Trabajo</option>
+                  <option value="openclaw">OpenClaw</option>
+                  <option value="skills">Skills</option>
+                  <option value="personal">Personal</option>
+                </select>
+                <select id="taskPriority">
+                  <option value="high">Alta</option>
+                  <option value="medium">Media</option>
+                  <option value="low">Baja</option>
+                </select>
+                <input id="taskDate" type="date" />
+              </div>
+              <button type="submit">Agregar tarea</button>
+            </form>
+            <div id="taskList" class="stack-list"></div>
+          </section>
+        </section>
+
+        <section class="screen" id="calendar">
+          <section class="glass section-card">
+            <div class="section-head">
+              <div>
+                <p class="section-kicker">Calendar</p>
+                <h3>Bloques y eventos</h3>
+              </div>
+            </div>
+            <form id="eventForm" class="stack-form">
+              <input id="eventTitle" type="text" placeholder="Nombre del bloque" maxlength="120" required />
+              <div class="grid-2">
+                <input id="eventTime" type="time" required />
+                <select id="eventTag">
+                  <option value="universidad">Universidad</option>
+                  <option value="trabajo">Trabajo</option>
+                  <option value="focus">Focus</option>
+                  <option value="personal">Personal</option>
+                </select>
+              </div>
+              <button type="submit">Añadir bloque</button>
+            </form>
+            <div id="eventList" class="stack-list"></div>
+          </section>
+        </section>
+
+        <section class="screen" id="focus">
+          <section class="glass section-card focus-card">
+            <div class="section-head">
+              <div>
+                <p class="section-kicker">Focus</p>
+                <h3>Una cosa a la vez</h3>
+              </div>
+            </div>
+            <input id="focusIntent" type="text" placeholder="¿En qué te vas a enfocar?" maxlength="120" />
+            <div class="timer-ring">
+              <span id="focusTimerLabel">25:00</span>
+              <small id="focusStateLabel">Sesión lista</small>
+            </div>
+            <div class="grid-3">
+              <button id="startFocusBtn" type="button">Iniciar</button>
+              <button id="pauseFocusBtn" type="button" class="ghost">Pausar</button>
+              <button id="resetFocusBtn" type="button" class="ghost">Reset</button>
+            </div>
+            <div class="mini-strip">
+              <article class="mini-card soft"><span id="focusSessionsCount">0</span><small>Sesiones</small></article>
+              <article class="mini-card soft"><span id="focusMinutesTotal">0</span><small>Min totales</small></article>
+            </div>
+          </section>
+        </section>
+
+        <section class="screen" id="journal">
+          <section class="glass section-card">
+            <div class="section-head">
+              <div>
+                <p class="section-kicker">Journal</p>
+                <h3>Chequeo rápido</h3>
+              </div>
+            </div>
+            <form id="journalForm" class="stack-form">
+              <select id="journalMood">
+                <option value="😮‍💨 Tranquilo">😮‍💨 Tranquilo</option>
+                <option value="🙂 Bien">🙂 Bien</option>
+                <option value="😤 Tenso">😤 Tenso</option>
+                <option value="🔥 Motivado">🔥 Motivado</option>
+                <option value="🥱 Cansado">🥱 Cansado</option>
+              </select>
+              <textarea id="journalWins" rows="3" placeholder="¿Qué salió bien?" maxlength="300"></textarea>
+              <textarea id="journalNotes" rows="4" placeholder="¿Qué quieres descargar o recordar?" maxlength="500"></textarea>
+              <button type="submit">Guardar entrada</button>
+            </form>
+            <div id="journalList" class="stack-list"></div>
+          </section>
+        </section>
+
+        <section class="screen" id="insights">
+          <section class="glass section-card">
+            <div class="section-head">
+              <div>
+                <p class="section-kicker">Insights</p>
+                <h3>Tu semana en números</h3>
+              </div>
+            </div>
+            <div class="insight-grid">
+              <article class="insight-card soft"><span id="insightTaskRate">0%</span><small>Tareas hechas</small></article>
+              <article class="insight-card soft"><span id="insightHabitRate">0%</span><small>Hábitos hoy</small></article>
+              <article class="insight-card soft"><span id="insightFocusRate">0</span><small>Min foco hoy</small></article>
+              <article class="insight-card soft"><span id="insightJournalCount">0</span><small>Entradas</small></article>
+            </div>
+            <div id="insightHighlights" class="stack-list"></div>
+          </section>
+        </section>
+      </main>
+
+      <nav class="bottom-nav glass" aria-label="Secciones principales">
+        <button class="nav-btn active" data-screen="today">Today</button>
+        <button class="nav-btn" data-screen="habits">Habits</button>
+        <button class="nav-btn" data-screen="tasks">Tasks</button>
+        <button class="nav-btn" data-screen="calendar">Calendar</button>
+        <button class="nav-btn" data-screen="focus">Focus</button>
+        <button class="nav-btn" data-screen="journal">Journal</button>
+        <button class="nav-btn" data-screen="insights">Insights</button>
       </nav>
+    </div>
 
-      <section id="today" class="tab-panel active stack">
-        <div class="card two-col">
-          <div>
-            <div class="section-head compact">
-              <div>
-                <p class="eyebrow">Foco</p>
-                <h3>Tareas del día</h3>
-              </div>
-              <button id="addTodayTodoBtn" class="primary-btn">+ Tarea</button>
-            </div>
-            <div id="todayTodos" class="list"></div>
-          </div>
-          <div>
-            <div class="section-head compact">
-              <div>
-                <p class="eyebrow">Captura rápida</p>
-                <h3>Recordatorios</h3>
-              </div>
-            </div>
-            <form id="reminderForm" class="form-grid single-col">
-              <input id="reminderTitle" type="text" placeholder="Ej: revisar cálculo antes de salir" required>
-              <select id="reminderCategory"></select>
-              <button class="primary-btn" type="submit">Guardar</button>
-            </form>
-            <div id="remindersList" class="list spaced"></div>
-          </div>
-        </div>
-      </section>
-
-      <section id="habits" class="tab-panel stack">
-        <div class="card two-col">
-          <div>
-            <div class="section-head compact">
-              <div>
-                <p class="eyebrow">Constancia</p>
-                <h3>Hábitos</h3>
-              </div>
-            </div>
-            <form id="habitForm" class="form-grid">
-              <input id="habitTitle" type="text" placeholder="Ej: leer 20 min" required>
-              <select id="habitCategory"></select>
-              <button class="primary-btn" type="submit">Crear hábito</button>
-            </form>
-            <div id="habitsList" class="list spaced"></div>
-          </div>
-          <div>
-            <div class="section-head compact">
-              <div>
-                <p class="eyebrow">Consistencia</p>
-                <h3>Heatmap</h3>
-              </div>
-            </div>
-            <div id="habitHeatmap" class="heatmap-panel"></div>
-          </div>
-        </div>
-      </section>
-
-      <section id="goals" class="tab-panel stack">
-        <div class="card two-col">
-          <div>
-            <div class="section-head compact">
-              <div>
-                <p class="eyebrow">Metas</p>
-                <h3>Objetivos importantes</h3>
-              </div>
-            </div>
-            <form id="goalForm" class="form-grid">
-              <input id="goalTitle" type="text" placeholder="Ej: aprobar cálculo" required>
-              <input id="goalTarget" type="number" min="1" step="1" value="10" title="Meta objetivo">
-              <button class="primary-btn" type="submit">Crear objetivo</button>
-            </form>
-            <div id="goalsList" class="list spaced"></div>
-          </div>
-          <div>
-            <div class="section-head compact">
-              <div>
-                <p class="eyebrow">Últimos movimientos</p>
-                <h3>Actividad reciente</h3>
-              </div>
-            </div>
-            <div id="recentActivity" class="list compact-list"></div>
-          </div>
-        </div>
-      </section>
-    </main>
-  </div>
-
-  <dialog id="todoDialog" class="todo-dialog">
-    <form method="dialog" id="todoForm" class="dialog-body">
-      <div>
-        <p class="eyebrow">Nueva tarea</p>
-        <h3>Agregar tarea del día</h3>
-      </div>
-      <input id="todoTitle" type="text" placeholder="Ej: repasar cálculo antes de salir" required>
-      <select id="todoCategory"></select>
-      <menu>
-        <button value="cancel" class="ghost-btn">Cancelar</button>
-        <button id="saveTodoBtn" value="default" class="primary-btn">Guardar</button>
-      </menu>
-    </form>
-  </dialog>
-
-  <script src="app.js"></script>
-</body>
+    <script src="app.js"></script>
+  </body>
 </html>
