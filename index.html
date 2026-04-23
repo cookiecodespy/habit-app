@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#0f172a">
   <title>Boss Mode</title>
-  <meta name="description" content="App minimalista de hábitos, recordatorios y foco para Tomas.">
+  <meta name="description" content="Tu sistema diario para hábitos, tareas y objetivos.">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="styles.css">
@@ -14,13 +14,13 @@
   <div class="app-shell">
     <header class="topbar glass">
       <div>
-        <p class="eyebrow">Boss Mode v4.0</p>
-        <h1>Tu sistema diario</h1>
-        <div class="release-badge">NEW BUILD · v4.0</div>
+        <p class="eyebrow">Boss Mode v5.0</p>
+        <h1>Simple, claro, diario</h1>
+        <div class="release-badge">Refined build · v5.0</div>
       </div>
       <div class="topbar-actions">
-        <button id="seedBtn" class="ghost-btn">Cargar presets</button>
-        <button id="resetDayBtn" class="ghost-btn danger-btn">Reset diario</button>
+        <button id="seedBtn" class="ghost-btn">Presets</button>
+        <button id="resetDayBtn" class="ghost-btn danger-btn">Reset</button>
       </div>
     </header>
 
@@ -30,10 +30,9 @@
           <p class="eyebrow">Hoy</p>
           <h2 id="todayDate"></h2>
           <p id="dailySummary" class="muted"></p>
-          <div class="hero-callout">Ahora con modo liga, perfil y ganchos para competir en el futuro.</div>
           <div class="progress-block">
             <div class="progress-copy">
-              <span>Progreso del día</span>
+              <span>Progreso diario</span>
               <strong id="todayProgressLabel">0%</strong>
             </div>
             <div class="progress-line large"><span id="todayProgressBar" style="width:0%"></span></div>
@@ -41,47 +40,28 @@
         </div>
         <div class="hero-stats">
           <div class="stat-pill">
-            <span>Puntos</span>
-            <strong id="pointsValue">0</strong>
-          </div>
-          <div class="stat-pill">
-            <span>Racha top</span>
-            <strong id="bestStreakValue">0</strong>
-          </div>
-          <div class="stat-pill">
-            <span>Completadas hoy</span>
+            <span>Hechas hoy</span>
             <strong id="doneTodayValue">0</strong>
           </div>
           <div class="stat-pill">
-            <span>Liga actual</span>
-            <strong id="leagueValue">Bronce</strong>
+            <span>Hábitos activos</span>
+            <strong id="habitCountValue">0</strong>
           </div>
-        </div>
-      </section>
-
-      <section class="card profile-strip">
-        <div>
-          <p class="eyebrow">Perfil</p>
-          <h3 id="profileName">Boss</h3>
-          <p class="muted" id="profileMood">Construyendo consistencia con estilo.</p>
-        </div>
-        <div class="profile-meta">
-          <div class="mini-stat">
-            <span>Nivel</span>
-            <strong id="levelValue">1</strong>
+          <div class="stat-pill">
+            <span>Mejor racha</span>
+            <strong id="bestStreakValue">0</strong>
           </div>
-          <div class="mini-stat">
-            <span>XP a siguiente</span>
-            <strong id="xpNextValue">100</strong>
+          <div class="stat-pill">
+            <span>Objetivos activos</span>
+            <strong id="goalCountValue">0</strong>
           </div>
         </div>
       </section>
 
       <nav class="tabs glass" aria-label="Secciones">
         <button class="tab active" data-tab="today">Hoy</button>
-        <button class="tab" data-tab="reminders">Inbox</button>
         <button class="tab" data-tab="habits">Hábitos</button>
-        <button class="tab" data-tab="rewards">Premios</button>
+        <button class="tab" data-tab="goals">Objetivos</button>
       </nav>
 
       <section id="today" class="tab-panel active stack">
@@ -89,128 +69,82 @@
           <div>
             <div class="section-head compact">
               <div>
-                <p class="eyebrow">En foco</p>
-                <h3>Tareas de hoy</h3>
+                <p class="eyebrow">Foco</p>
+                <h3>Tareas del día</h3>
               </div>
-              <button id="addTodayTodoBtn" class="primary-btn">+ Nueva tarea</button>
+              <button id="addTodayTodoBtn" class="primary-btn">+ Tarea</button>
             </div>
             <div id="todayTodos" class="list"></div>
           </div>
           <div>
             <div class="section-head compact">
               <div>
-                <p class="eyebrow">Radar</p>
-                <h3>Resumen útil</h3>
+                <p class="eyebrow">Captura rápida</p>
+                <h3>Recordatorios</h3>
               </div>
             </div>
-            <div id="insightCards" class="insight-grid"></div>
+            <form id="reminderForm" class="form-grid single-col">
+              <input id="reminderTitle" type="text" placeholder="Ej: revisar cálculo antes de salir" required>
+              <select id="reminderCategory"></select>
+              <button class="primary-btn" type="submit">Guardar</button>
+            </form>
+            <div id="remindersList" class="list spaced"></div>
           </div>
-        </div>
-
-        <div class="card two-col">
-          <div>
-            <div class="section-head compact">
-              <div>
-                <p class="eyebrow">Tu norte</p>
-                <h3>Áreas importantes</h3>
-              </div>
-            </div>
-            <div class="chips" id="categoryChips"></div>
-          </div>
-          <div>
-            <div class="section-head compact">
-              <div>
-                <p class="eyebrow">Historial</p>
-                <h3>Últimos logros</h3>
-              </div>
-            </div>
-            <div id="recentActivity" class="list compact-list"></div>
-          </div>
-        </div>
-
-        <div class="card two-col">
-          <div>
-            <div class="section-head compact">
-              <div>
-                <p class="eyebrow">Momentum</p>
-                <h3>Tu liga y motivación</h3>
-              </div>
-            </div>
-            <div id="leaguePanel" class="league-panel"></div>
-          </div>
-          <div>
-            <div class="section-head compact">
-              <div>
-                <p class="eyebrow">Versus</p>
-                <h3>Futuro multiplayer</h3>
-              </div>
-            </div>
-            <div id="socialPreview" class="social-preview"></div>
-          </div>
-        </div>
-      </section>
-
-      <section id="reminders" class="tab-panel stack">
-        <div class="card">
-          <div class="section-head">
-            <div>
-              <p class="eyebrow">Captura rápida</p>
-              <h3>Recordatorios</h3>
-            </div>
-          </div>
-          <form id="reminderForm" class="form-grid">
-            <input id="reminderTitle" type="text" placeholder="Ej: subir skill a OpenClaw" required>
-            <select id="reminderCategory"></select>
-            <input id="reminderReward" type="number" min="5" step="5" value="15" title="Puntos al completar">
-            <button class="primary-btn" type="submit">Guardar recordatorio</button>
-          </form>
-          <p class="muted tiny">Úsalos como bandeja de entrada. Después los pasas al día correcto.</p>
-          <div id="remindersList" class="list spaced"></div>
         </div>
       </section>
 
       <section id="habits" class="tab-panel stack">
-        <div class="card">
-          <div class="section-head">
-            <div>
-              <p class="eyebrow">Constancia</p>
-              <h3>Hábitos y rachas</h3>
-            </div>
-          </div>
-          <form id="habitForm" class="form-grid">
-            <input id="habitTitle" type="text" placeholder="Ej: leer 20 min" required>
-            <select id="habitCategory"></select>
-            <input id="habitReward" type="number" min="5" step="5" value="20" title="Puntos por cumplir">
-            <button class="primary-btn" type="submit">Crear hábito</button>
-          </form>
-          <div id="habitsList" class="list spaced"></div>
-        </div>
-      </section>
-
-      <section id="rewards" class="tab-panel stack">
         <div class="card two-col">
           <div>
-            <div class="section-head">
+            <div class="section-head compact">
               <div>
-                <p class="eyebrow">Motivación</p>
-                <h3>Premios</h3>
+                <p class="eyebrow">Constancia</p>
+                <h3>Hábitos</h3>
               </div>
             </div>
-            <form id="rewardForm" class="form-grid">
-              <input id="rewardTitle" type="text" placeholder="Ej: pedir algo rico o una pausa larga" required>
-              <input id="rewardCost" type="number" min="20" step="5" value="60" title="Costo en puntos">
-              <button class="primary-btn" type="submit">Crear premio</button>
+            <form id="habitForm" class="form-grid">
+              <input id="habitTitle" type="text" placeholder="Ej: leer 20 min" required>
+              <select id="habitCategory"></select>
+              <button class="primary-btn" type="submit">Crear hábito</button>
             </form>
-            <div id="rewardsList" class="list spaced"></div>
+            <div id="habitsList" class="list spaced"></div>
           </div>
           <div>
             <div class="section-head compact">
               <div>
-                <p class="eyebrow">Canjes</p>
-                <h3>Historial de premios</h3>
+                <p class="eyebrow">Consistencia</p>
+                <h3>Heatmap</h3>
               </div>
             </div>
-            <div id="redeemedRewardsList" class="list compact-list"></div>
+            <div id="habitHeatmap" class="heatmap-panel"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="goals" class="tab-panel stack">
+        <div class="card two-col">
+          <div>
+            <div class="section-head compact">
+              <div>
+                <p class="eyebrow">Metas</p>
+                <h3>Objetivos importantes</h3>
+              </div>
+            </div>
+            <form id="goalForm" class="form-grid">
+              <input id="goalTitle" type="text" placeholder="Ej: aprobar cálculo" required>
+              <input id="goalTarget" type="number" min="1" step="1" value="10" title="Meta objetivo">
+              <button class="primary-btn" type="submit">Crear objetivo</button>
+            </form>
+            <div id="goalsList" class="list spaced"></div>
+          </div>
+          <div>
+            <div class="section-head compact">
+              <div>
+                <p class="eyebrow">Últimos movimientos</p>
+                <h3>Actividad reciente</h3>
+              </div>
+            </div>
+            <div id="recentActivity" class="list compact-list"></div>
           </div>
         </div>
       </section>
@@ -221,11 +155,10 @@
     <form method="dialog" id="todoForm" class="dialog-body">
       <div>
         <p class="eyebrow">Nueva tarea</p>
-        <h3>Agregar TODO</h3>
+        <h3>Agregar tarea del día</h3>
       </div>
       <input id="todoTitle" type="text" placeholder="Ej: repasar cálculo antes de salir" required>
       <select id="todoCategory"></select>
-      <input id="todoReward" type="number" min="5" step="5" value="10">
       <menu>
         <button value="cancel" class="ghost-btn">Cancelar</button>
         <button id="saveTodoBtn" value="default" class="primary-btn">Guardar</button>
