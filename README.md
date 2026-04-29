@@ -36,17 +36,3 @@ Los datos se guardan sólo en el navegador del dispositivo usando `localStorage`
 ## Continuidad de cambios
 
 Antes de cerrar cualquier cambio, dejar una nota en `docs/session/YYYY-MM-DD-HHMM.md`. Ver `CHANGELOG-RULE.md`.
-
-## OpenClaw polish pass (20260429-104703)
-
-Se agregó una capa segura de utilidad diaria en `lo-polish.js` sin romper las pantallas existentes:
-
-- **Centro útil flotante** con resumen de hábitos, tareas de hoy y gastos.
-- **Gastos del mes / hoy / todo** con filtros rápidos.
-- **Agregar y borrar gastos manuales** guardados en `localStorage` (`lo_expenses_v2`).
-- **Inferencia de gastos existentes** desde datos/capturas que ya tenga la app.
-- **Refresh manual** que dispara `lo:refresh` para sincronizar pantallas.
-- **Exportar backup JSON** desde el navegador.
-- **Service worker corregido** para cachear los archivos reales actuales (`lo-*.js/jsx`, `lo-polish.js`) en vez de archivos viejos como `app.js`/`styles.css`.
-
-Backup previo: `.openclaw-polish-backup-20260429-104703`.
