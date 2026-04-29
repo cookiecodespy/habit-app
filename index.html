@@ -3,8 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#f5f7fb" />
-    <meta name="description" content="Boss Mode, tu Life OS personal para hábitos, foco, tareas y claridad diaria." />
+    <meta name="theme-color" content="#101827" />
+    <meta name="description" content="Tomas Flow, tu cockpit personal para hábitos, tareas, foco y claridad diaria." />
     <link rel="manifest" href="manifest.webmanifest" />
     <link rel="icon" href="assets/icon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="styles.css" />
@@ -15,7 +15,7 @@
       <header class="app-header glass">
         <div>
           <p class="eyebrow">Boss Mode</p>
-          <h1>Tu sistema personal</h1>
+          <h1>Tomas Flow</h1>
           <p class="subtitle" id="todayLabel"></p>
         </div>
         <button id="installBtn" class="ghost hidden">Instalar</button>
@@ -26,7 +26,7 @@
           <div class="hero-card gradient-card">
             <div>
               <p class="section-kicker">Today</p>
-              <h2>Buenos impulsos, menos fricción</h2>
+              <h2>Decide el día antes de que el día decida por ti</h2>
               <p id="todayMessage" class="body-copy"></p>
             </div>
             <div class="hero-score">
@@ -41,6 +41,24 @@
             <article class="mini-card glass"><span id="focusMinutesToday">0</span><small>Focus min</small></article>
           </div>
 
+          <section class="glass section-card command-card">
+            <div class="section-head compact">
+              <div>
+                <p class="section-kicker">Captura rápida</p>
+                <h3>Suelta la idea; yo la ordeno</h3>
+              </div>
+            </div>
+            <form id="quickCaptureForm" class="quick-capture">
+              <input id="quickCaptureInput" type="text" placeholder="Ej: estudiar cálculo, tomar agua, gym 19:00..." maxlength="140" required />
+              <button type="submit" aria-label="Capturar">+</button>
+            </form>
+            <div class="quick-actions" aria-label="Acciones rápidas">
+              <button type="button" class="chip-btn" data-quick="water">💧 Agua</button>
+              <button type="button" class="chip-btn" data-quick="study">📚 Estudiar</button>
+              <button type="button" class="chip-btn" data-quick="focus">🎯 Foco 25</button>
+            </div>
+          </section>
+
           <section class="glass section-card">
             <div class="section-head">
               <div>
@@ -49,6 +67,16 @@
               </div>
             </div>
             <div id="todaySummary" class="stack-list"></div>
+          </section>
+
+          <section class="glass section-card">
+            <div class="section-head">
+              <div>
+                <p class="section-kicker">Plan</p>
+                <h3>3 movimientos para ganar hoy</h3>
+              </div>
+            </div>
+            <div id="todayPlan" class="stack-list"></div>
           </section>
 
           <section class="glass section-card">
@@ -120,6 +148,11 @@
               </div>
               <button type="submit">Agregar tarea</button>
             </form>
+            <div class="filter-row" aria-label="Filtros de tareas">
+              <button type="button" class="chip-btn active" data-task-filter="active">Activas</button>
+              <button type="button" class="chip-btn" data-task-filter="today">Hoy</button>
+              <button type="button" class="chip-btn" data-task-filter="all">Todas</button>
+            </div>
             <div id="taskList" class="stack-list"></div>
           </section>
         </section>
@@ -218,13 +251,13 @@
       </main>
 
       <nav class="bottom-nav glass" aria-label="Secciones principales">
-        <button class="nav-btn active" data-screen="today">Today</button>
-        <button class="nav-btn" data-screen="habits">Habits</button>
-        <button class="nav-btn" data-screen="tasks">Tasks</button>
-        <button class="nav-btn" data-screen="calendar">Calendar</button>
-        <button class="nav-btn" data-screen="focus">Focus</button>
-        <button class="nav-btn" data-screen="journal">Journal</button>
-        <button class="nav-btn" data-screen="insights">Insights</button>
+        <button class="nav-btn active" data-screen="today">Hoy</button>
+        <button class="nav-btn" data-screen="habits">Hábitos</button>
+        <button class="nav-btn" data-screen="tasks">Tareas</button>
+        <button class="nav-btn" data-screen="calendar">Agenda</button>
+        <button class="nav-btn" data-screen="focus">Foco</button>
+        <button class="nav-btn" data-screen="journal">Diario</button>
+        <button class="nav-btn" data-screen="insights">Stats</button>
       </nav>
     </div>
 

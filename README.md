@@ -1,5 +1,7 @@
 # Tomas Flow
 
+Rediseño 2026.4.27: cockpit mobile-first con captura rápida, plan del día, filtros de tareas y mejor visual para foco/hábitos.
+
 App web estática, mobile-first y lista para GitHub Pages.
 
 ## Incluye
@@ -31,3 +33,6 @@ App web estática, mobile-first y lista para GitHub Pages.
 - `assets/icon.svg`
 
 Los datos se guardan sólo en el navegador del dispositivo usando `localStorage`.
+## Continuidad de cambios
+
+Antes de cerrar cualquier cambio, dejar una nota en `docs/session/YYYY-MM-DD-HHMM.md`. Ver `CHANGELOG-RULE.md`.
