@@ -1,4 +1,4 @@
-// Life OS — Data Layer v2
+// LifeOS — Data Layer v2
 // Estructura: captures, tasks (by context), calendar events, habits, reminders, focus, radar
 
 const LOData = (() => {
@@ -270,6 +270,53 @@ const LOData = (() => {
     window.dispatchEvent(new CustomEvent('lo:points', { detail: s.points }));
   };
 
+  // ── GASTOS ───────────────────────────────────────────────────────
+  const GASTO_CATS = ['Comida','Transporte','Estudio','Entretenimiento','Salud','Ropa','Hogar','Otros'];
+  const GASTO_COLORS = { Comida:'#FF9F0A', Transporte:'#0A84FF', Estudio:'#BF5AF2', Entretenimiento:'#FF453A', Salud:'#30D158', Ropa:'#FF6B81', Hogar:'#64D2FF', Otros:'#636366' };
+  const GASTO_ICONS  = { Comida:'🍔', Transporte:'🚌', Estudio:'📚', Entretenimiento:'🎮', Salud:'💊', Ropa:'👕', Hogar:'🏠', Otros:'💸' };
+
+  function getAllGastos() { return load('lo_gastos', []); }
+
+  const gastos = {
+    CATS: GASTO_CATS,
+    COLORS: GASTO_COLORS,
+    ICONS: GASTO_ICONS,
+    getAll: getAllGastos,
+    add: function(data) {
+      const list = getAllGastos();
+      const g = { id: Date.now(), date: today(), ...data };
+      list.unshift(g);
+      save('lo_gastos', list);
+      emit();
+      return g;
+    },
+    delete: function(id) {
+      save('lo_gastos', getAllGastos().filter(function(g){ return g.id !== id; }));
+      emit();
+    },
+    getByMonth: function(ym) {
+      return getAllGastos().filter(function(g){ return g.date && g.date.startsWith(ym); });
+    },
+    getCurrentMonth: function() {
+      const d = new Date();
+      return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
+    },
+    getMonthTotal: function(ym) {
+      return getAllGastos().filter(function(g){ return g.date && g.date.startsWith(ym); }).reduce(function(s,g){ return s+(g.amount||0); }, 0);
+    },
+    getTodayTotal: function() {
+      return getAllGastos().filter(function(g){ return g.date === today(); }).reduce(function(s,g){ return s+(g.amount||0); }, 0);
+    },
+    getByCat: function(ym) {
+      const list = getAllGastos().filter(function(g){ return g.date && g.date.startsWith(ym); });
+      const result = {};
+      GASTO_CATS.forEach(function(c){ result[c] = list.filter(function(g){ return g.category===c; }).reduce(function(s,g){ return s+(g.amount||0); }, 0); });
+      return result;
+    },
+    getBudget: function() { return load('lo_budget', { monthly: 50000, categories: {} }); },
+    saveBudget: function(data) { save('lo_budget', data); emit(); },
+  };
+
   // ── SCORE ─────────────────────────────────────────────────────────
   const getDailyScore = () => {
     const allH = habits.getAll();
@@ -287,7 +334,7 @@ const LOData = (() => {
     return Math.min(100, Math.round(score));
   };
 
-  return { captures, tasks, events, habits, reminders, focus, dailyCheck, radar, settings, addPoints, getDailyScore, today };
+  return { captures, tasks, events, habits, reminders, focus, dailyCheck, radar, settings, gastos, addPoints, getDailyScore, today };
 })();
 
 window.LOData = LOData;

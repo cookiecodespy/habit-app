@@ -1,7 +1,7 @@
-// lo-screens-2.jsx — Calendario + Tareas  [Apple Glass redesign]
+// lo-screens-2.jsx — Calendario + Tareas  [v3: iOS premium]
 
 /* ══════════════════════════════════════════════════════════════
-   CALENDARIO SCREEN
+   CALENDARIO
 ══════════════════════════════════════════════════════════════ */
 const CalendarioScreen = () => {
   const [cur, setCur]       = React.useState(new Date());
@@ -13,6 +13,7 @@ const CalendarioScreen = () => {
 
   const CATS = LOData.events.CATEGORIES;
   const CC   = LOData.events.COLORS;
+  const catIcon = { Universidad:'book', Trabajo:'briefcase', Proyecto:'rocket', Personal:'leaf', Salud:'heart' };
 
   const refresh = () => setAllEv(LOData.events.getAll());
   React.useEffect(()=>{ refresh(); window.addEventListener('lo:refresh',refresh); return()=>window.removeEventListener('lo:refresh',refresh); },[]);
@@ -20,7 +21,6 @@ const CalendarioScreen = () => {
   const y=cur.getFullYear(), m=cur.getMonth();
   const MONTHS=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
   const fd=new Date(y,m,1).getDay(), dim=new Date(y,m+1,0).getDate();
-  // Start week on Monday
   const fdMon = (fd+6)%7;
   const cells=[...Array(fdMon).fill(null),...Array.from({length:dim},(_,i)=>i+1)];
 
@@ -36,40 +36,31 @@ const CalendarioScreen = () => {
     setShowAdd(false); refresh();
   };
 
-  const catIcon = { Universidad:'🎓', Trabajo:'💼', Proyecto:'🚀', Personal:'🌿', Salud:'❤️' };
-
   return (
     <div style={{ paddingBottom:20 }}>
-      <div style={{ display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:22 }}>
-        <div>
-          <h1 style={{ fontSize:30,fontWeight:700,color:'#FFF',margin:'0 0 3px',letterSpacing:-.5 }}>Calendario</h1>
-          <p style={{ fontSize:14,color:'rgba(235,235,245,0.4)',margin:0 }}>Clases, trabajo y vida</p>
-        </div>
-        <button onClick={()=>{ setForm(f=>({...f,date:sel})); setShowAdd(!showAdd); }}
-          style={{ width:38,height:38,borderRadius:12,background:'linear-gradient(145deg,#6B6AEA,#5E5CE6)',border:'0.5px solid rgba(255,255,255,0.18)',color:'#FFF',fontSize:22,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 4px 14px rgba(94,92,230,.4)' }}>+</button>
-      </div>
+      <Title title="Calendario" sub="Clases, trabajo y vida" right={<PlusBtn onClick={()=>{ setForm(f=>({...f,date:sel})); setShowAdd(!showAdd); }}/>}/>
 
       {/* Category filter */}
       <div style={{ display:'flex',gap:6,overflowX:'auto',marginBottom:14,paddingBottom:2 }}>
-        <button onClick={()=>setCatFilter('all')} style={{ flexShrink:0,padding:'6px 14px',borderRadius:20,border:'none',cursor:'pointer',fontSize:12,fontWeight:600,background:catFilter==='all'?'#6B6AEA':'rgba(28,28,30,0.8)',color:catFilter==='all'?'#FFF':'rgba(235,235,245,0.5)' }}>Todos</button>
+        <button onClick={()=>setCatFilter('all')} style={{ flexShrink:0,padding:'6px 14px',borderRadius:18,border:'none',cursor:'pointer',fontSize:12,fontWeight:600,background:catFilter==='all'?'#6B6AEA':'rgba(28,28,30,0.7)',color:catFilter==='all'?'#FFF':'rgba(235,235,245,0.5)' }}>Todos</button>
         {CATS.map(c=>(
-          <button key={c} onClick={()=>setCatFilter(c)} style={{ flexShrink:0,padding:'6px 12px',borderRadius:20,border:catFilter===c?`0.5px solid ${CC[c]||'#6B6AEA'}55`:'0.5px solid transparent',cursor:'pointer',fontSize:12,fontWeight:600,background:catFilter===c?`${CC[c]||'#6B6AEA'}28`:'rgba(28,28,30,0.8)',color:catFilter===c?CC[c]||'#6B6AEA':'rgba(235,235,245,0.5)' }}>{c}</button>
+          <button key={c} onClick={()=>setCatFilter(c)} style={{ flexShrink:0,display:'flex',alignItems:'center',gap:5,padding:'6px 12px',borderRadius:18,border:catFilter===c?`0.5px solid ${CC[c]||'#6B6AEA'}55`:'0.5px solid transparent',cursor:'pointer',fontSize:12,fontWeight:600,background:catFilter===c?`${CC[c]||'#6B6AEA'}26`:'rgba(28,28,30,0.7)',color:catFilter===c?CC[c]||'#6B6AEA':'rgba(235,235,245,0.5)' }}>{catIcon[c]&&<Icon name={catIcon[c]} size={11}/>} {c}</button>
         ))}
       </div>
 
-      {/* Month calendar */}
-      <C style={{ padding:'16px',marginBottom:12 }}>
-        <div style={{ display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16 }}>
-          <button onClick={()=>setCur(new Date(y,m-1,1))} style={{ background:'rgba(44,44,46,0.8)',border:'0.5px solid rgba(255,255,255,0.08)',borderRadius:10,width:32,height:32,cursor:'pointer',color:'#FFF',fontSize:18,display:'flex',alignItems:'center',justifyContent:'center' }}>‹</button>
-          <span style={{ fontWeight:700,fontSize:17,color:'#FFF',letterSpacing:-.2 }}>{MONTHS[m]} {y}</span>
-          <button onClick={()=>setCur(new Date(y,m+1,1))} style={{ background:'rgba(44,44,46,0.8)',border:'0.5px solid rgba(255,255,255,0.08)',borderRadius:10,width:32,height:32,cursor:'pointer',color:'#FFF',fontSize:18,display:'flex',alignItems:'center',justifyContent:'center' }}>›</button>
+      {/* Month */}
+      <C style={{ padding:'14px 16px 16px',marginBottom:12 }}>
+        <div style={{ display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:14 }}>
+          <button onClick={()=>setCur(new Date(y,m-1,1))} style={{ background:'rgba(44,44,46,0.7)',border:'0.5px solid rgba(255,255,255,0.06)',borderRadius:9,width:30,height:30,cursor:'pointer',color:'#FFF',display:'flex',alignItems:'center',justifyContent:'center' }}><Icon name="chevron-l" size={14} weight={2.5}/></button>
+          <span style={{ fontWeight:700,fontSize:17,color:'#FFF',letterSpacing:-0.3 }}>{MONTHS[m]} {y}</span>
+          <button onClick={()=>setCur(new Date(y,m+1,1))} style={{ background:'rgba(44,44,46,0.7)',border:'0.5px solid rgba(255,255,255,0.06)',borderRadius:9,width:30,height:30,cursor:'pointer',color:'#FFF',display:'flex',alignItems:'center',justifyContent:'center' }}><Icon name="chevron-r" size={14} weight={2.5}/></button>
         </div>
         <div style={{ display:'grid',gridTemplateColumns:'repeat(7,1fr)',gap:2,marginBottom:6 }}>
           {'LMMJVSD'.split('').map((d,i)=>(
             <div key={i} style={{ textAlign:'center',fontSize:11,fontWeight:600,color:'rgba(235,235,245,0.38)',padding:'3px 0' }}>{d}</div>
           ))}
         </div>
-        <div style={{ display:'grid',gridTemplateColumns:'repeat(7,1fr)',gap:2 }}>
+        <div style={{ display:'grid',gridTemplateColumns:'repeat(7,1fr)',gap:3 }}>
           {cells.map((day,i)=>{
             if(!day) return <div key={i}/>;
             const ds=getDS(day), isT=ds===today, isS=ds===sel;
@@ -79,9 +70,10 @@ const CalendarioScreen = () => {
                 aspectRatio:'1',borderRadius:10,
                 border:isS&&!isT?'1.5px solid rgba(107,106,234,0.7)':'1px solid transparent',
                 background:isT?'#6B6AEA':isS?'rgba(107,106,234,0.18)':'transparent',
-                color:'#FFF',cursor:'pointer',fontSize:14,fontWeight:isT?700:400,
+                color:'#FFF',cursor:'pointer',fontSize:14,fontWeight:isT?700:500,
                 display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:1,padding:'2px 0',
-                boxShadow:isT?'0 2px 10px rgba(107,106,234,.4)':'none',
+                fontVariantNumeric:'tabular-nums',
+                boxShadow:isT?'0 2px 12px rgba(107,106,234,.45)':'none',
               }}>
                 {day}
                 {dots.length>0&&<div style={{ display:'flex',gap:2 }}>{dots.map((col,di)=><div key={di} style={{ width:4,height:4,borderRadius:'50%',background:isT?'rgba(255,255,255,0.7)':col }}/>)}</div>}
@@ -91,69 +83,109 @@ const CalendarioScreen = () => {
         </div>
       </C>
 
-      {/* Add form */}
       {showAdd && (
         <C style={{ padding:16,marginBottom:12,border:'0.5px solid rgba(107,106,234,0.3)' }}>
-          <p style={{ fontWeight:700,fontSize:16,color:'#FFF',marginBottom:14 }}>Nuevo evento</p>
-          <input value={form.title} onChange={e=>setForm(f=>({...f,title:e.target.value}))} placeholder="Título del evento"
-            style={{ width:'100%',padding:'12px 14px',borderRadius:12,border:'0.5px solid rgba(255,255,255,0.08)',background:'rgba(44,44,46,0.8)',color:'#FFF',fontSize:15,marginBottom:10 }} autoFocus/>
+          <p style={{ fontWeight:700,fontSize:16,color:'#FFF',marginBottom:14,letterSpacing:-0.3 }}>Nuevo evento</p>
+          <input value={form.title} onChange={e=>setForm(f=>({...f,title:e.target.value}))} placeholder="Título"
+            style={{ width:'100%',padding:'12px 14px',borderRadius:12,border:'0.5px solid rgba(255,255,255,0.08)',background:'rgba(44,44,46,0.7)',color:'#FFF',fontSize:15,marginBottom:10 }} autoFocus/>
           <div style={{ display:'grid',gridTemplateColumns:'1fr 1fr',gap:8,marginBottom:10 }}>
             <input type="date" value={form.date} onChange={e=>setForm(f=>({...f,date:e.target.value}))}
-              style={{ padding:'12px',borderRadius:12,border:'0.5px solid rgba(255,255,255,0.08)',background:'rgba(44,44,46,0.8)',color:'#FFF',fontSize:14 }}/>
+              style={{ padding:'11px 12px',borderRadius:12,border:'0.5px solid rgba(255,255,255,0.08)',background:'rgba(44,44,46,0.7)',color:'#FFF',fontSize:14 }}/>
             <input type="time" value={form.time} onChange={e=>setForm(f=>({...f,time:e.target.value}))}
-              style={{ padding:'12px',borderRadius:12,border:'0.5px solid rgba(255,255,255,0.08)',background:'rgba(44,44,46,0.8)',color:'#FFF',fontSize:14 }}/>
+              style={{ padding:'11px 12px',borderRadius:12,border:'0.5px solid rgba(255,255,255,0.08)',background:'rgba(44,44,46,0.7)',color:'#FFF',fontSize:14 }}/>
           </div>
           <div style={{ display:'flex',gap:6,flexWrap:'wrap',marginBottom:10 }}>
             {CATS.map(c=>(
-              <button key={c} onClick={()=>setForm(f=>({...f,category:c}))} style={{ padding:'7px 12px',borderRadius:10,border:form.category===c?`0.5px solid ${CC[c]||'#6B6AEA'}`:'0.5px solid transparent',cursor:'pointer',fontSize:12,fontWeight:600,background:form.category===c?`${CC[c]||'#6B6AEA'}28`:'rgba(44,44,46,0.8)',color:form.category===c?CC[c]||'#6B6AEA':'rgba(235,235,245,0.5)' }}>{catIcon[c]} {c}</button>
+              <button key={c} onClick={()=>setForm(f=>({...f,category:c}))} style={{ display:'flex',alignItems:'center',gap:5,padding:'7px 11px',borderRadius:10,border:form.category===c?`0.5px solid ${CC[c]||'#6B6AEA'}`:'0.5px solid transparent',cursor:'pointer',fontSize:12,fontWeight:600,background:form.category===c?`${CC[c]||'#6B6AEA'}28`:'rgba(44,44,46,0.7)',color:form.category===c?CC[c]||'#6B6AEA':'rgba(235,235,245,0.5)' }}>{catIcon[c]&&<Icon name={catIcon[c]} size={11}/>} {c}</button>
             ))}
           </div>
           <input value={form.location} onChange={e=>setForm(f=>({...f,location:e.target.value}))} placeholder="Lugar (opcional)"
-            style={{ width:'100%',padding:'12px 14px',borderRadius:12,border:'0.5px solid rgba(255,255,255,0.08)',background:'rgba(44,44,46,0.8)',color:'#FFF',fontSize:14,marginBottom:12 }}/>
+            style={{ width:'100%',padding:'12px 14px',borderRadius:12,border:'0.5px solid rgba(255,255,255,0.08)',background:'rgba(44,44,46,0.7)',color:'#FFF',fontSize:14,marginBottom:12 }}/>
           <div style={{ display:'flex',gap:8 }}>
-            <button onClick={addEvent} style={{ flex:1,padding:12,borderRadius:12,background:'linear-gradient(145deg,#6B6AEA,#5E5CE6)',color:'#FFF',border:'none',fontWeight:600,cursor:'pointer',boxShadow:'0 4px 14px rgba(94,92,230,.35)' }}>Agregar</button>
-            <button onClick={()=>setShowAdd(false)} style={{ flex:1,padding:12,borderRadius:12,background:'rgba(44,44,46,0.8)',border:'0.5px solid rgba(255,255,255,0.08)',color:'rgba(235,235,245,0.6)',border:'none',cursor:'pointer' }}>Cancelar</button>
+            <button onClick={addEvent} style={{ flex:1,padding:12,borderRadius:12,background:'linear-gradient(145deg,#7877F0,#5E5CE6)',color:'#FFF',border:'none',fontWeight:600,cursor:'pointer',boxShadow:'0 4px 14px rgba(94,92,230,.35)' }}>Agregar</button>
+            <button onClick={()=>setShowAdd(false)} style={{ flex:1,padding:12,borderRadius:12,background:'rgba(44,44,46,0.7)',color:'rgba(235,235,245,0.6)',border:'0.5px solid rgba(255,255,255,0.08)',cursor:'pointer' }}>Cancelar</button>
           </div>
         </C>
       )}
 
-      {/* Day label */}
-      <p style={{ fontSize:14,fontWeight:600,color:'rgba(235,235,245,0.45)',margin:'0 4px 10px',textTransform:'capitalize' }}>
-        {sel===today?'Hoy':new Date(sel+'T12:00').toLocaleDateString('es',{weekday:'long',day:'numeric',month:'long'})}
+      <p style={{ fontSize:14,fontWeight:600,color:'rgba(235,235,245,0.5)',margin:'0 4px 10px',textTransform:'capitalize',letterSpacing:-0.1 }}>
+        {sel===today?'Hoy':new Date(sel+'T12:00').toLocaleDateString('es-CL',{weekday:'long',day:'numeric',month:'long'})}
       </p>
 
-      {selEvs.length===0 ? (
-        <C style={{ padding:'28px 0',textAlign:'center' }}>
-          <p style={{ color:'rgba(235,235,245,0.35)',fontSize:15,margin:0 }}>Sin eventos este día</p>
-        </C>
-      ) : (
-        <div style={{ display:'flex',flexDirection:'column',gap:8 }}>
-          {selEvs.map(e=>(
-            <div key={e.id} style={{ display:'flex',gap:12,alignItems:'flex-start' }}>
-              <span style={{ fontSize:12,fontWeight:700,color:CC[e.category]||'#6B6AEA',minWidth:44,textAlign:'right',flexShrink:0,marginTop:14 }}>{e.time||'—'}</span>
-              <div style={{ width:3,alignSelf:'stretch',borderRadius:2,background:CC[e.category]||'#6B6AEA',flexShrink:0,minHeight:44,boxShadow:`0 0 6px ${CC[e.category]||'#6B6AEA'}60` }}/>
-              <div style={{ flex:1,...G.card,padding:'12px 14px' }}>
-                <div style={{ display:'flex',justifyContent:'space-between',alignItems:'flex-start' }}>
-                  <div style={{ flex:1,minWidth:0 }}>
-                    <p style={{ margin:'0 0 3px',fontWeight:600,fontSize:15,color:'#FFF' }}>{e.title}</p>
-                    {e.location&&<p style={{ margin:0,fontSize:13,color:'rgba(235,235,245,0.45)' }}>📍 {e.location}</p>}
-                  </div>
-                  <div style={{ display:'flex',gap:8,alignItems:'center',marginLeft:8 }}>
-                    <Tag label={e.category} color={CC[e.category]||'#6B6AEA'}/>
-                    <button onClick={()=>{ LOData.events.delete(e.id); refresh(); }} style={{ background:'none',border:'none',color:'rgba(235,235,245,0.28)',cursor:'pointer',fontSize:14 }}>✕</button>
+      {(() => {
+        // Combine events + tasks (context=Hoy if sel=today, or dueDate=sel) + reminders (if sel=today)
+        const dayItems = [];
+        selEvs.forEach(e=>dayItems.push({kind:'event',id:'e'+e.id,time:e.time||'',title:e.title,category:e.category,location:e.location,color:CC[e.category]||'#6B6AEA',raw:e}));
+        LOData.tasks.getAll().forEach(t=>{
+          if(t.completed) return;
+          const isToday = sel===today && t.context==='Hoy';
+          const isDue   = t.dueDate===sel;
+          if(isToday||isDue){
+            const pc={urgente:'#FF453A',importante:'#FF9F0A',cuando_pueda:'#30D158'}[t.priority]||'#6B6AEA';
+            dayItems.push({kind:'task',id:'t'+t.id,time:'',title:t.title,category:t.context,color:pc,raw:t});
+          }
+        });
+        if(sel===today){
+          LOData.reminders.getActive().forEach(r=>{
+            const day = new Date().getDay();
+            const isWeekday = day>=1&&day<=5;
+            if(r.repeat==='daily'||r.repeat==='once'||(r.repeat==='weekdays'&&isWeekday)||r.repeat==='weekly'){
+              const cc={General:'#6B6AEA',Salud:'#FF453A',Universidad:'#0A84FF',Trabajo:'#FF9F0A',Personal:'#30D158',Finanzas:'#64D2FF'};
+              dayItems.push({kind:'reminder',id:'r'+r.id,time:r.time||'',title:r.title,category:r.category,color:cc[r.category]||'#6B6AEA',raw:r});
+            }
+          });
+        }
+        dayItems.sort((a,b)=>{
+          if(!a.time&&b.time) return 1;
+          if(a.time&&!b.time) return -1;
+          return (a.time||'').localeCompare(b.time||'');
+        });
+
+        if(dayItems.length===0) return (
+          <C style={{ padding:'28px 0',textAlign:'center' }}>
+            <p style={{ color:'rgba(235,235,245,0.4)',fontSize:14,margin:0 }}>Nada agendado este día</p>
+          </C>
+        );
+
+        return (
+          <div style={{ display:'flex',flexDirection:'column',gap:8 }}>
+            {dayItems.map(it=>{
+              const kindLabel = {event:'Evento',task:'Tarea',reminder:'Recordatorio'}[it.kind];
+              const kindIcon  = {event:'calendar',task:'check-list',reminder:'bell'}[it.kind];
+              return (
+                <div key={it.id} style={{ display:'flex',gap:11,alignItems:'flex-start' }}>
+                  <span style={{ fontSize:12,fontWeight:700,color:it.color,minWidth:42,textAlign:'right',flexShrink:0,marginTop:14,fontVariantNumeric:'tabular-nums' }}>{it.time||'—'}</span>
+                  <div style={{ width:3,alignSelf:'stretch',borderRadius:2,background:it.color,flexShrink:0,minHeight:46,boxShadow:`0 0 6px ${it.color}60` }}/>
+                  <div style={{ flex:1,...G.card,padding:'11px 14px' }}>
+                    <div style={{ display:'flex',justifyContent:'space-between',alignItems:'flex-start',gap:8 }}>
+                      <div style={{ flex:1,minWidth:0 }}>
+                        <div style={{ display:'flex',alignItems:'center',gap:6,marginBottom:3 }}>
+                          <div style={{ color:it.color,display:'flex' }}><Icon name={kindIcon} size={11} weight={2.2}/></div>
+                          <span style={{ fontSize:10,fontWeight:700,color:it.color,textTransform:'uppercase',letterSpacing:0.5 }}>{kindLabel}</span>
+                        </div>
+                        <p style={{ margin:'0 0 3px',fontWeight:600,fontSize:15,color:'#FFF',letterSpacing:-0.2 }}>{it.title}</p>
+                        {it.kind==='event'&&it.location&&<p style={{ margin:0,fontSize:13,color:'rgba(235,235,245,0.45)',display:'flex',alignItems:'center',gap:4 }}><Icon name="pin" size={11}/> {it.location}</p>}
+                        {it.kind==='task'&&<p style={{ margin:0,fontSize:12,color:'rgba(235,235,245,0.42)' }}>Contexto · {it.category}</p>}
+                        {it.kind==='reminder'&&<p style={{ margin:0,fontSize:12,color:'rgba(235,235,245,0.42)' }}>{it.category}</p>}
+                      </div>
+                      <div style={{ display:'flex',gap:8,alignItems:'center' }}>
+                        <Tag label={it.category} color={it.color}/>
+                        {it.kind==='event' && <button onClick={()=>{ LOData.events.delete(it.raw.id); refresh(); }} style={{ background:'none',border:'none',color:'rgba(235,235,245,0.3)',cursor:'pointer',padding:2,display:'flex' }}><Icon name="close" size={13} weight={2.2}/></button>}
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+              );
+            })}
+          </div>
+        );
+      })()}
     </div>
   );
 };
 
 /* ══════════════════════════════════════════════════════════════
-   TAREAS SCREEN
+   TAREAS
 ══════════════════════════════════════════════════════════════ */
 const TareasScreen = () => {
   const [tasks, setTasks]     = React.useState([]);
@@ -162,8 +194,8 @@ const TareasScreen = () => {
   const [form, setForm]       = React.useState({ title:'', priority:'importante', context:'Hoy', dueDate:'' });
   const [search, setSearch]   = React.useState('');
 
-  const CTXS    = LOData.tasks.CONTEXTS;
-  const ctxIcon = { Hoy:'☀️', Universidad:'🎓', Trabajo:'💼', Proyectos:'🚀', Personal:'🌿', 'En espera':'⏳' };
+  const CTXS = LOData.tasks.CONTEXTS;
+  const ctxIcon = { Hoy:'sun', Universidad:'book', Trabajo:'briefcase', Proyectos:'rocket', Personal:'leaf', 'En espera':'hourglass' };
   const priConf = {
     urgente:      { label:'Alta',  color:'#FF453A' },
     importante:   { label:'Media', color:'#FF9F0A' },
@@ -198,18 +230,18 @@ const TareasScreen = () => {
         left={
           <button onClick={()=>toggle(t.id)} style={{
             width:24,height:24,borderRadius:7,
-            border:`2px solid ${t.completed?pc.color:'rgba(255,255,255,0.2)'}`,
+            border:`2px solid ${t.completed?pc.color:'rgba(255,255,255,0.22)'}`,
             background:t.completed?pc.color:'transparent',
             cursor:'pointer',flexShrink:0,display:'flex',alignItems:'center',justifyContent:'center',
-            color:'#FFF',fontSize:13,transition:'all .15s',
-          }}>{t.completed?'✓':''}</button>
+            color:'#FFF',transition:'all .15s',
+          }}>{t.completed?<Icon name="check" size={13} weight={3}/>:''}</button>
         }
-        label={<span style={{ textDecoration:t.completed?'line-through':'none',color:t.completed?'rgba(235,235,245,0.35)':'#FFF',fontSize:16 }}>{t.title}</span>}
-        sub={t.dueDate?`📅 ${t.dueDate}`:undefined}
+        label={<span style={{ textDecoration:t.completed?'line-through':'none',color:t.completed?'rgba(235,235,245,0.35)':'#FFF',fontSize:16,letterSpacing:-0.2 }}>{t.title}</span>}
+        sub={t.dueDate?<span style={{ display:'inline-flex',alignItems:'center',gap:4 }}><Icon name="calendar" size={11}/> {t.dueDate}</span>:undefined}
         right={
           <div style={{ display:'flex',gap:6,alignItems:'center' }}>
             <Tag label={pc.label} color={pc.color}/>
-            <button onClick={()=>del(t.id)} style={{ background:'none',border:'none',color:'rgba(235,235,245,0.28)',cursor:'pointer',fontSize:14 }}>✕</button>
+            <button onClick={()=>del(t.id)} style={{ background:'none',border:'none',color:'rgba(235,235,245,0.3)',cursor:'pointer',padding:2,display:'flex' }}><Icon name="close" size={13} weight={2.2}/></button>
           </div>
         }
       />
@@ -218,27 +250,20 @@ const TareasScreen = () => {
 
   const Section = ({ title, items, color }) => items.length===0?null:(
     <div style={{ marginBottom:12 }}>
-      <p style={{ fontSize:12,fontWeight:600,color:color||'rgba(235,235,245,0.4)',textTransform:'uppercase',letterSpacing:.7,margin:'0 4px 8px' }}>{title}</p>
+      <p style={{ fontSize:12,fontWeight:600,color:color||'rgba(235,235,245,0.42)',textTransform:'uppercase',letterSpacing:0.6,margin:'0 4px 8px' }}>{title}</p>
       <C>{items.map((t,i)=><TaskItem key={t.id} t={t} last={i===items.length-1}/>)}</C>
     </div>
   );
 
   return (
     <div style={{ paddingBottom:20 }}>
-      <div style={{ display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:22 }}>
-        <div>
-          <h1 style={{ fontSize:30,fontWeight:700,color:'#FFF',margin:'0 0 3px',letterSpacing:-.5 }}>Tareas</h1>
-          <p style={{ fontSize:14,color:'rgba(235,235,245,0.4)',margin:0 }}>Ejecutá lo importante</p>
-        </div>
-        <button onClick={()=>setShowAdd(!showAdd)}
-          style={{ width:38,height:38,borderRadius:12,background:'linear-gradient(145deg,#6B6AEA,#5E5CE6)',border:'0.5px solid rgba(255,255,255,0.18)',color:'#FFF',fontSize:22,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 4px 14px rgba(94,92,230,.4)' }}>+</button>
-      </div>
+      <Title title="Tareas" sub="Ejecutá lo importante" right={<PlusBtn onClick={()=>setShowAdd(!showAdd)}/>}/>
 
       {/* Search */}
       <div style={{ position:'relative',marginBottom:14 }}>
-        <svg style={{ position:'absolute',left:13,top:'50%',transform:'translateY(-50%)',opacity:.4 }} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Buscar tarea..."
-          style={{ width:'100%',padding:'11px 14px 11px 38px',...G.card,color:'#FFF',fontSize:15,borderRadius:14 }}/>
+        <div style={{ position:'absolute',left:13,top:'50%',transform:'translateY(-50%)',color:'rgba(235,235,245,0.4)' }}><Icon name="search" size={15}/></div>
+        <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Buscar tarea…"
+          style={{ width:'100%',padding:'11px 14px 11px 36px',...G.card,color:'#FFF',fontSize:15,borderRadius:13,letterSpacing:-0.1 }}/>
       </div>
 
       {/* Context tabs */}
@@ -246,30 +271,29 @@ const TareasScreen = () => {
         {CTXS.map(c=>{
           const n=ctxCount.find(x=>x.c===c)?.n||0;
           return (
-            <button key={c} onClick={()=>setCtx(c)} style={{ flexShrink:0,display:'flex',alignItems:'center',gap:6,padding:'8px 14px',borderRadius:20,border:ctx===c?'0.5px solid rgba(107,106,234,0.5)':'0.5px solid transparent',cursor:'pointer',background:ctx===c?'#6B6AEA':'rgba(28,28,30,0.8)',color:ctx===c?'#FFF':'rgba(235,235,245,0.45)',fontSize:13,fontWeight:600 }}>
-              {ctxIcon[c]} {c}
-              {n>0&&<span style={{ background:ctx===c?'rgba(255,255,255,0.22)':'rgba(107,106,234,0.4)',color:'#FFF',borderRadius:99,padding:'1px 7px',fontSize:11,fontWeight:700 }}>{n}</span>}
+            <button key={c} onClick={()=>setCtx(c)} style={{ flexShrink:0,display:'flex',alignItems:'center',gap:6,padding:'8px 13px',borderRadius:18,border:ctx===c?'0.5px solid rgba(107,106,234,0.5)':'0.5px solid transparent',cursor:'pointer',background:ctx===c?'#6B6AEA':'rgba(28,28,30,0.7)',color:ctx===c?'#FFF':'rgba(235,235,245,0.5)',fontSize:13,fontWeight:600,letterSpacing:-0.1 }}>
+              {ctxIcon[c]&&<Icon name={ctxIcon[c]} size={12}/>} {c}
+              {n>0&&<span style={{ background:ctx===c?'rgba(255,255,255,0.22)':'rgba(107,106,234,0.4)',color:'#FFF',borderRadius:99,padding:'1px 7px',fontSize:11,fontWeight:700,fontVariantNumeric:'tabular-nums' }}>{n}</span>}
             </button>
           );
         })}
       </div>
 
-      {/* Add form */}
       {showAdd && (
         <C style={{ padding:16,marginBottom:14,border:'0.5px solid rgba(107,106,234,0.3)' }}>
-          <p style={{ fontWeight:700,fontSize:16,color:'#FFF',marginBottom:14 }}>{ctxIcon[ctx]} Nueva tarea en {ctx}</p>
-          <input value={form.title} onChange={e=>setForm(f=>({...f,title:e.target.value}))} onKeyDown={e=>e.key==='Enter'&&add()} placeholder="¿Qué necesitás hacer?"
-            style={{ width:'100%',padding:'12px 14px',borderRadius:12,border:'0.5px solid rgba(255,255,255,0.08)',background:'rgba(44,44,46,0.8)',color:'#FFF',fontSize:15,marginBottom:10 }} autoFocus/>
+          <p style={{ fontWeight:700,fontSize:16,color:'#FFF',marginBottom:14,letterSpacing:-0.3,display:'flex',alignItems:'center',gap:8 }}>{ctxIcon[ctx]&&<Icon name={ctxIcon[ctx]} size={16} color="#7B7AEE"/>} Nueva en {ctx}</p>
+          <input value={form.title} onChange={e=>setForm(f=>({...f,title:e.target.value}))} onKeyDown={e=>e.key==='Enter'&&add()} placeholder="¿Qué necesitas hacer?"
+            style={{ width:'100%',padding:'12px 14px',borderRadius:12,border:'0.5px solid rgba(255,255,255,0.08)',background:'rgba(44,44,46,0.7)',color:'#FFF',fontSize:15,marginBottom:10 }} autoFocus/>
           <div style={{ display:'flex',gap:6,marginBottom:10,flexWrap:'wrap' }}>
             {Object.entries(priConf).map(([k,v])=>(
-              <button key={k} onClick={()=>setForm(f=>({...f,priority:k}))} style={{ padding:'8px 14px',borderRadius:10,border:form.priority===k?`0.5px solid ${v.color}`:'0.5px solid transparent',cursor:'pointer',fontSize:13,fontWeight:600,background:form.priority===k?`${v.color}22`:'rgba(44,44,46,0.8)',color:form.priority===k?v.color:'rgba(235,235,245,0.45)' }}>{v.label}</button>
+              <button key={k} onClick={()=>setForm(f=>({...f,priority:k}))} style={{ padding:'8px 14px',borderRadius:10,border:form.priority===k?`0.5px solid ${v.color}`:'0.5px solid transparent',cursor:'pointer',fontSize:13,fontWeight:600,background:form.priority===k?`${v.color}22`:'rgba(44,44,46,0.7)',color:form.priority===k?v.color:'rgba(235,235,245,0.5)' }}>{v.label}</button>
             ))}
           </div>
           <input type="date" value={form.dueDate} onChange={e=>setForm(f=>({...f,dueDate:e.target.value}))}
-            style={{ width:'100%',padding:'12px 14px',borderRadius:12,border:'0.5px solid rgba(255,255,255,0.08)',background:'rgba(44,44,46,0.8)',color:'#FFF',fontSize:14,marginBottom:12 }}/>
+            style={{ width:'100%',padding:'12px 14px',borderRadius:12,border:'0.5px solid rgba(255,255,255,0.08)',background:'rgba(44,44,46,0.7)',color:'#FFF',fontSize:14,marginBottom:12 }}/>
           <div style={{ display:'flex',gap:8 }}>
-            <button onClick={add} style={{ flex:1,padding:12,borderRadius:12,background:'linear-gradient(145deg,#6B6AEA,#5E5CE6)',color:'#FFF',border:'none',fontWeight:600,cursor:'pointer',boxShadow:'0 4px 14px rgba(94,92,230,.35)' }}>Agregar</button>
-            <button onClick={()=>setShowAdd(false)} style={{ flex:1,padding:12,borderRadius:12,background:'rgba(44,44,46,0.8)',color:'rgba(235,235,245,0.55)',border:'0.5px solid rgba(255,255,255,0.08)',cursor:'pointer' }}>Cancelar</button>
+            <button onClick={add} style={{ flex:1,padding:12,borderRadius:12,background:'linear-gradient(145deg,#7877F0,#5E5CE6)',color:'#FFF',border:'none',fontWeight:600,cursor:'pointer',boxShadow:'0 4px 14px rgba(94,92,230,.35)' }}>Agregar</button>
+            <button onClick={()=>setShowAdd(false)} style={{ flex:1,padding:12,borderRadius:12,background:'rgba(44,44,46,0.7)',color:'rgba(235,235,245,0.55)',border:'0.5px solid rgba(255,255,255,0.08)',cursor:'pointer' }}>Cancelar</button>
           </div>
         </C>
       )}
@@ -280,8 +304,8 @@ const TareasScreen = () => {
 
       {byPriority.done.length>0 && (
         <details>
-          <summary style={{ cursor:'pointer',fontSize:12,fontWeight:600,color:'rgba(235,235,245,0.35)',textTransform:'uppercase',letterSpacing:.7,margin:'0 4px 8px',userSelect:'none' }}>
-            Completadas · {byPriority.done.length}
+          <summary style={{ cursor:'pointer',fontSize:12,fontWeight:600,color:'rgba(235,235,245,0.4)',textTransform:'uppercase',letterSpacing:0.6,margin:'0 4px 8px',userSelect:'none',display:'flex',alignItems:'center',gap:5 }}>
+            <Icon name="chevron-r" size={11} weight={2.5}/> Completadas · {byPriority.done.length}
           </summary>
           <C style={{ marginTop:8,opacity:.55 }}>
             {byPriority.done.map((t,i)=><TaskItem key={t.id} t={t} last={i===byPriority.done.length-1}/>)}
@@ -290,10 +314,10 @@ const TareasScreen = () => {
       )}
 
       {ctxTasks.length===0&&(
-        <div style={{ textAlign:'center',padding:'44px 0' }}>
-          <p style={{ fontSize:46,margin:'0 0 12px' }}>{ctxIcon[ctx]}</p>
-          <p style={{ fontWeight:600,color:'#FFF',fontSize:17,margin:0 }}>Sin tareas en {ctx}</p>
-          <p style={{ color:'rgba(235,235,245,0.35)',fontSize:14,margin:'6px 0 0' }}>Tocá + para agregar una</p>
+        <div style={{ textAlign:'center',padding:'48px 0' }}>
+          <div style={{ width:64,height:64,borderRadius:18,background:'rgba(107,106,234,0.15)',border:'0.5px solid rgba(107,106,234,0.25)',display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 14px',color:'#7B7AEE' }}>{ctxIcon[ctx]&&<Icon name={ctxIcon[ctx]} size={28}/>}</div>
+          <p style={{ fontWeight:600,color:'#FFF',fontSize:17,margin:0,letterSpacing:-0.3 }}>Sin tareas en {ctx}</p>
+          <p style={{ color:'rgba(235,235,245,0.4)',fontSize:14,margin:'6px 0 0' }}>Tocá + para agregar una</p>
         </div>
       )}
     </div>

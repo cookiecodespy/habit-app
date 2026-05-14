@@ -33,22 +33,42 @@
   details summary{list-style:none}
   details summary::-webkit-details-marker{display:none}
 
-  @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-  @keyframes scaleIn{from{opacity:0;transform:scale(0.94)}to{opacity:1;transform:scale(1)}}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes scaleIn{from{opacity:0;transform:scale(0.93)}to{opacity:1;transform:scale(1)}}
   @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
-  .fade-up{animation:fadeUp .3s cubic-bezier(.34,1.2,.64,1) both}
+  @keyframes slideInRight{from{opacity:0;transform:translateX(22px)}to{opacity:1;transform:translateX(0)}}
+  .fade-up{animation:fadeUp .32s cubic-bezier(.34,1.2,.64,1) both}
   .scale-in{animation:scaleIn .25s cubic-bezier(.34,1.2,.64,1) both}
+  .slide-in{animation:slideInRight .28s cubic-bezier(.34,1.2,.64,1) both}
 
   /* ── Ambient Background ── */
   body::before{
     content:'';
     position:fixed;inset:0;
     background:
-      radial-gradient(ellipse at 15% 40%,rgba(94,92,230,0.18) 0%,transparent 55%),
-      radial-gradient(ellipse at 85% 10%,rgba(191,90,242,0.14) 0%,transparent 50%),
-      radial-gradient(ellipse at 65% 85%,rgba(10,132,255,0.10) 0%,transparent 50%),
-      radial-gradient(ellipse at 30% 90%,rgba(48,209,88,0.06) 0%,transparent 45%);
+      radial-gradient(ellipse at 15% 35%,rgba(94,92,230,0.22) 0%,transparent 52%),
+      radial-gradient(ellipse at 88% 8%,rgba(191,90,242,0.16) 0%,transparent 48%),
+      radial-gradient(ellipse at 60% 88%,rgba(10,132,255,0.12) 0%,transparent 50%),
+      radial-gradient(ellipse at 5% 90%,rgba(48,209,88,0.07) 0%,transparent 45%),
+      radial-gradient(ellipse at 95% 60%,rgba(255,159,10,0.06) 0%,transparent 40%);
     pointer-events:none;z-index:0;
+  }
+  body::after{
+    content:'';
+    position:fixed;inset:0;
+    background:
+      radial-gradient(ellipse 200px 200px at 15% 35%,rgba(94,92,230,0.04) 0%,transparent 70%);
+    pointer-events:none;z-index:0;
+    animation:ambientDrift 18s ease-in-out infinite alternate;
+  }
+  @keyframes ambientDrift{
+    0%  { transform:translate(0,0) scale(1); }
+    50% { transform:translate(18px,-12px) scale(1.06); }
+    100%{ transform:translate(-10px,8px) scale(0.97); }
+  }
+  @keyframes pulse{
+    0%,100%{ opacity:1; transform:scale(1); }
+    50%    { opacity:0.5; transform:scale(0.7); }
   }
 
   /* ── Shell ── */
@@ -76,26 +96,26 @@
 
   /* ── Glass card base ── */
   .glass{
-    background:rgba(28,28,30,0.78);
-    backdrop-filter:blur(40px) saturate(180%);
-    -webkit-backdrop-filter:blur(40px) saturate(180%);
-    border:0.5px solid rgba(255,255,255,0.10);
+    background:rgba(26,26,28,0.82);
+    backdrop-filter:blur(48px) saturate(200%);
+    -webkit-backdrop-filter:blur(48px) saturate(200%);
+    border:0.5px solid rgba(255,255,255,0.09);
   }
   .glass-bright{
-    background:rgba(44,44,46,0.72);
-    backdrop-filter:blur(40px) saturate(180%);
-    -webkit-backdrop-filter:blur(40px) saturate(180%);
-    border:0.5px solid rgba(255,255,255,0.13);
+    background:rgba(42,42,44,0.78);
+    backdrop-filter:blur(48px) saturate(200%);
+    -webkit-backdrop-filter:blur(48px) saturate(200%);
+    border:0.5px solid rgba(255,255,255,0.12);
   }
 
   /* ── Bottom nav ── */
   .nav{
     position:absolute;bottom:0;left:0;right:0;
     height:83px;
-    background:rgba(18,18,20,0.88);
-    backdrop-filter:blur(50px) saturate(200%);
-    -webkit-backdrop-filter:blur(50px) saturate(200%);
-    border-top:0.5px solid rgba(255,255,255,0.10);
+    background:rgba(12,12,16,0.92);
+    backdrop-filter:blur(60px) saturate(200%);
+    -webkit-backdrop-filter:blur(60px) saturate(200%);
+    border-top:0.5px solid rgba(255,255,255,0.08);
     display:flex;padding:0 4px;
     padding-bottom:env(safe-area-inset-bottom,16px);
     z-index:100;
@@ -103,22 +123,29 @@
   .nav-btn{
     flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
     gap:4px;background:none;border:none;cursor:pointer;padding:8px 2px 0;position:relative;
+    transition:opacity .15s;
   }
+  .nav-btn:active{ opacity:0.7; }
   .nav-icon-wrap{
     width:28px;height:28px;display:flex;align-items:center;justify-content:center;
-    border-radius:8px;transition:all .2s cubic-bezier(.34,1.4,.64,1);
+    border-radius:9px;transition:all .25s cubic-bezier(.34,1.4,.64,1);
   }
   .nav-btn.active .nav-icon-wrap{
-    background:rgba(255,107,157,0.18);
-    transform:scale(1.08);
+    background:rgba(107,106,234,0.22);
+    transform:scale(1.1) translateY(-1px);
   }
   .nav-icon{font-size:20px;line-height:1}
-  .nav-lbl{font-size:10px;font-weight:500;color:rgba(235,235,245,.38);letter-spacing:-.1px;transition:color .15s}
-  .nav-btn.active .nav-lbl{color:#FF6B9D;font-weight:600}
+  .nav-lbl{font-size:10px;font-weight:500;color:rgba(235,235,245,.32);letter-spacing:-.1px;transition:color .15s;line-height:1}
+  .nav-btn.active .nav-lbl{color:#7B7AEE;font-weight:700}
   .nav-dot{
     position:absolute;top:6px;right:calc(50% - 18px);
     width:8px;height:8px;border-radius:50%;
-    background:#FF453A;border:2px solid rgba(18,18,20,0.9);
+    background:#FF453A;border:2px solid rgba(12,12,16,0.92);
+    animation:dotPulse 2s ease-in-out infinite;
+  }
+  @keyframes dotPulse{
+    0%,100%{ box-shadow:0 0 0 0 rgba(255,69,58,0.4); }
+    50%    { box-shadow:0 0 0 4px rgba(255,69,58,0); }
   }
 
   /* ── FAB ── */
@@ -126,15 +153,20 @@
     position:absolute;bottom:98px;right:16px;
     width:52px;height:52px;
     border-radius:16px;
-    background:linear-gradient(145deg,#FF6B9D,#FF7A6B);
-    border:0.5px solid rgba(255,255,255,0.2);
+    background:linear-gradient(145deg,#7877F0,#6B6AEA,#5E5CE6);
+    border:0.5px solid rgba(255,255,255,0.22);
     cursor:pointer;
     font-size:24px;display:flex;align-items:center;justify-content:center;
-    box-shadow:0 6px 24px rgba(255,107,157,.45),0 2px 8px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,0.15);
+    box-shadow:
+      0 8px 28px rgba(94,92,230,.55),
+      0 2px 8px rgba(0,0,0,.7),
+      inset 0 1px 0 rgba(255,255,255,0.18),
+      inset 0 -1px 0 rgba(0,0,0,0.2);
     z-index:50;
-    transition:transform .18s cubic-bezier(.34,1.56,.64,1),box-shadow .18s;
+    transition:transform .2s cubic-bezier(.34,1.56,.64,1),box-shadow .2s;
   }
-  .fab:active{transform:scale(.88);box-shadow:0 2px 12px rgba(94,92,230,.3)}
+  .fab:hover{ transform:scale(1.06); box-shadow:0 10px 32px rgba(94,92,230,.65),0 2px 10px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,0.18); }
+  .fab:active{ transform:scale(.87); box-shadow:0 2px 12px rgba(94,92,230,.3); }
 
   /* ── Back button ── */
   .back-btn{
@@ -150,139 +182,359 @@
 <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
-<script src="lo-data.js"></script>
-<script src="lo-ai.js"></script>
+<script src="lo-data.js?v=2"></script>
+<script src="lo-ai.js?v=2"></script>
 </head>
 <body>
 <div id="root"></div>
-<script type="text/babel" src="lo-screens-1.jsx"></script>
-<script type="text/babel" src="lo-screens-2.jsx"></script>
-<script type="text/babel" src="lo-screens-3.jsx"></script>
-<script type="text/babel" src="lo-screens-4.jsx"></script>
-<script type="text/babel" src="lo-lifeos-v3.jsx"></script>
+<script type="text/babel" src="lo-icons.jsx?v=3"></script>
+<script type="text/babel" src="lo-screens-1.jsx?v=3"></script>
+<script type="text/babel" src="lo-screens-2.jsx?v=3"></script>
+<script type="text/babel" src="lo-screens-3.jsx?v=3"></script>
+<script type="text/babel" src="lo-screens-4.jsx?v=3"></script>
+<script type="text/babel" src="lo-screens-docs.jsx?v=3"></script>
 <script type="text/babel">
 
-/* ── ONBOARDING ─────────────────────────────────────────────── */
+/* ── ONBOARDING TOUR (multi-step, LifeOS-style) ─────────── */
+const TourSlide = ({ title, accent, subtitle, children, bg }) => (
+  <div style={{
+    minHeight:'100vh', display:'flex', flexDirection:'column', padding:'60px 28px 36px',
+    background:bg, position:'relative', overflow:'hidden',
+  }}>
+    {children}
+  </div>
+);
+
 const Onboarding = ({ onDone }) => {
+  const [step, setStep] = React.useState(0);
   const [name, setName] = React.useState('');
-  return (
+  const TOTAL = 5;
+  const next = () => step<TOTAL-1 ? setStep(step+1) : finish();
+  const back = () => step>0 && setStep(step-1);
+  const finish = () => onDone(name);
+
+  const Progress = () => (
+    <div style={{ display:'flex',alignItems:'center',gap:12,marginBottom:42 }}>
+      {step>0 ? (
+        <button onClick={back} style={{ width:34,height:34,borderRadius:'50%',background:'rgba(255,255,255,0.08)',border:'0.5px solid rgba(255,255,255,0.12)',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',color:'rgba(235,235,245,0.7)' }}>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 6 9 12 15 18"/></svg>
+        </button>
+      ) : <div style={{ width:34 }}/>}
+      <div style={{ flex:1,height:5,background:'rgba(255,255,255,0.1)',borderRadius:3,overflow:'hidden' }}>
+        <div style={{ height:'100%',width:`${((step+1)/TOTAL)*100}%`,background:'linear-gradient(90deg,#7877F0,#5E5CE6)',borderRadius:3,transition:'width .35s cubic-bezier(.4,0,.2,1)',boxShadow:'0 0 10px rgba(94,92,230,0.5)' }}/>
+      </div>
+      {step<TOTAL-1 ? (
+        <button onClick={finish} style={{ background:'none',border:'none',color:'rgba(235,235,245,0.55)',fontSize:15,fontWeight:500,cursor:'pointer',padding:0 }}>Saltar</button>
+      ) : <div style={{ width:50 }}/>}
+    </div>
+  );
+
+  const Slide = ({ children }) => (
     <div style={{
-      height:'100vh',display:'flex',flexDirection:'column',alignItems:'center',
-      justifyContent:'center',padding:'40px 32px',
-      background:'linear-gradient(160deg,#0a0a0f 0%,#0d0d18 100%)',
-      position:'relative',overflow:'hidden',
+      minHeight:'100vh',display:'flex',flexDirection:'column',padding:'52px 28px 40px',
+      background:'linear-gradient(160deg,#0a0a0f 0%,#0d0d18 100%)',position:'relative',overflow:'hidden',
     }}>
       {/* Ambient orbs */}
-      <div style={{ position:'absolute',top:'15%',left:'10%',width:220,height:220,borderRadius:'50%',background:'rgba(94,92,230,0.15)',filter:'blur(70px)',pointerEvents:'none' }}/>
-      <div style={{ position:'absolute',bottom:'20%',right:'5%',width:180,height:180,borderRadius:'50%',background:'rgba(191,90,242,0.12)',filter:'blur(60px)',pointerEvents:'none' }}/>
-
-      {/* App icon */}
-      <div style={{
-        width:96,height:96,
-        borderRadius:'28px',
-        background:'linear-gradient(145deg,#6B6AEA,#BF5AF2)',
-        display:'flex',alignItems:'center',justifyContent:'center',
-        fontSize:50,marginBottom:28,
-        boxShadow:'0 12px 40px rgba(94,92,230,.5),0 4px 12px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,0.2)',
-        position:'relative',zIndex:1,
-      }}>🌀</div>
-
-      <h1 style={{ fontSize:38,fontWeight:700,color:'#FFF',marginBottom:8,letterSpacing:-.5,position:'relative',zIndex:1 }}>LifeOS</h1>
-      <p style={{ color:'rgba(235,235,245,.5)',fontSize:17,textAlign:'center',lineHeight:1.55,marginBottom:48,maxWidth:280,position:'relative',zIndex:1 }}>
-        Tu sistema para capturar, ordenar y ejecutar lo que importa.
-      </p>
-
-      <div style={{ width:'100%',maxWidth:320,position:'relative',zIndex:1 }}>
-        <p style={{ fontSize:12,fontWeight:600,color:'rgba(235,235,245,.4)',textTransform:'uppercase',letterSpacing:.8,marginBottom:10 }}>¿Cómo te llamás?</p>
-        <input
-          value={name}
-          onChange={e=>setName(e.target.value)}
-          onKeyDown={e=>e.key==='Enter'&&onDone(name)}
-          placeholder="Tu nombre"
-          style={{
-            width:'100%',padding:'16px 18px',borderRadius:18,
-            border:'0.5px solid rgba(255,255,255,0.12)',
-            background:'rgba(28,28,30,0.85)',
-            backdropFilter:'blur(20px)',WebkitBackdropFilter:'blur(20px)',
-            color:'#FFF',fontSize:17,marginBottom:14,
-          }}
-          autoFocus
-        />
-        <button
-          onClick={()=>onDone(name)}
-          style={{
-            width:'100%',padding:17,borderRadius:18,
-            background:'linear-gradient(145deg,#6B6AEA,#5E5CE6)',
-            color:'#FFF',border:'0.5px solid rgba(255,255,255,0.18)',
-            fontSize:17,fontWeight:600,cursor:'pointer',
-            boxShadow:'0 6px 24px rgba(94,92,230,.45),inset 0 1px 0 rgba(255,255,255,0.15)',
-          }}
-        >Empezar →</button>
+      <div style={{ position:'absolute',top:'10%',right:'-10%',width:240,height:240,borderRadius:'50%',background:'rgba(94,92,230,0.18)',filter:'blur(80px)',pointerEvents:'none' }}/>
+      <div style={{ position:'absolute',bottom:'25%',left:'-15%',width:220,height:220,borderRadius:'50%',background:'rgba(191,90,242,0.12)',filter:'blur(70px)',pointerEvents:'none' }}/>
+      <div style={{ position:'relative',zIndex:1,display:'flex',flexDirection:'column',flex:1 }}>
+        <Progress/>
+        {children}
       </div>
     </div>
   );
+
+  const NextBtn = ({ label='Continuar', disabled }) => (
+    <button onClick={next} disabled={disabled} style={{
+      marginTop:'auto',width:'100%',padding:17,borderRadius:18,
+      background:disabled?'rgba(44,44,46,0.7)':'linear-gradient(145deg,#7877F0,#5E5CE6)',
+      color:disabled?'rgba(235,235,245,0.3)':'#FFF',
+      border:disabled?'0.5px solid rgba(255,255,255,0.08)':'0.5px solid rgba(255,255,255,0.2)',
+      fontSize:17,fontWeight:600,cursor:disabled?'default':'pointer',letterSpacing:-0.2,
+      boxShadow:disabled?'none':'0 8px 28px rgba(94,92,230,.45),inset 0 1px 0 rgba(255,255,255,0.18)',
+      display:'flex',alignItems:'center',justifyContent:'center',gap:7,
+    }}>
+      {label}
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+    </button>
+  );
+
+  // ── STEP 0: Welcome / intro
+  if (step===0) return (
+    <Slide>
+      <div style={{ flex:1,display:'flex',flexDirection:'column',justifyContent:'center',alignItems:'center',textAlign:'center' }}>
+        <div style={{
+          width:104,height:104,borderRadius:30,background:'linear-gradient(145deg,#7877F0,#BF5AF2)',
+          display:'flex',alignItems:'center',justifyContent:'center',marginBottom:32,color:'#FFF',
+          boxShadow:'0 16px 50px rgba(94,92,230,.55),0 4px 16px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,0.22)',
+        }}>
+          <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg>
+        </div>
+        <h1 style={{ fontSize:38,fontWeight:700,color:'#FFF',margin:'0 0 12px',letterSpacing:-0.8,lineHeight:1.05 }}>
+          Bienvenido a <span style={{ background:'linear-gradient(90deg,#7877F0,#BF5AF2)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',backgroundClip:'text' }}>LifeOS</span>
+        </h1>
+        <p style={{ color:'rgba(235,235,245,.6)',fontSize:17,lineHeight:1.55,maxWidth:320,margin:0,letterSpacing:-0.1 }}>
+          Tu sistema personal para capturar, ordenar y ejecutar lo que importa.
+        </p>
+      </div>
+      <NextBtn label="Empezar"/>
+    </Slide>
+  );
+
+  // ── STEP 1: A timeline of your day (LifeOS-style)
+  if (step===1) return (
+    <Slide>
+      <h1 style={{ fontSize:34,fontWeight:700,color:'#FFF',margin:'0 0 8px',letterSpacing:-0.7,lineHeight:1.1 }}>
+        Una <span style={{ color:'#7B7AEE' }}>línea de tiempo</span> de tu día
+      </h1>
+      <p style={{ color:'rgba(235,235,245,.55)',fontSize:16,lineHeight:1.55,margin:'0 0 36px',letterSpacing:-0.1 }}>
+        Eventos, tareas y recordatorios todos en un solo lugar, sincronizados automáticamente.
+      </p>
+      {/* Mock timeline */}
+      <div style={{ background:'rgba(28,28,30,0.6)',borderRadius:24,border:'0.5px solid rgba(255,255,255,0.08)',padding:'18px 18px 20px',boxShadow:'0 12px 40px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.04)',backdropFilter:'blur(40px)' }}>
+        {[
+          { time:'08:00', title:'Tomar agua',          kind:'Recordatorio', col:'#FF453A', icon:'bell' },
+          { time:'10:00', title:'Cálculo II',           kind:'Evento',       col:'#0A84FF', icon:'calendar' },
+          { time:'12:30', title:'Almuerzo con mamá',    kind:'Evento',       col:'#30D158', icon:'calendar' },
+          { time:'14:00', title:'Entregar informe',     kind:'Tarea',        col:'#FF9F0A', icon:'check-list' },
+        ].map((it,i,arr)=>(
+          <div key={i} style={{ display:'flex',gap:0,alignItems:'flex-start',position:'relative' }}>
+            <div style={{ width:46,paddingTop:14,fontSize:12,fontWeight:700,color:'#FFF',fontVariantNumeric:'tabular-nums',textAlign:'right' }}>{it.time}</div>
+            <div style={{ width:22,display:'flex',justifyContent:'center',position:'relative',flexShrink:0 }}>
+              <div style={{ width:2,height:'100%',background:'rgba(84,84,88,0.3)',position:'absolute',top:0,bottom:0 }}/>
+              <div style={{ width:10,height:10,borderRadius:'50%',background:it.col,marginTop:16,position:'relative',zIndex:1,boxShadow:`0 0 0 3px rgba(28,28,30,0.95), 0 0 8px ${it.col}90` }}/>
+            </div>
+            <div style={{ flex:1,padding:'10px 0 10px 6px' }}>
+              <div style={{ display:'flex',alignItems:'center',gap:6,marginBottom:2 }}>
+                <div style={{ color:it.col }}>
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    {it.icon==='calendar'&&<><rect x="3" y="4" width="18" height="18" rx="3"/><line x1="3" y1="10" x2="21" y2="10"/></>}
+                    {it.icon==='bell'&&<><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></>}
+                    {it.icon==='check-list'&&<><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></>}
+                  </svg>
+                </div>
+                <span style={{ fontSize:9.5,fontWeight:700,color:it.col,textTransform:'uppercase',letterSpacing:0.6 }}>{it.kind}</span>
+              </div>
+              <p style={{ margin:0,fontSize:14,fontWeight:600,color:'#FFF',letterSpacing:-0.15 }}>{it.title}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+      <NextBtn/>
+    </Slide>
+  );
+
+  // ── STEP 2: Capture
+  if (step===2) return (
+    <Slide>
+      <h1 style={{ fontSize:34,fontWeight:700,color:'#FFF',margin:'0 0 8px',letterSpacing:-0.7,lineHeight:1.1 }}>
+        Captura sin <span style={{ color:'#FF9F0A' }}>pensar</span>
+      </h1>
+      <p style={{ color:'rgba(235,235,245,.55)',fontSize:16,lineHeight:1.55,margin:'0 0 32px',letterSpacing:-0.1 }}>
+        Apenas se te cruce una idea, tarea o gasto: anótalo. Después decides qué hacer con cada cosa.
+      </p>
+      <div style={{ display:'flex',flexDirection:'column',gap:12 }}>
+        {[
+          { icon:'lightbulb', col:'#FF9F0A', name:'Idea',         desc:'Pensamientos para revisar' },
+          { icon:'list',      col:'#0A84FF', name:'Tarea',        desc:'Acciones que tienes que hacer' },
+          { icon:'bell',      col:'#FF453A', name:'Recordatorio', desc:'Con horario y repetición' },
+          { icon:'wallet',    col:'#30D158', name:'Gasto',        desc:'Dinero gastado' },
+        ].map(it=>(
+          <div key={it.name} style={{ display:'flex',alignItems:'center',gap:14,padding:'14px 16px',background:'rgba(28,28,30,0.6)',borderRadius:16,border:'0.5px solid rgba(255,255,255,0.06)' }}>
+            <div style={{ width:44,height:44,borderRadius:13,background:`linear-gradient(145deg,${it.col}30,${it.col}1a)`,border:`0.5px solid ${it.col}38`,display:'flex',alignItems:'center',justifyContent:'center',color:it.col,flexShrink:0 }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                {it.icon==='lightbulb'&&<><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 1 4 12.5c-.5.4-1 1-1 2v.5H9v-.5c0-1-.5-1.6-1-2A7 7 0 0 1 12 2z"/></>}
+                {it.icon==='list'&&<><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r="1" fill="currentColor"/><circle cx="4" cy="12" r="1" fill="currentColor"/><circle cx="4" cy="18" r="1" fill="currentColor"/></>}
+                {it.icon==='bell'&&<><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></>}
+                {it.icon==='wallet'&&<><path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"/><path d="M4 6v12a2 2 0 0 0 2 2h14v-4"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></>}
+              </svg>
+            </div>
+            <div style={{ flex:1,minWidth:0 }}>
+              <p style={{ margin:'0 0 2px',fontSize:15,fontWeight:600,color:'#FFF',letterSpacing:-0.2 }}>{it.name}</p>
+              <p style={{ margin:0,fontSize:13,color:'rgba(235,235,245,0.5)' }}>{it.desc}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+      <NextBtn/>
+    </Slide>
+  );
+
+  // ── STEP 3: AI
+  if (step===3) return (
+    <Slide>
+      <h1 style={{ fontSize:34,fontWeight:700,color:'#FFF',margin:'0 0 8px',letterSpacing:-0.7,lineHeight:1.1 }}>
+        <span style={{ background:'linear-gradient(90deg,#BF5AF2,#64D2FF)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',backgroundClip:'text' }}>IA</span> integrada
+      </h1>
+      <p style={{ color:'rgba(235,235,245,.55)',fontSize:16,lineHeight:1.55,margin:'0 0 32px',letterSpacing:-0.1 }}>
+        Opcional. Conecta Ollama o Gemma localmente. Tus datos nunca salen de tu equipo.
+      </p>
+      <div style={{ display:'flex',flexDirection:'column',gap:14,flex:1 }}>
+        {[
+          { col:'#BF5AF2', t:'Auto-clasifica capturas', d:'La IA detecta si es tarea, idea o gasto' },
+          { col:'#FF9F0A', t:'Insights diarios',         d:'Análisis de tu progreso en la pantalla Hoy' },
+          { col:'#0A84FF', t:'Sugiere prioridades',      d:'Evalúa urgencia de tus tareas' },
+        ].map(it=>(
+          <div key={it.t} style={{ display:'flex',gap:14,alignItems:'flex-start',padding:'15px 18px',background:`linear-gradient(135deg,${it.col}14 0%,rgba(28,28,30,0.6) 80%)`,borderRadius:16,border:`0.5px solid ${it.col}28` }}>
+            <div style={{ width:8,height:8,borderRadius:'50%',background:it.col,marginTop:8,flexShrink:0,boxShadow:`0 0 12px ${it.col}90` }}/>
+            <div>
+              <p style={{ margin:'0 0 3px',fontSize:15,fontWeight:600,color:'#FFF',letterSpacing:-0.2 }}>{it.t}</p>
+              <p style={{ margin:0,fontSize:13,color:'rgba(235,235,245,0.55)',lineHeight:1.4 }}>{it.d}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+      <NextBtn/>
+    </Slide>
+  );
+
+  // ── STEP 4: Name (final)
+  return (
+    <Slide>
+      <h1 style={{ fontSize:34,fontWeight:700,color:'#FFF',margin:'0 0 8px',letterSpacing:-0.7,lineHeight:1.1 }}>
+        ¿Cómo te <span style={{ color:'#7B7AEE' }}>llamas</span>?
+      </h1>
+      <p style={{ color:'rgba(235,235,245,.55)',fontSize:16,lineHeight:1.55,margin:'0 0 36px',letterSpacing:-0.1 }}>
+        Para saludarte como corresponde cada vez que abras la app.
+      </p>
+      <input
+        value={name}
+        onChange={e=>setName(e.target.value)}
+        onKeyDown={e=>e.key==='Enter'&&name.trim()&&finish()}
+        placeholder="Tu nombre"
+        style={{
+          width:'100%',padding:'18px 20px',borderRadius:18,
+          border:'0.5px solid rgba(255,255,255,0.12)',
+          background:'rgba(28,28,30,0.85)',
+          backdropFilter:'blur(20px)',WebkitBackdropFilter:'blur(20px)',
+          color:'#FFF',fontSize:18,marginBottom:14,letterSpacing:-0.2,
+        }}
+        autoFocus
+      />
+      <div style={{ flex:1 }}/>
+      <button onClick={finish} style={{
+        width:'100%',padding:17,borderRadius:18,
+        background:'linear-gradient(145deg,#7877F0,#5E5CE6)',
+        color:'#FFF',border:'0.5px solid rgba(255,255,255,0.2)',
+        fontSize:17,fontWeight:600,cursor:'pointer',letterSpacing:-0.2,
+        boxShadow:'0 8px 28px rgba(94,92,230,.45),inset 0 1px 0 rgba(255,255,255,0.18)',
+        display:'flex',alignItems:'center',justifyContent:'center',gap:7,
+      }}>
+        Empezar
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </button>
+    </Slide>
+  );
 };
 
-/* ── LIFEOS v3 NAV ───────────────────────────────────── */
+/* ── NAV ICONS ── */
 const NAV_ICONS = {
-  inbox:    <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.5 5h13L22 12v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-6z"/></svg>,
-  timeline: <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="2" x2="12" y2="22"/><circle cx="12" cy="6" r="3"/><circle cx="12" cy="18" r="3"/></svg>,
-  ai:       <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2l1.8 5.6L20 9.2l-5 3.7L16.2 20 12 16.4 7.8 20 9 12.9 4 9.2l6.2-1.6z"/></svg>,
-  settings: <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21a2 2 0 1 1-4 0v-.1A1.7 1.7 0 0 0 8.6 19a1.7 1.7 0 0 0-1.88.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.1-.4H3a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 5 8.6a1.7 1.7 0 0 0-.34-1.88l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.1V3a2 2 0 1 1 4 0v.1A1.7 1.7 0 0 0 15.4 5a1.7 1.7 0 0 0 1.88-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.4 9c.4.17.74.38 1 .6.3.27.66.4 1.1.4H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>,
+  hoy:        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>,
+  captura:    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>,
+  calendario: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="3"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>,
+  tareas:     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>,
+  mas:        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="8" cy="8" r="2"/><circle cx="16" cy="8" r="2"/><circle cx="8" cy="16" r="2"/><circle cx="16" cy="16" r="2"/></svg>,
 };
 
+/* ── MAIN TABS ───────────────────────────────────────────────── */
 const MAIN_TABS = [
-  { id:'inbox',    label:'Inbox' },
-  { id:'timeline', label:'Timeline' },
-  { id:'ai',       label:'AI' },
-  { id:'settings', label:'Settings' },
+  { id:'hoy',        label:'Hoy'    },
+  { id:'captura',    label:'Cap.'   },
+  { id:'calendario', label:'Agenda' },
+  { id:'tareas',     label:'Tareas' },
+  { id:'mas',        label:'Más'    },
 ];
+const MAS_SCREENS = ['habitos','vida','recordar','focus-hub','ai-settings','gastos','docs'];
 
+/* ── APP ─────────────────────────────────────────────────────── */
 const App = () => {
   const [onboarded, setOnboarded] = React.useState(()=>!!LOData.settings.get().onboarded);
-  const [tab, setTab] = React.useState(()=>{
-    const old = localStorage.getItem('lo_tab') || 'ai';
-    const map = { hoy:'timeline', captura:'inbox', calendario:'timeline', tareas:'timeline', mas:'settings', 'ai-settings':'settings' };
-    return ['inbox','timeline','ai','settings'].includes(old) ? old : (map[old] || 'ai');
-  });
+  const [tab, setTab]       = React.useState(()=>{ const t=localStorage.getItem('lo_tab')||'hoy'; return MAS_SCREENS.includes(t)?'mas':t; });
+  const [subScreen, setSub] = React.useState(()=>{ const t=localStorage.getItem('lo_tab'); return MAS_SCREENS.includes(t)?t:null; });
   const [showFocus, setShowFocus] = React.useState(false);
-  const [unproc, setUnproc] = React.useState(0);
-  const [screenKey, setKey] = React.useState(0);
+  const [unproc, setUnproc]       = React.useState(0);
+  const [screenKey, setKey]       = React.useState(0);
 
   const refresh = () => setUnproc(LOData.captures.getUnprocessed().length);
   React.useEffect(()=>{ refresh(); window.addEventListener('lo:refresh',refresh); return()=>window.removeEventListener('lo:refresh',refresh); },[]);
 
   const navigate = dest => {
-    if(dest==='focus'){ setShowFocus(true); return; }
-    const map = { captura:'inbox', tareas:'timeline', calendario:'timeline', hoy:'timeline', mas:'settings', 'ai-settings':'settings' };
-    const next = map[dest] || dest;
-    if(['inbox','timeline','ai','settings'].includes(next)){
-      setTab(next); localStorage.setItem('lo_tab',next); setKey(k=>k+1);
+    if(MAS_SCREENS.includes(dest)){
+      setTab('mas'); setSub(dest); localStorage.setItem('lo_tab',dest);
+    } else if(dest==='focus'){
+      setShowFocus(true);
+    } else {
+      setTab(dest); setSub(null); localStorage.setItem('lo_tab',dest);
     }
+    setKey(k=>k+1);
   };
+
+  const goMas = () => { setTab('mas'); setSub(null); localStorage.setItem('lo_tab','mas'); setKey(k=>k+1); };
+  const onTabClick = t => { if(t==='mas'&&tab==='mas') setSub(null); navigate(t); };
   const finish = name => { LOData.settings.save({ name:name||'Tomás', onboarded:true }); setOnboarded(true); };
+
   if(!onboarded) return <Onboarding onDone={finish}/>;
+
+  const activeTab = MAS_SCREENS.includes(tab)?'mas':tab;
 
   return (
     <div id="shell">
       {showFocus && <FocusOverlay onClose={()=>setShowFocus(false)}/>}
+
       <div className="screen">
         <div key={screenKey} className="screen-pad fade-up">
-          {tab==='inbox' && <LifeInboxScreen onNavigate={navigate}/>} 
-          {tab==='timeline' && <LifeTimelineScreen onNavigate={navigate}/>} 
-          {tab==='ai' && <LifeAIScreen onNavigate={navigate}/>} 
-          {tab==='settings' && <LifeSettingsScreen onNavigate={navigate}/>} 
+
+          {tab==='mas' && subScreen && (
+            <button className="back-btn" onClick={goMas}>
+              <svg width="10" height="16" viewBox="0 0 10 16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M8 1L2 8l6 7"/></svg>
+              Más
+            </button>
+          )}
+
+          {tab==='hoy'        && <HoyScreen onNavigate={navigate} onOpenFocus={()=>setShowFocus(true)}/>}
+          {tab==='captura'    && <CapturaScreen onNavigate={navigate}/>}
+          {tab==='calendario' && <CalendarioScreen/>}
+          {tab==='tareas'     && <TareasScreen/>}
+          {tab==='mas' && !subScreen    && <MasHub onNavigate={navigate}/>}
+          {tab==='mas' && subScreen==='habitos'   && <HabitosScreen/>}
+          {tab==='mas' && subScreen==='vida'      && <VidaScreen/>}
+          {tab==='mas' && subScreen==='recordar'    && <RecordatoriosScreen/>}
+          {tab==='mas' && subScreen==='gastos'      && <GastosScreen/>}
+          {tab==='mas' && subScreen==='ai-settings' && <AISettingsScreen/>}
+          {tab==='mas' && subScreen==='docs'        && <DocsScreen/>}
+          {tab==='mas' && subScreen==='focus-hub' && (
+            <div style={{ display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',minHeight:'60vh',gap:18 }}>
+              <div style={{ width:88,height:88,borderRadius:26,background:'linear-gradient(145deg,#7877F0,#5E5CE6)',display:'flex',alignItems:'center',justifyContent:'center',color:'#FFF',boxShadow:'0 12px 36px rgba(94,92,230,0.5),inset 0 1px 0 rgba(255,255,255,0.2)' }}>
+                <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg>
+              </div>
+              <div style={{ textAlign:'center' }}>
+                <p style={{ margin:'0 0 4px',fontSize:22,fontWeight:700,color:'#FFF',letterSpacing:-0.4 }}>Focus</p>
+                <p style={{ margin:0,fontSize:14,color:'rgba(235,235,245,0.45)' }}>Bloque de trabajo profundo</p>
+              </div>
+              <button onClick={()=>setShowFocus(true)} style={{ display:'inline-flex',alignItems:'center',gap:8,padding:'14px 32px',borderRadius:16,background:'linear-gradient(145deg,#7877F0,#5E5CE6)',color:'#FFF',border:'0.5px solid rgba(255,255,255,0.2)',fontSize:16,fontWeight:600,cursor:'pointer',boxShadow:'0 6px 24px rgba(94,92,230,.4),inset 0 1px 0 rgba(255,255,255,0.2)' }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20"/></svg> Iniciar Focus
+              </button>
+            </div>
+          )}
         </div>
       </div>
-      <button className="fab" onClick={()=>navigate('inbox')} aria-label="Agregar">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.8" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg>
-      </button>
+
+      {/* FAB */}
+      {tab!=='captura' && (
+        <button className="fab" onClick={()=>navigate('captura')}>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        </button>
+      )}
+
+      {/* Bottom nav */}
       <nav className="nav">
         {MAIN_TABS.map(t=>(
-          <button key={t.id} className={`nav-btn${tab===t.id?' active':''}`} onClick={()=>navigate(t.id)}>
-            {t.id==='inbox' && unproc>0 && <div className="nav-dot"/>}
-            <div className="nav-icon-wrap" style={{ color:tab===t.id?'#FF6B9D':'rgba(235,235,245,0.42)' }}>{NAV_ICONS[t.id]}</div>
-            <span className="nav-lbl" style={{ color:tab===t.id?'#FF6B9D':undefined }}>{t.label}</span>
+          <button key={t.id} className={`nav-btn${activeTab===t.id?' active':''}`} onClick={()=>onTabClick(t.id)}>
+            {t.id==='captura' && unproc>0 && <div className="nav-dot"/>}
+            <div className="nav-icon-wrap" style={{ color:activeTab===t.id?'#6B6AEA':'rgba(235,235,245,0.42)' }}>
+              {NAV_ICONS[t.id]}
+            </div>
+            <span className="nav-lbl">{t.label}</span>
           </button>
         ))}
       </nav>
