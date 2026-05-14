@@ -169,17 +169,17 @@
 <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
-<script src="lo-data.js?v=5"></script>
-<script src="lo-ai.js?v=5"></script>
+<script src="lo-data.js?v=6"></script>
+<script src="lo-ai.js?v=6"></script>
 </head>
 <body>
 <div id="root"></div>
-<script type="text/babel" src="lo-icons.jsx?v=5"></script>
-<script type="text/babel" src="lo-screens-1.jsx?v=5"></script>
-<script type="text/babel" src="lo-screens-2.jsx?v=5"></script>
-<script type="text/babel" src="lo-screens-3.jsx?v=5"></script>
-<script type="text/babel" src="lo-screens-4.jsx?v=5"></script>
-<script type="text/babel" src="lo-screens-docs.jsx?v=5"></script>
+<script type="text/babel" src="lo-icons.jsx?v=6"></script>
+<script type="text/babel" src="lo-screens-1.jsx?v=6"></script>
+<script type="text/babel" src="lo-screens-2.jsx?v=6"></script>
+<script type="text/babel" src="lo-screens-3.jsx?v=6"></script>
+<script type="text/babel" src="lo-screens-4.jsx?v=6"></script>
+<script type="text/babel" src="lo-screens-docs.jsx?v=6"></script>
 <script type="text/babel">
 
 /* ── ONBOARDING TOUR (multi-step, LifeOS-style) ─────────── */
@@ -219,11 +219,8 @@ const Onboarding = ({ onDone }) => {
   const Slide = ({ children }) => (
     <div style={{
       minHeight:'100vh',display:'flex',flexDirection:'column',padding:'52px 28px 40px',
-      background:'linear-gradient(160deg,#0a0a0f 0%,#0d0d18 100%)',position:'relative',overflow:'hidden',
+      background:'#000000',position:'relative',overflow:'hidden',
     }}>
-      {/* Ambient orbs */}
-      <div style={{ position:'absolute',top:'10%',right:'-10%',width:240,height:240,borderRadius:'50%',background:'rgba(0,200,177,0.18)',filter:'blur(80px)',pointerEvents:'none' }}/>
-      <div style={{ position:'absolute',bottom:'25%',left:'-15%',width:220,height:220,borderRadius:'50%',background:'rgba(191,90,242,0.12)',filter:'blur(70px)',pointerEvents:'none' }}/>
       <div style={{ position:'relative',zIndex:1,display:'flex',flexDirection:'column',flex:1 }}>
         <Progress/>
         {children}

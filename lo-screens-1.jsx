@@ -649,26 +649,24 @@ const TimelineScreen = ({ onNavigate, onOpenFocus }) => {
 };
 
 /* ══════════════════════════════════════════════════════════════
-   INBOX SCREEN — captura rápida y procesamiento
+   INBOX SCREEN — captura directa con destino inmediato
 ══════════════════════════════════════════════════════════════ */
 const InboxScreen = ({ onNavigate }) => {
   const [items, setItems]         = React.useState([]);
   const [text, setText]           = React.useState('');
-  const [type, setType]           = React.useState('idea');
-  const [filter, setFilter]       = React.useState('inbox');
-  const [procId, setProcId]       = React.useState(null);
   const [recording, setRecording] = React.useState(false);
-  const [aiLoading, setAiLoading] = React.useState(null);
   const [voiceSupported, setVoiceSupported] = React.useState(false);
-  const [interimText, setInterimText] = React.useState('');
-  const taRef      = React.useRef(null);
-  const recRef     = React.useRef(null);
-
-  const tm = Object.fromEntries(CAP_TYPES.map(t=>[t.id,t]));
+  const [interimText, setInterimText]       = React.useState('');
+  const [activeFlow, setActiveFlow]         = React.useState(null); // null | 'reminder' | 'event'
+  const [flowForm, setFlowForm]             = React.useState({ date: LOData.today(), time:'09:00', repeat:'once' });
+  const [toast, setToast]                   = React.useState(null); // { msg, color }
+  const [showSaved, setShowSaved]           = React.useState(false);
+  const taRef = React.useRef(null);
+  const recRef = React.useRef(null);
 
   React.useEffect(()=>{
     refresh();
-    if(taRef.current) taRef.current.focus();
+    setTimeout(()=>taRef.current?.focus(), 80);
     const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
     setVoiceSupported(!!SpeechRec);
     return () => { if(recRef.current) try { recRef.current.stop(); } catch(e){} };
@@ -676,183 +674,286 @@ const InboxScreen = ({ onNavigate }) => {
 
   const refresh = () => setItems(LOData.captures.getAll());
 
-  const submit = async () => {
-    if(!text.trim()) return;
-    const item = LOData.captures.add({ text:text.trim(), type });
-    setText(''); setInterimText('');
-    const ai = window.LOAI?.getSettings();
-    if(ai?.enabled){
-      setAiLoading(item.id);
-      const cat = await LOAI.classifyCapture(item.text);
-      if(cat){ const list=LOData.captures.getAll(); const c=list.find(x=>x.id===item.id); if(c){ c.type=cat; localStorage.setItem('lo_captures',JSON.stringify(list)); } }
-      setAiLoading(null);
-    }
+  const showToast = (msg, color='#34C759') => {
+    setToast({ msg, color });
+    setTimeout(()=>setToast(null), 2200);
+  };
+
+  // Voice recognition
+  const startVoice = () => {
+    const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if(!SpeechRec) return;
+    const rec = new SpeechRec();
+    rec.lang='es-ES'; rec.continuous=true; rec.interimResults=true;
+    rec.onstart=()=>setRecording(true);
+    rec.onend=()=>{ setRecording(false); setInterimText(''); };
+    rec.onerror=()=>{ setRecording(false); setInterimText(''); };
+    rec.onresult=(event)=>{
+      let final='',interim='';
+      for(let i=event.resultIndex;i<event.results.length;i++){
+        if(event.results[i].isFinal) final+=event.results[i][0].transcript;
+        else interim+=event.results[i][0].transcript;
+      }
+      if(final) setText(t=>(t?t+' ':'')+final);
+      setInterimText(interim);
+    };
+    recRef.current=rec;
+    try{ rec.start(); }catch(e){ setRecording(false); }
+  };
+  const stopVoice  = () => { if(recRef.current) try{ recRef.current.stop(); }catch(e){} setRecording(false); setInterimText(''); };
+
+  // Quick-add actions — each creates the item IMMEDIATELY in the right place
+  const doTarea = () => {
+    const t = text.trim(); if(!t) return;
+    LOData.tasks.add({ title:t, context:'Hoy', priority:'importante' });
+    window.dispatchEvent(new Event('lo:refresh'));
+    setText(''); setActiveFlow(null);
+    showToast('✅ Tarea agregada a Hoy', '#34C759');
+  };
+
+  const doIdea = () => {
+    const t = text.trim(); if(!t) return;
+    LOData.captures.add({ text:t, type:'idea' });
+    setText(''); setActiveFlow(null);
+    showToast('💡 Idea guardada en Bandeja', '#FF9F0A');
     refresh();
   };
 
-  const del     = id => { LOData.captures.delete(id); refresh(); };
-  const process = (id, target) => {
-    const c = items.find(x=>x.id===id);
-    if(!c) return;
-    if(target==='task-hoy')      LOData.tasks.add({ title:c.text, context:'Hoy', priority:'importante' });
-    else if(target==='task')     LOData.tasks.add({ title:c.text, context:'Personal', priority:'cuando_pueda' });
-    else if(target==='reminder') LOData.reminders.add({ title:c.text, time:'09:00', repeat:'once', category:'General' });
-    else if(target==='gasto')    LOData.gastos.add({ amount:0, category:'Otros', note:c.text });
-    LOData.captures.markProcessed(id); setProcId(null); refresh();
+  const doReminder = () => {
+    const t = text.trim(); if(!t) return;
+    LOData.reminders.add({ title:t, time:flowForm.time, repeat:flowForm.repeat, category:'General' });
+    window.dispatchEvent(new Event('lo:refresh'));
+    setText(''); setActiveFlow(null);
+    showToast('🔔 Recordatorio creado · '+flowForm.time, '#FF9F0A');
   };
 
-  const startVoice = () => {
-    const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if(!SpeechRec){ alert('Tu navegador no soporta reconocimiento de voz. Probá Chrome o Safari.'); return; }
-    const rec = new SpeechRec();
-    rec.lang = 'es-ES'; rec.continuous = true; rec.interimResults = true;
-    rec.onstart    = () => setRecording(true);
-    rec.onend      = () => { setRecording(false); setInterimText(''); };
-    rec.onerror    = (e) => { setRecording(false); setInterimText(''); console.warn('Speech error:', e.error); };
-    rec.onresult   = (event) => {
-      let final = '', interim = '';
-      for(let i=event.resultIndex; i<event.results.length; i++){
-        if(event.results[i].isFinal) final += event.results[i][0].transcript;
-        else interim += event.results[i][0].transcript;
-      }
-      if(final) setText(t => (t ? t + ' ' : '') + final);
-      setInterimText(interim);
-    };
-    recRef.current = rec;
-    try { rec.start(); } catch(e){ setRecording(false); }
+  const doEvento = () => {
+    const t = text.trim(); if(!t) return;
+    LOData.events.add({ title:t, date:flowForm.date, time:flowForm.time, category:'Personal' });
+    window.dispatchEvent(new Event('lo:refresh'));
+    setText(''); setActiveFlow(null);
+    showToast('📅 Evento en Timeline · '+flowForm.date, '#0A84FF');
   };
 
-  const stopVoice = () => { if(recRef.current) try { recRef.current.stop(); } catch(e){} setRecording(false); setInterimText(''); };
-  const toggleVoice = () => recording ? stopVoice() : startVoice();
+  const delItem = id => { LOData.captures.delete(id); refresh(); };
+  const pending = items.filter(c=>!c.processed);
+  const timeAgo = ts => { const m=Math.floor((Date.now()-ts)/60000); if(m<1)return'ahora'; if(m<60)return`hace ${m}m`; const h=Math.floor(m/60); return h<24?`hace ${h}h`:`hace ${Math.floor(h/24)}d`; };
 
-  const timeAgo = ts => {
-    const m=Math.floor((Date.now()-ts)/60000);
-    if(m<1) return 'ahora'; if(m<60) return `hace ${m}m`;
-    const h=Math.floor(m/60); if(h<24) return `hace ${h}h`;
-    return `hace ${Math.floor(h/24)}d`;
-  };
-
-  const filtered = filter==='inbox'?items.filter(c=>!c.processed):filter==='all'?items:items.filter(c=>c.processed);
-  const unproc   = items.filter(c=>!c.processed).length;
+  // Input styles
+  const inS = { width:'100%',padding:'13px 15px',borderRadius:12,border:'0.5px solid rgba(84,84,88,0.45)',background:'#2C2C2E',color:'#FFF',fontSize:15,fontFamily:'inherit',lineHeight:1.5 };
 
   return (
     <div style={{ paddingBottom:20 }}>
-      <Title title="Inbox" sub="Captura rápido. Procesa después."/>
 
-      {/* Quick reference */}
-      <div style={{ display:'flex',gap:8,marginBottom:14,padding:'11px 13px',borderRadius:13,background:'rgba(0,200,177,0.07)',border:'0.5px solid rgba(0,200,177,0.18)' }}>
-        <div style={{ color:'#00C8B1',marginTop:1 }}><Icon name="lightbulb" size={14}/></div>
-        <p style={{ margin:0,fontSize:12,color:'rgba(235,235,245,0.62)',lineHeight:1.45,letterSpacing:-0.05 }}>
-          <strong style={{ color:'#FF9F0A' }}>Idea</strong> = pensamiento · <strong style={{ color:'#0A84FF' }}>Tarea</strong> = acción · luego <em>Procesa</em> hacia Tareas, Recordatorios o Gastos.
-        </p>
+      {/* Toast */}
+      {toast&&(
+        <div style={{ position:'fixed',top:64,left:'50%',transform:'translateX(-50%)',
+          padding:'10px 20px',borderRadius:22,background:'#1C1C1E',
+          border:`0.5px solid ${toast.color}55`,
+          color:'#FFF',fontSize:14,fontWeight:600,zIndex:999,
+          boxShadow:`0 4px 20px rgba(0,0,0,0.5),0 0 0 0.5px ${toast.color}44`,
+          whiteSpace:'nowrap',letterSpacing:-0.2 }}>
+          {toast.msg}
+        </div>
+      )}
+
+      {/* Header */}
+      <div style={{ marginBottom:20 }}>
+        <h1 style={{ fontSize:34,fontWeight:700,color:'#FFF',margin:0,letterSpacing:-0.7,lineHeight:1.1 }}>Agregar</h1>
+        <p style={{ fontSize:14,color:'rgba(235,235,245,0.42)',margin:'3px 0 0' }}>¿Qué quieres capturar hoy?</p>
       </div>
 
-      {/* Input */}
-      <C style={{ padding:14,marginBottom:12 }}>
-        <div style={{ position:'relative',marginBottom:12 }}>
-          <textarea ref={taRef} value={text} onChange={e=>setText(e.target.value)}
-            onKeyDown={e=>{ if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); submit(); } }}
-            placeholder="Escribí lo que quieres capturar…" rows={3}
-            style={{ width:'100%',padding:'12px 14px',borderRadius:13,border:'0.5px solid rgba(84,84,88,0.45)',background:'#2C2C2E',color:'#FFF',fontSize:16,resize:'none',fontFamily:'inherit',lineHeight:1.5,letterSpacing:-0.1 }}/>
-          {interimText && (
-            <div style={{ position:'absolute',bottom:10,left:14,right:14,fontSize:14,color:'rgba(0,200,177,0.85)',pointerEvents:'none',fontStyle:'italic' }}>{interimText}…</div>
-          )}
-        </div>
-
-        {/* Type selector */}
-        <div style={{ display:'flex',gap:6,overflowX:'auto',marginBottom:6,paddingBottom:2 }}>
-          {CAP_TYPES.map(b=>(
-            <button key={b.id} onClick={()=>setType(b.id)} style={{ flexShrink:0,padding:'7px 11px',borderRadius:10,border:type===b.id?`0.5px solid ${b.color}55`:'0.5px solid rgba(84,84,88,0.35)',cursor:'pointer',background:type===b.id?`${b.color}22`:'#2C2C2E',color:type===b.id?b.color:'rgba(235,235,245,0.5)',fontSize:12,fontWeight:600,display:'flex',alignItems:'center',gap:5 }}>
-              <Icon name={b.icon} size={12}/>{b.label}
-            </button>
-          ))}
-        </div>
-        <p style={{ margin:'4px 4px 12px',fontSize:11,color:'rgba(235,235,245,0.4)',fontStyle:'italic' }}>{tm[type]?.desc}</p>
-
-        {/* Action buttons */}
-        <div style={{ display:'flex',gap:8 }}>
-          <button onClick={toggleVoice} style={{ width:48,height:48,borderRadius:14,border:'none',cursor:'pointer',flexShrink:0,display:'flex',alignItems:'center',justifyContent:'center',background:recording?'linear-gradient(145deg,#FF5146,#FF453A)':'#2C2C2E',boxShadow:recording?'0 0 18px rgba(255,69,58,.5)':'none',transition:'all .2s',position:'relative',color:recording?'#FFF':voiceSupported?'rgba(235,235,245,0.7)':'rgba(84,84,88,0.5)' }}>
-            <Icon name={recording?'stop':'mic'} size={recording?16:19} weight={2}/>
+      {/* TEXT INPUT */}
+      <C style={{ padding:14,marginBottom:14 }}>
+        <div style={{ position:'relative',marginBottom:10 }}>
+          <textarea ref={taRef} value={text+(interimText?interimText:'')}
+            onChange={e=>{ if(!recording) setText(e.target.value); }}
+            onKeyDown={e=>{ if(e.key==='Enter'&&!e.shiftKey&&text.trim()){ e.preventDefault(); doTarea(); } }}
+            placeholder="Escribe una tarea, idea, recordatorio…" rows={2}
+            style={{ ...inS,resize:'none',paddingRight:52 }}/>
+          {/* Voice btn inside input */}
+          <button onClick={recording?stopVoice:startVoice}
+            style={{ position:'absolute',top:10,right:10,width:34,height:34,borderRadius:10,
+              border:'none',cursor:voiceSupported?'pointer':'not-allowed',
+              background:recording?'#FF453A':'rgba(84,84,88,0.3)',
+              color:recording?'#FFF':'rgba(235,235,245,0.6)',
+              display:'flex',alignItems:'center',justifyContent:'center',
+              boxShadow:recording?'0 0 14px rgba(255,69,58,0.6)':'none' }}>
+            <Icon name={recording?'stop':'mic'} size={15} weight={2}/>
           </button>
-
-          <button onClick={submit} disabled={!text.trim()} style={{ flex:1,height:48,borderRadius:14,background:text.trim()?'linear-gradient(145deg,#00D4BC,#00B5A0)':'#2C2C2E',color:text.trim()?'#FFF':'rgba(235,235,245,0.3)',border:text.trim()?'0.5px solid rgba(255,255,255,0.18)':'none',fontWeight:600,fontSize:16,cursor:text.trim()?'pointer':'default',boxShadow:text.trim()?'0 4px 16px rgba(0,200,177,.4),inset 0 0.5px 0 rgba(255,255,255,0.2)':'none',transition:'all .2s',display:'flex',alignItems:'center',justifyContent:'center',gap:7,letterSpacing:-0.2 }}>
-            Capturar <Icon name="arrow-right" size={15} weight={2.5}/>
-          </button>
+          {recording&&<p style={{ margin:'4px 0 0',fontSize:12,color:'#FF453A',display:'flex',alignItems:'center',gap:5 }}>
+            <span style={{ width:6,height:6,borderRadius:'50%',background:'#FF453A',display:'inline-block',animation:'pulse 1s infinite' }}/>
+            Escuchando…
+          </p>}
         </div>
-
-        {recording && (
-          <div style={{ marginTop:10,padding:'9px 14px',borderRadius:12,background:'rgba(255,69,58,0.1)',border:'0.5px solid rgba(255,69,58,0.3)',display:'flex',alignItems:'center',gap:8 }}>
-            <div style={{ width:8,height:8,borderRadius:'50%',background:'#FF453A',flexShrink:0,animation:'pulse 1s infinite' }}/>
-            <span style={{ fontSize:13,color:'rgba(235,235,245,0.7)' }}>Escuchando en español…</span>
-            <button onClick={stopVoice} style={{ marginLeft:'auto',background:'none',border:'none',color:'rgba(235,235,245,0.4)',cursor:'pointer',fontSize:13 }}>Detener</button>
-          </div>
-        )}
-        {!voiceSupported && (
-          <p style={{ margin:'8px 4px 0',fontSize:11,color:'rgba(235,235,245,0.32)',display:'flex',alignItems:'center',gap:5 }}><Icon name="mic-off" size={11}/> Voz no disponible — usá Safari o Chrome</p>
-        )}
+        <p style={{ margin:0,fontSize:12,color:'rgba(235,235,245,0.32)',letterSpacing:-0.1 }}>Enter = tarea de hoy · Elige abajo para otro tipo</p>
       </C>
 
-      {/* Filter tabs */}
-      <div style={{ display:'flex',gap:0,marginBottom:12,...G.card,padding:3,borderRadius:13 }}>
-        {[['inbox',`Bandeja (${unproc})`],['all','Todas'],['done','Procesadas']].map(([v,l])=>(
-          <button key={v} onClick={()=>setFilter(v)} style={{ flex:1,padding:'8px 4px',borderRadius:10,border:'none',cursor:'pointer',background:filter===v?'rgba(84,84,88,0.50)':'transparent',color:filter===v?'#FFF':'rgba(235,235,245,0.4)',fontSize:12,fontWeight:filter===v?600:500,transition:'all .15s',letterSpacing:-0.1 }}>{l}</button>
-        ))}
+      {/* QUICK-ADD ACTIONS — each clearly explains what it does and where the item goes */}
+      <p style={{ margin:'0 4px 10px',fontSize:12,fontWeight:700,color:'rgba(235,235,245,0.4)',textTransform:'uppercase',letterSpacing:0.6 }}>¿A dónde va?</p>
+
+      {/* Row 1 */}
+      <div style={{ display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:10 }}>
+
+        {/* TAREA HOY */}
+        <button onClick={doTarea} disabled={!text.trim()}
+          style={{ padding:'14px 14px 12px',borderRadius:14,...G.card,
+            background:text.trim()?'rgba(0,132,255,0.14)':'#1C1C1E',
+            border:`0.5px solid ${text.trim()?'rgba(10,132,255,0.4)':'rgba(84,84,88,0.4)'}`,
+            cursor:text.trim()?'pointer':'default',textAlign:'left',
+            opacity:text.trim()?1:0.45,transition:'all .15s' }}>
+          <div style={{ width:34,height:34,borderRadius:10,background:'rgba(10,132,255,0.2)',
+            display:'flex',alignItems:'center',justifyContent:'center',marginBottom:8,color:'#0A84FF' }}>
+            <Icon name="check-list" size={16} weight={2}/>
+          </div>
+          <p style={{ margin:'0 0 2px',fontSize:14,fontWeight:700,color:'#FFF',letterSpacing:-0.3 }}>Tarea de hoy</p>
+          <p style={{ margin:0,fontSize:11,color:'rgba(235,235,245,0.45)',lineHeight:1.3 }}>Va a tu lista del día</p>
+        </button>
+
+        {/* RECORDATORIO */}
+        <button onClick={()=>setActiveFlow(activeFlow==='reminder'?null:'reminder')}
+          style={{ padding:'14px 14px 12px',borderRadius:14,...G.card,
+            background:activeFlow==='reminder'?'rgba(255,159,10,0.18)':'#1C1C1E',
+            border:`0.5px solid ${activeFlow==='reminder'?'rgba(255,159,10,0.5)':'rgba(84,84,88,0.4)'}`,
+            cursor:'pointer',textAlign:'left',transition:'all .15s' }}>
+          <div style={{ width:34,height:34,borderRadius:10,background:'rgba(255,159,10,0.2)',
+            display:'flex',alignItems:'center',justifyContent:'center',marginBottom:8,color:'#FF9F0A' }}>
+            <Icon name="bell" size={16} weight={2}/>
+          </div>
+          <p style={{ margin:'0 0 2px',fontSize:14,fontWeight:700,color:'#FFF',letterSpacing:-0.3 }}>Recordatorio</p>
+          <p style={{ margin:0,fontSize:11,color:'rgba(235,235,245,0.45)',lineHeight:1.3 }}>Con hora y repetición</p>
+        </button>
+
+        {/* EVENTO / TIMELINE */}
+        <button onClick={()=>setActiveFlow(activeFlow==='event'?null:'event')}
+          style={{ padding:'14px 14px 12px',borderRadius:14,...G.card,
+            background:activeFlow==='event'?'rgba(52,199,89,0.18)':'#1C1C1E',
+            border:`0.5px solid ${activeFlow==='event'?'rgba(52,199,89,0.5)':'rgba(84,84,88,0.4)'}`,
+            cursor:'pointer',textAlign:'left',transition:'all .15s' }}>
+          <div style={{ width:34,height:34,borderRadius:10,background:'rgba(52,199,89,0.2)',
+            display:'flex',alignItems:'center',justifyContent:'center',marginBottom:8,color:'#34C759' }}>
+            <Icon name="calendar" size={16} weight={2}/>
+          </div>
+          <p style={{ margin:'0 0 2px',fontSize:14,fontWeight:700,color:'#FFF',letterSpacing:-0.3 }}>Evento / Timeline</p>
+          <p style={{ margin:0,fontSize:11,color:'rgba(235,235,245,0.45)',lineHeight:1.3 }}>Aparece en tu agenda</p>
+        </button>
+
+        {/* IDEA */}
+        <button onClick={doIdea} disabled={!text.trim()}
+          style={{ padding:'14px 14px 12px',borderRadius:14,...G.card,
+            background:text.trim()?'rgba(255,214,10,0.12)':'#1C1C1E',
+            border:`0.5px solid ${text.trim()?'rgba(255,214,10,0.38)':'rgba(84,84,88,0.4)'}`,
+            cursor:text.trim()?'pointer':'default',textAlign:'left',
+            opacity:text.trim()?1:0.45,transition:'all .15s' }}>
+          <div style={{ width:34,height:34,borderRadius:10,background:'rgba(255,214,10,0.18)',
+            display:'flex',alignItems:'center',justifyContent:'center',marginBottom:8,color:'#FFD60A' }}>
+            <Icon name="lightbulb" size={16} weight={2}/>
+          </div>
+          <p style={{ margin:'0 0 2px',fontSize:14,fontWeight:700,color:'#FFF',letterSpacing:-0.3 }}>Idea / Nota</p>
+          <p style={{ margin:0,fontSize:11,color:'rgba(235,235,245,0.45)',lineHeight:1.3 }}>Guarda para revisar</p>
+        </button>
       </div>
 
-      {/* List */}
-      {filtered.length===0 ? (
-        <div style={{ textAlign:'center',padding:'52px 0' }}>
-          <div style={{ width:64,height:64,borderRadius:18,background:'rgba(0,200,177,0.15)',border:'0.5px solid rgba(0,200,177,0.25)',display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 14px',color:'#00C8B1' }}><Icon name="inbox" size={28}/></div>
-          <p style={{ color:'rgba(235,235,245,0.55)',fontSize:16,fontWeight:600,margin:0,letterSpacing:-0.2 }}>{filter==='inbox'?'¡Todo procesado!':'Sin capturas'}</p>
-        </div>
-      ) : (
-        <C>
-          {filtered.map((item,i)=>{
-            const t=tm[item.type]||tm.idea;
-            const isP=procId===item.id;
-            const isAiLoading=aiLoading===item.id;
-            return (
-              <div key={item.id}>
-                <div style={{ padding:'13px 16px',opacity:item.processed?.55:1 }}>
-                  <div style={{ display:'flex',gap:12 }}>
-                    <IconTile name={isAiLoading?'hourglass':t.icon} color={t.color} size={34}/>
-                    <div style={{ flex:1,minWidth:0 }}>
-                      <p style={{ margin:'0 0 4px',fontSize:15,color:'#FFF',lineHeight:1.4,letterSpacing:-0.1 }}>{item.text}</p>
-                      <div style={{ display:'flex',gap:6,alignItems:'center',flexWrap:'wrap' }}>
-                        <span style={{ fontSize:12,color:'rgba(235,235,245,0.32)' }}>{timeAgo(item.id)}</span>
-                        <Tag label={t.label} color={t.color}/>
-                        {item.processed&&<span style={{ display:'inline-flex',alignItems:'center',gap:3,color:'#30D158',fontSize:11,fontWeight:600 }}><Icon name="check" size={10} weight={3}/> Procesada</span>}
-                        {isAiLoading&&<Tag label="IA…" color="#BF5AF2"/>}
-                      </div>
-                    </div>
-                    <button onClick={()=>del(item.id)} style={{ background:'none',border:'none',color:'rgba(235,235,245,0.3)',cursor:'pointer',flexShrink:0,padding:4,display:'flex',alignItems:'center' }}><Icon name="close" size={14} weight={2.2}/></button>
-                  </div>
-                  {!item.processed&&!isP&&(
-                    <button onClick={()=>setProcId(item.id)} style={{ marginTop:10,padding:9,width:'100%',borderRadius:11,background:'#2C2C2E',border:'0.5px solid rgba(84,84,88,0.38)',color:'#00C8B1',fontSize:13,fontWeight:600,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:6,letterSpacing:-0.1 }}>
-                      Procesar <Icon name="arrow-right" size={12} weight={2.5}/>
-                    </button>
-                  )}
-                  {isP&&(
-                    <div style={{ marginTop:10 }}>
-                      <p style={{ margin:'0 0 8px 2px',fontSize:11,color:'rgba(235,235,245,0.5)',fontWeight:600,textTransform:'uppercase',letterSpacing:0.5 }}>¿A dónde lo mandas?</p>
-                      <div style={{ display:'grid',gridTemplateColumns:'1fr 1fr',gap:6,marginBottom:6 }}>
-                        <button onClick={()=>process(item.id,'task-hoy')} style={{ padding:'10px 8px',borderRadius:11,border:'0.5px solid rgba(255,69,58,0.3)',background:'rgba(255,69,58,0.12)',color:'#FF453A',fontSize:13,fontWeight:600,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:6 }}><Icon name="sun" size={13}/> Hoy</button>
-                        <button onClick={()=>process(item.id,'task')} style={{ padding:'10px 8px',borderRadius:11,border:'0.5px solid rgba(10,132,255,0.3)',background:'rgba(10,132,255,0.12)',color:'#0A84FF',fontSize:13,fontWeight:600,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:6 }}><Icon name="list" size={13}/> Tarea</button>
-                        <button onClick={()=>process(item.id,'reminder')} style={{ padding:'10px 8px',borderRadius:11,border:'0.5px solid rgba(255,159,10,0.3)',background:'rgba(255,159,10,0.12)',color:'#FF9F0A',fontSize:13,fontWeight:600,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:6 }}><Icon name="bell" size={13}/> Recordatorio</button>
-                        <button onClick={()=>process(item.id,'gasto')} style={{ padding:'10px 8px',borderRadius:11,border:'0.5px solid rgba(48,209,88,0.3)',background:'rgba(48,209,88,0.12)',color:'#30D158',fontSize:13,fontWeight:600,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:6 }}><Icon name="wallet" size={13}/> Gasto</button>
-                      </div>
-                      <div style={{ display:'flex',gap:6 }}>
-                        <button onClick={()=>{ LOData.captures.markProcessed(item.id); setProcId(null); refresh(); }} style={{ flex:1,padding:'8px',borderRadius:10,border:'0.5px solid rgba(84,84,88,0.45)',background:'#2C2C2E',color:'rgba(235,235,245,0.55)',fontSize:12,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:5 }}><Icon name="archive" size={11}/> Solo archivar</button>
-                        <button onClick={()=>setProcId(null)} style={{ padding:'8px 14px',background:'none',border:'none',color:'rgba(235,235,245,0.4)',fontSize:12,cursor:'pointer' }}>Cancelar</button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-                {i<filtered.length-1&&<div style={{ height:'0.5px',background:G.sep,marginLeft:62 }}/>}
-              </div>
-            );
-          })}
+      {/* REMINDER MINI-FORM */}
+      {activeFlow==='reminder' && (
+        <C style={{ padding:'14px 16px',marginBottom:10,border:'0.5px solid rgba(255,159,10,0.35)' }}>
+          <p style={{ margin:'0 0 12px',fontSize:14,fontWeight:700,color:'#FFF',letterSpacing:-0.2 }}>
+            🔔 {text.trim()||'Nombre del recordatorio'}
+          </p>
+          <div style={{ display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:12 }}>
+            <div>
+              <p style={{ margin:'0 0 5px',fontSize:11,color:'rgba(235,235,245,0.45)',fontWeight:600,textTransform:'uppercase',letterSpacing:0.4 }}>Hora</p>
+              <input type="time" value={flowForm.time} onChange={e=>setFlowForm(f=>({...f,time:e.target.value}))} style={{ ...inS,padding:'10px 12px',fontSize:15 }}/>
+            </div>
+            <div>
+              <p style={{ margin:'0 0 5px',fontSize:11,color:'rgba(235,235,245,0.45)',fontWeight:600,textTransform:'uppercase',letterSpacing:0.4 }}>Repetir</p>
+              <select value={flowForm.repeat} onChange={e=>setFlowForm(f=>({...f,repeat:e.target.value}))} style={{ ...inS,padding:'10px 12px',fontSize:13 }}>
+                <option value="once">Una vez</option>
+                <option value="daily">Cada día</option>
+                <option value="weekdays">Lun–Vie</option>
+                <option value="weekly">Semanal</option>
+              </select>
+            </div>
+          </div>
+          <button onClick={doReminder} disabled={!text.trim()} style={{
+            width:'100%',padding:13,borderRadius:12,
+            background:text.trim()?'linear-gradient(145deg,#FF9F0A,#FF8C00)':'#2C2C2E',
+            color:text.trim()?'#000':'rgba(235,235,245,0.3)',
+            border:'none',fontWeight:700,fontSize:15,cursor:text.trim()?'pointer':'default',
+            boxShadow:text.trim()?'0 4px 16px rgba(255,159,10,0.35)':'none' }}>
+            Crear Recordatorio →
+          </button>
         </C>
+      )}
+
+      {/* EVENT MINI-FORM */}
+      {activeFlow==='event' && (
+        <C style={{ padding:'14px 16px',marginBottom:10,border:'0.5px solid rgba(52,199,89,0.35)' }}>
+          <p style={{ margin:'0 0 12px',fontSize:14,fontWeight:700,color:'#FFF',letterSpacing:-0.2 }}>
+            📅 {text.trim()||'Nombre del evento'}
+          </p>
+          <div style={{ display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:12 }}>
+            <div>
+              <p style={{ margin:'0 0 5px',fontSize:11,color:'rgba(235,235,245,0.45)',fontWeight:600,textTransform:'uppercase',letterSpacing:0.4 }}>Fecha</p>
+              <input type="date" value={flowForm.date} onChange={e=>setFlowForm(f=>({...f,date:e.target.value}))} style={{ ...inS,padding:'10px 12px',fontSize:14 }}/>
+            </div>
+            <div>
+              <p style={{ margin:'0 0 5px',fontSize:11,color:'rgba(235,235,245,0.45)',fontWeight:600,textTransform:'uppercase',letterSpacing:0.4 }}>Hora</p>
+              <input type="time" value={flowForm.time} onChange={e=>setFlowForm(f=>({...f,time:e.target.value}))} style={{ ...inS,padding:'10px 12px',fontSize:15 }}/>
+            </div>
+          </div>
+          <button onClick={doEvento} disabled={!text.trim()} style={{
+            width:'100%',padding:13,borderRadius:12,
+            background:text.trim()?'linear-gradient(145deg,#34C759,#28A745)':'#2C2C2E',
+            color:text.trim()?'#FFF':'rgba(235,235,245,0.3)',
+            border:'none',fontWeight:700,fontSize:15,cursor:text.trim()?'pointer':'default',
+            boxShadow:text.trim()?'0 4px 16px rgba(52,199,89,0.35)':'none' }}>
+            Agregar al Timeline →
+          </button>
+        </C>
+      )}
+
+      {/* PENDING IDEAS LIST */}
+      {pending.length>0 && (
+        <>
+          <Hdr title={`Guardadas · ${pending.length}`} mt={16}/>
+          <C>
+            {pending.map((item,i)=>{
+              const CAT_CFG = { idea:{ icon:'lightbulb',color:'#FFD60A' }, tarea:{ icon:'check-list',color:'#0A84FF' }, recordatorio:{ icon:'bell',color:'#FF9F0A' }, nota:{ icon:'note',color:'#BF5AF2' }, gasto:{ icon:'wallet',color:'#34C759' } };
+              const cfg = CAT_CFG[item.type]||CAT_CFG.idea;
+              return (
+                <div key={item.id} style={{ display:'flex',alignItems:'center',gap:12,padding:'12px 16px',position:'relative' }}>
+                  <IconTile name={cfg.icon} color={cfg.color} size={34}/>
+                  <div style={{ flex:1,minWidth:0 }}>
+                    <p style={{ margin:'0 0 3px',fontSize:14,color:'#FFF',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',letterSpacing:-0.1 }}>{item.text}</p>
+                    <span style={{ fontSize:11,color:'rgba(235,235,245,0.32)' }}>{timeAgo(item.id)}</span>
+                  </div>
+                  {/* Quick actions */}
+                  <div style={{ display:'flex',gap:6,flexShrink:0 }}>
+                    <button onClick={()=>{ LOData.tasks.add({ title:item.text, context:'Hoy', priority:'importante' }); LOData.captures.markProcessed(item.id); refresh(); showToast('✅ A Hoy','#34C759'); }}
+                      style={{ padding:'6px 10px',borderRadius:8,background:'rgba(10,132,255,0.15)',border:'0.5px solid rgba(10,132,255,0.3)',color:'#0A84FF',fontSize:11,fontWeight:600,cursor:'pointer' }}>
+                      → Hoy
+                    </button>
+                    <button onClick={()=>delItem(item.id)}
+                      style={{ width:28,height:28,borderRadius:8,background:'none',border:'none',color:'rgba(235,235,245,0.25)',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center' }}>
+                      <Icon name="close" size={13} weight={2}/>
+                    </button>
+                  </div>
+                  {i<pending.length-1&&<div style={{ position:'absolute',bottom:0,left:62,right:0,height:'0.5px',background:G.sep }}/>}
+                </div>
+              );
+            })}
+          </C>
+        </>
+      )}
+
+      {/* Empty state */}
+      {pending.length===0&&!text&&(
+        <div style={{ textAlign:'center',padding:'48px 0 24px' }}>
+          <div style={{ fontSize:48,marginBottom:10,opacity:0.25 }}>📥</div>
+          <p style={{ margin:'0 0 5px',fontSize:16,fontWeight:600,color:'rgba(235,235,245,0.45)' }}>Inbox vacío</p>
+          <p style={{ margin:0,fontSize:13,color:'rgba(235,235,245,0.28)' }}>Escribe arriba para empezar</p>
+        </div>
       )}
     </div>
   );
