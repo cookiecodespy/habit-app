@@ -165,371 +165,286 @@ const buildTimeline = (period) => {
 window.buildTimeline = buildTimeline;
 
 /* ══════════════════════════════════════════════════════════════
-   TIMELINE SCREEN — visual time-block day / week / month view
+   TIMELINE SCREEN — Structured-quality premium timeline
 ══════════════════════════════════════════════════════════════ */
 const TimelineScreen = ({ onNavigate, onOpenFocus }) => {
-  const [habits, setHabits]       = React.useState([]);
-  const [focusMins, setFocusMins] = React.useState(0);
-  const [check, setCheck]         = React.useState(null);
-  const [showCI, setShowCI]       = React.useState(false);
-  const [ciForm, setCiForm]       = React.useState({ energia:3, foco:3, animo:3, intencion:'' });
-  const [aiInsight, setAiInsight] = React.useState(null);
-  const [inbox, setInbox]         = React.useState([]);
-  const [period, setPeriod]       = React.useState('today');
-  const [timeline, setTimeline]   = React.useState([]);
-  const [nowMin, setNowMin]       = React.useState(()=>{ const n=new Date(); return n.getHours()*60+n.getMinutes(); });
-  const scrollRef                 = React.useRef(null);
+  const [habits, setHabits]   = React.useState([]);
+  const [check, setCheck]     = React.useState(null);
+  const [showCI, setShowCI]   = React.useState(false);
+  const [ciForm, setCiForm]   = React.useState({ energia:3, foco:3, animo:3, intencion:'' });
+  const [period, setPeriod]   = React.useState('today');
+  const [timeline, setTimeline] = React.useState([]);
+  const [nowMin, setNowMin]   = React.useState(()=>{ const n=new Date(); return n.getHours()*60+n.getMinutes(); });
+  const scrollRef             = React.useRef(null);
 
   const name    = LOData.settings.getName();
-  const greet   = () => { const h=new Date().getHours(); return h<12?`Buenos días`:`${h<19?'Buenas tardes':'Buenas noches'}`; };
-  const dateStr = () => { const d=new Date(); return `${['dom','lun','mar','mié','jue','vie','sáb'][d.getDay()]} ${d.getDate()} de ${['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'][d.getMonth()]}`; };
+  const catColor = LOData.events.COLORS;
+  const moodC   = v => ['#FF453A','#FF9F0A','#FFD60A','#34C759','#34C759'][Math.max(0,Math.min(4,(v||3)-1))];
+  const moodL   = v => ['Bajo','Regular','Neutro','Bien','Excelente'][Math.max(0,Math.min(4,(v||3)-1))];
+
+  const dateStr = () => {
+    const d = new Date();
+    const days   = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+    const months = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+    return `${days[d.getDay()]} ${d.getDate()} de ${months[d.getMonth()]}`;
+  };
 
   const refresh = () => {
     setHabits(LOData.habits.getAll());
-    setFocusMins(LOData.focus.getTodayMinutes());
     setCheck(LOData.dailyCheck.getToday());
-    setInbox(LOData.captures.getUnprocessed().slice(0,4));
     setTimeline(buildTimeline(period));
-    const n=new Date(); setNowMin(n.getHours()*60+n.getMinutes());
+    const n = new Date(); setNowMin(n.getHours()*60+n.getMinutes());
   };
+
   React.useEffect(()=>{
     refresh();
-    window.addEventListener('lo:refresh',refresh);
+    window.addEventListener('lo:refresh', refresh);
     const ticker = setInterval(()=>{ const n=new Date(); setNowMin(n.getHours()*60+n.getMinutes()); }, 60000);
-    const ai = window.LOAI?.getSettings();
-    if (ai?.enabled) {
-      const allH = LOData.habits.getAll();
-      const done  = allH.filter(h=>LOData.habits.isToday(h)).length;
-      const ctx   = `Hábitos: ${done}/${allH.length}. Focus hoy: ${LOData.focus.getTodayMinutes()} min. Tareas pendientes: ${LOData.tasks.getAll().filter(t=>!t.completed).length}.`;
-      LOAI.getDailyInsight(ctx).then(r=>r&&setAiInsight(r));
-    }
-    return()=>{ window.removeEventListener('lo:refresh',refresh); clearInterval(ticker); };
+    return()=>{ window.removeEventListener('lo:refresh', refresh); clearInterval(ticker); };
   },[]);
   React.useEffect(()=>{ setTimeline(buildTimeline(period)); },[period]);
 
-  // Scroll to current time when viewing today
+  // Scroll to current time − 1 hour on today view
   React.useEffect(()=>{
     if (period==='today' && scrollRef.current) {
-      const SLOT_H=64, START_H=5;
-      const scrollTo = Math.max(0, (nowMin/60 - START_H - 1)) * SLOT_H;
-      setTimeout(()=>{ if(scrollRef.current) scrollRef.current.scrollTop = scrollTo; }, 120);
+      const SLOT_H=88, START_H=6;
+      // Scroll to first event of the day, or 1h before current time (whichever is earlier)
+      const todayEvts = LOData.events.getToday().filter(e=>e.time).sort((a,b)=>a.time.localeCompare(b.time));
+      const firstEvtMin = todayEvts.length > 0 ? (() => { const [hh,mm]=todayEvts[0].time.split(':').map(Number); return hh*60+mm; })() : nowMin;
+      const targetMin = Math.min(firstEvtMin, nowMin);
+      const scrollTo = Math.max(0, (targetMin/60 - START_H - 0.5) * SLOT_H);
+      setTimeout(()=>{ if(scrollRef.current) scrollRef.current.scrollTop = scrollTo; }, 80);
     }
   }, [period]);
 
-  const doneH      = habits.filter(h=>LOData.habits.isToday(h)).length;
-  const totalTasks = LOData.tasks.getAll().filter(t=>t.context==='Hoy').length;
-  const doneTasks  = LOData.tasks.getAll().filter(t=>t.context==='Hoy'&&t.completed).length;
-  const catColor   = LOData.events.COLORS;
-  const moodFace   = v => { const i=Math.max(0,Math.min(4,(v||3)-1)); return ['#FF453A','#FF9F0A','#FFD60A','#30D158','#34C759'][i]; };
-  const moodLabel  = v => ['Bajo','Regular','Neutro','Bien','Excelente'][Math.max(0,Math.min(4,(v||3)-1))];
+  const itemColor = it => {
+    if(it.kind==='event') return catColor[it.category]||'#0A84FF';
+    if(it.kind==='task') return {urgente:'#FF453A',importante:'#FF9F0A',cuando_pueda:'#34C759'}[it.priority]||'#00C8B1';
+    return '#FF453A';
+  };
 
-  // Group timeline by date for non-today views
+  const doneH = habits.filter(h=>LOData.habits.isToday(h)).length;
+
+  // Week/month grouping
   const grouped = (() => {
-    if(period==='today') return [{ date:LOData.today(), items:timeline }];
     const g = {};
     timeline.forEach(it=>{ (g[it.date]=g[it.date]||[]).push(it); });
     return Object.keys(g).sort().map(d=>({ date:d, items:g[d] }));
   })();
-
   const dateLabel = ds => {
     const d = new Date(ds+'T12:00');
     const today = LOData.today();
     const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate()+1);
-    const tomStr = tomorrow.toISOString().split('T')[0];
-    if (ds===today) return 'Hoy';
-    if (ds===tomStr) return 'Mañana';
+    if(ds===today) return 'Hoy';
+    if(ds===tomorrow.toISOString().split('T')[0]) return 'Mañana';
     return d.toLocaleDateString('es-CL',{weekday:'long',day:'numeric',month:'long'});
   };
 
-  const ProgBar = ({ val, max, color }) => {
-    const pct = max>0 ? Math.round((val/max)*100) : 0;
+  // ── DAY VIEW — Structured-quality timeline ──────────────────
+  const DayView = () => {
+    const SLOT_H=88, START_H=6, END_H=23;
+    const HOURS   = Array.from({length:END_H-START_H},(_,i)=>i+START_H);
+    const toMin   = t => { if(!t) return null; const [hh,mm]=t.split(':').map(Number); return hh*60+(mm||0); };
+    const todayItems  = timeline.filter(it=>it.date===LOData.today());
+    const timedItems  = todayItems.filter(it=>it.time);
+    const allDay      = todayItems.filter(it=>!it.time);
+    const blockTop    = m => ((m/60-START_H)*SLOT_H);
+    const blockH      = m => Math.max(52, ((it.raw?.duration||55)/60)*SLOT_H-3);
+
     return (
-      <div style={{ height:4, background:'rgba(84,84,88,0.45)', borderRadius:2, overflow:'hidden', marginTop:6 }}>
-        <div style={{ height:'100%', width:`${pct}%`, background:color, borderRadius:2, transition:'width .6s cubic-bezier(.4,0,.2,1)', boxShadow:`0 0 6px ${color}80` }}/>
-      </div>
+      <>
+        {/* Timeline grid */}
+        <div style={{ background:'#000',borderRadius:16,overflow:'hidden',border:'0.5px solid rgba(84,84,88,0.3)',marginBottom:allDay.length?10:14 }}>
+          <div ref={scrollRef} style={{ height:460,overflowY:'auto',position:'relative',WebkitOverflowScrolling:'touch' }}>
+            <div style={{ position:'relative',minHeight: (END_H-START_H)*SLOT_H }}>
+              {/* Hour rows */}
+              {HOURS.map(h=>{
+                const isNow  = Math.floor(nowMin/60)===h;
+                const isPast = (h+1)*60 < nowMin;
+                const label  = h<12?`${h}am`:h===12?'12pm':`${h-12}pm`;
+                return (
+                  <div key={h} style={{ display:'flex',height:SLOT_H,position:'relative' }}>
+                    <div style={{ width:52,paddingRight:10,paddingTop:10,textAlign:'right',flexShrink:0,
+                      fontSize:11,fontWeight:600,letterSpacing:-0.3,fontVariantNumeric:'tabular-nums',
+                      color:isNow?'#FF453A':isPast?'rgba(84,84,88,0.4)':'rgba(235,235,245,0.22)' }}>
+                      {label}
+                    </div>
+                    <div style={{ flex:1,borderTop:'0.5px solid rgba(84,84,88,0.15)',position:'relative' }}>
+                      <div style={{ position:'absolute',top:'50%',left:0,right:10,height:'0.5px',background:'rgba(84,84,88,0.07)' }}/>
+                    </div>
+                  </div>
+                );
+              })}
+
+              {/* EVENT BLOCKS — SOLID COLOR, Structured-style */}
+              {timedItems.map((it,ii)=>{
+                const m = toMin(it.time);
+                if(m===null||m/60<START_H||m/60>=END_H) return null;
+                const top  = blockTop(m);
+                const bh   = Math.max(52, ((it.raw?.duration||55)/60)*SLOT_H-3);
+                const col  = itemColor(it);
+                const done = it.kind==='task' && it.raw?.completed;
+                // Structured uses solid color blocks — dramatic, vivid, unmistakeable
+                return (
+                  <div key={it.id} style={{
+                    position:'absolute',
+                    top: top+1,
+                    left: 54 + ii*6,
+                    right: 8,
+                    height: bh,
+                    borderRadius: 11,
+                    background: done ? '#2C2C2E' : col,
+                    opacity: done ? 0.45 : 1,
+                    overflow: 'hidden',
+                    cursor: 'pointer',
+                    zIndex: ii+2,
+                    boxShadow: done ? 'none' : `0 4px 16px ${col}55`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 10,
+                    padding: '0 12px',
+                  }}>
+                    {/* Subtle left shine for depth */}
+                    <div style={{ position:'absolute',top:0,left:0,bottom:0,width:3,background:'rgba(255,255,255,0.18)',borderRadius:'11px 0 0 11px' }}/>
+                    {/* Icon */}
+                    <div style={{ width:28,height:28,borderRadius:8,background:'rgba(0,0,0,0.2)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,color:'#FFF' }}>
+                      <Icon name={it.kind==='event'?'calendar':it.kind==='task'?'check-list':'bell'} size={14} weight={2}/>
+                    </div>
+                    {/* Text */}
+                    <div style={{ flex:1,minWidth:0 }}>
+                      <p style={{ margin:0,fontSize:13,fontWeight:700,color:'#FFF',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',letterSpacing:-0.3,textDecoration:done?'line-through':'none' }}>
+                        {it.title}
+                      </p>
+                      {bh>58&&(
+                        <p style={{ margin:'2px 0 0',fontSize:11,color:'rgba(255,255,255,0.72)',letterSpacing:-0.1 }}>
+                          {it.time}{it.kind==='event'&&it.category?' · '+it.category:''}
+                        </p>
+                      )}
+                    </div>
+                    {/* Task checkbox */}
+                    {it.kind==='task'&&(
+                      <button onClick={e=>{e.stopPropagation();LOData.tasks.toggle(it.raw.id);refresh();}}
+                        style={{ width:22,height:22,borderRadius:7,border:'1.5px solid rgba(255,255,255,0.6)',background:done?'rgba(255,255,255,0.3)':'transparent',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',color:'#FFF',flexShrink:0 }}>
+                        {done&&<Icon name="check" size={11} weight={3}/>}
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
+
+              {/* CURRENT TIME LINE */}
+              {nowMin>=START_H*60&&nowMin<END_H*60&&(
+                <div style={{ position:'absolute',left:0,right:0,top:blockTop(nowMin)+1,display:'flex',alignItems:'center',pointerEvents:'none',zIndex:40 }}>
+                  <div style={{ width:52,display:'flex',justifyContent:'flex-end',paddingRight:4,flexShrink:0 }}>
+                    <div style={{ width:10,height:10,borderRadius:'50%',background:'#FF453A',boxShadow:'0 0 0 2.5px #000,0 0 10px rgba(255,69,58,0.9)' }}/>
+                  </div>
+                  <div style={{ flex:1,height:1.5,background:'#FF453A',opacity:0.9,boxShadow:'0 0 4px rgba(255,69,58,0.4)' }}/>
+                </div>
+              )}
+            </div>
+
+            {/* Empty state */}
+            {timedItems.length===0&&(
+              <div style={{ position:'absolute',inset:0,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:10,pointerEvents:'none' }}>
+                <div style={{ fontSize:48,opacity:0.15 }}>📅</div>
+                <p style={{ margin:0,fontSize:16,fontWeight:600,color:'rgba(235,235,245,0.25)',letterSpacing:-0.3 }}>Día libre</p>
+                <p style={{ margin:0,fontSize:13,color:'rgba(235,235,245,0.15)' }}>Toca + para agregar</p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* All-day / no-time tasks */}
+        {allDay.length>0&&(
+          <div style={{ marginBottom:14 }}>
+            <p style={{ margin:'0 4px 8px',fontSize:11,fontWeight:700,color:'rgba(235,235,245,0.32)',textTransform:'uppercase',letterSpacing:0.5 }}>TODO EL DÍA</p>
+            <C>
+              {allDay.map((it,idx)=>{
+                const col=itemColor(it); const done=it.kind==='task'&&it.raw?.completed;
+                return (
+                  <div key={it.id} style={{ display:'flex',alignItems:'center',gap:12,padding:'12px 16px',position:'relative',opacity:done?0.5:1 }}>
+                    <div style={{ width:10,height:10,borderRadius:'50%',background:col,flexShrink:0 }}/>
+                    <p style={{ flex:1,margin:0,fontSize:15,fontWeight:600,color:'#FFF',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',letterSpacing:-0.2,textDecoration:done?'line-through':'none' }}>{it.title}</p>
+                    {it.kind==='task'&&(
+                      <button onClick={()=>{LOData.tasks.toggle(it.raw.id);refresh();}} style={{ width:24,height:24,borderRadius:7,border:`1.5px solid ${done?'rgba(84,84,88,0.4)':col}`,background:done?col:'transparent',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',color:'#FFF',flexShrink:0 }}>
+                        {done&&<Icon name="check" size={11} weight={3}/>}
+                      </button>
+                    )}
+                    {idx<allDay.length-1&&<div style={{ position:'absolute',bottom:0,left:34,right:0,height:'0.5px',background:G.sep }}/>}
+                  </div>
+                );
+              })}
+            </C>
+          </div>
+        )}
+      </>
     );
   };
 
   return (
     <div style={{ paddingBottom:20 }}>
-      {/* Header */}
-      <div style={{ marginBottom:20 }}>
-        <p style={{ fontSize:13,fontWeight:500,color:'rgba(235,235,245,0.42)',margin:'0 0 3px',letterSpacing:-0.1 }}>{greet()},</p>
-        <h1 style={{ fontSize:34,fontWeight:700,color:'#FFF',margin:'0 0 4px',letterSpacing:-0.7,lineHeight:1.05 }}>{name}</h1>
-        <p style={{ fontSize:13,color:'rgba(235,235,245,0.4)',margin:0,letterSpacing:-0.1 }}>{dateStr()}</p>
+
+      {/* ── COMPACT HEADER ── */}
+      <div style={{ display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:16 }}>
+        <div>
+          <p style={{ margin:0,fontSize:13,color:'rgba(235,235,245,0.40)',letterSpacing:-0.1 }}>{dateStr()}</p>
+          <h1 style={{ margin:'2px 0 0',fontSize:32,fontWeight:700,color:'#FFF',letterSpacing:-0.8,lineHeight:1.05 }}>{name}</h1>
+        </div>
+        <div style={{ display:'flex',gap:8,alignItems:'center',marginTop:4 }}>
+          {/* Focus pill */}
+          <button onClick={onOpenFocus} style={{ display:'flex',alignItems:'center',gap:5,padding:'7px 13px',borderRadius:20,background:'rgba(0,200,177,0.14)',border:'0.5px solid rgba(0,200,177,0.3)',color:'#00C8B1',fontSize:13,fontWeight:600,cursor:'pointer' }}>
+            <Icon name="target" size={13}/> Focus
+          </button>
+        </div>
       </div>
 
-      {/* Stat pills */}
-      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:10, marginBottom:12 }}>
-        <C style={{ padding:'13px 13px 12px' }}>
-          <IconTile name="target" color="#00C8B1" size={30}/>
-          <p style={{ margin:'10px 0 1px',fontSize:22,fontWeight:700,color:'#FFF',letterSpacing:-1,lineHeight:1,fontVariantNumeric:'tabular-nums' }}>{focusMins}<span style={{ fontSize:12,fontWeight:500,color:'rgba(235,235,245,0.4)',marginLeft:2 }}>m</span></p>
-          <p style={{ margin:0,fontSize:11,color:'rgba(235,235,245,0.42)',fontWeight:500,letterSpacing:-0.1 }}>Foco hoy</p>
-          <ProgBar val={focusMins} max={120} color='#00C8B1'/>
-        </C>
-        <C style={{ padding:'13px 13px 12px' }}>
-          <IconTile name="leaf" color="#30D158" size={30}/>
-          <p style={{ margin:'10px 0 1px',fontSize:22,fontWeight:700,color:'#FFF',letterSpacing:-1,lineHeight:1,fontVariantNumeric:'tabular-nums' }}>{doneH}<span style={{ fontSize:14,fontWeight:400,color:'rgba(235,235,245,0.4)' }}>/{habits.length}</span></p>
-          <p style={{ margin:0,fontSize:11,color:'rgba(235,235,245,0.42)',fontWeight:500,letterSpacing:-0.1 }}>Hábitos</p>
-          <ProgBar val={doneH} max={habits.length||1} color='#30D158'/>
-        </C>
-        <C style={{ padding:'13px 13px 12px' }}>
-          <IconTile name="check-list" color="#FF9F0A" size={30}/>
-          <p style={{ margin:'10px 0 1px',fontSize:22,fontWeight:700,color:'#FFF',letterSpacing:-1,lineHeight:1,fontVariantNumeric:'tabular-nums' }}>{doneTasks}<span style={{ fontSize:14,fontWeight:400,color:'rgba(235,235,245,0.4)' }}>/{totalTasks}</span></p>
-          <p style={{ margin:0,fontSize:11,color:'rgba(235,235,245,0.42)',fontWeight:500,letterSpacing:-0.1 }}>Tareas</p>
-          <ProgBar val={doneTasks} max={totalTasks||1} color='#FF9F0A'/>
-        </C>
-      </div>
-
-      {/* Hábitos quick-check */}
-      {habits.length>0 && (
-        <C style={{ padding:'14px 16px', marginBottom:12 }}>
-          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:12 }}>
-            <p style={{ margin:0, fontSize:14, fontWeight:600, color:'rgba(235,235,245,0.7)',letterSpacing:-0.2 }}>Hábitos de hoy</p>
-            <button onClick={()=>onNavigate('habitos')} style={{ background:'none',border:'none',color:'#00C8B1',fontSize:13,cursor:'pointer',padding:0,fontWeight:500,letterSpacing:-0.1 }}>Ver todos</button>
-          </div>
-          <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
-            {habits.map(h=>{
-              const done = LOData.habits.isToday(h);
-              return (
-                <button key={h.id} onClick={()=>{ LOData.habits.toggle(h.id); refresh(); window.dispatchEvent(new Event('lo:refresh')); }}
-                  style={{ display:'flex',flexDirection:'column',alignItems:'center',gap:5,padding:'10px 8px',borderRadius:13,border:done?'0.5px solid rgba(48,209,88,0.5)':'0.5px solid rgba(84,84,88,0.45)',background:done?'rgba(48,209,88,0.14)':'#2C2C2E',cursor:'pointer',minWidth:58,transition:'all .2s',position:'relative' }}>
-                  <span style={{ fontSize:20 }}>{h.icon}</span>
-                  <span style={{ fontSize:10,color:done?'#30D158':'rgba(235,235,245,0.5)',fontWeight:600,textAlign:'center',lineHeight:1.2,maxWidth:54,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',letterSpacing:-0.1 }}>{h.name}</span>
-                  {done && <div style={{ position:'absolute',top:5,right:5,width:14,height:14,borderRadius:'50%',background:'#30D158',display:'flex',alignItems:'center',justifyContent:'center',color:'#FFF' }}><Icon name="check" size={9} weight={3}/></div>}
-                </button>
-              );
-            })}
-          </div>
-        </C>
-      )}
-
-      {/* ── Period selector: Hoy / Semana / Mes ── */}
-      <div style={{ display:'flex',gap:0,marginBottom:12,...G.card,padding:3,borderRadius:13 }}>
+      {/* ── PERIOD SELECTOR — compact pills ── */}
+      <div style={{ display:'flex',gap:8,marginBottom:14 }}>
         {[['today','Hoy'],['week','Semana'],['month','Mes']].map(([v,l])=>(
-          <button key={v} onClick={()=>setPeriod(v)} style={{ flex:1,padding:'9px 4px',borderRadius:10,border:'none',cursor:'pointer',background:period===v?'rgba(84,84,88,0.50)':'transparent',color:period===v?'#FFF':'rgba(235,235,245,0.45)',fontSize:13,fontWeight:period===v?600:500,transition:'all .15s',letterSpacing:-0.1 }}>{l}</button>
+          <button key={v} onClick={()=>setPeriod(v)} style={{ padding:'7px 18px',borderRadius:20,border:'none',cursor:'pointer',fontSize:14,fontWeight:period===v?700:500,letterSpacing:-0.2,transition:'all .15s',
+            background:period===v?'#00C8B1':'#1C1C1E',
+            color:period===v?'#000':'rgba(235,235,245,0.5)' }}>
+            {l}
+          </button>
         ))}
       </div>
 
-      {/* ── TIMELINE: Structured-style visual day view ── */}
-      {period==='today' && (() => {
-        const SLOT_H=72, START_H=5, END_H=23;
-        const HOURS = Array.from({length:END_H-START_H},(_,i)=>i+START_H);
-        const timeToMin = t => { if(!t) return null; const [hh,mm]=t.split(':').map(Number); return hh*60+(mm||0); };
-        const todayItems = timeline.filter(it=>it.date===LOData.today());
-        const timedItems = todayItems.filter(it=>it.time);
-        const allDayItems = todayItems.filter(it=>!it.time);
+      {/* ── TODAY: visual timeline ── */}
+      {period==='today' && <DayView/>}
 
-        const itemColor = it => {
-          if(it.kind==='event') return catColor[it.category]||'#0A84FF';
-          if(it.kind==='task')  return {urgente:'#FF453A',importante:'#FF9F0A',cuando_pueda:'#34C759'}[it.priority]||'#00C8B1';
-          return '#FF453A';
-        };
-        const itemIcon = it => it.kind==='event'?'calendar':it.kind==='task'?'check-list':'bell';
-        const typeLabel = it => it.kind==='event'?it.category:it.kind==='task'?'Tarea':'Recordatorio';
-
-        // Position a block: top offset within the day (in px from START_H)
-        const blockTop = m => ((m/60 - START_H) * SLOT_H);
-        // Block height: use duration or default 60 min
-        const blockH = (startM, durMin=55) => Math.max(42, (durMin/60)*SLOT_H - 3);
-
-        return (
-          <div style={{ marginBottom:14 }}>
-            {/* TIMELINE GRID — Structured-style */}
-            <div style={{ background:'#000', borderRadius:16, overflow:'hidden', border:'0.5px solid rgba(84,84,88,0.35)' }}>
-              <div ref={scrollRef} style={{ maxHeight:440, overflowY:'auto', position:'relative' }}>
-                {/* Hour grid background */}
-                <div style={{ position:'relative', paddingBottom:16 }}>
-                  {/* Hour rows */}
-                  {HOURS.map(h=>{
-                    const isNow  = Math.floor(nowMin/60)===h;
-                    const isPast = (h+1)*60 < nowMin;
-                    const label  = h===0?'12am':h<12?`${h}am`:h===12?'12pm':`${h-12}pm`;
-                    return (
-                      <div key={h} style={{ display:'flex',height:SLOT_H,position:'relative' }}>
-                        {/* Hour label */}
-                        <div style={{ width:54,paddingRight:10,paddingTop:10,textAlign:'right',flexShrink:0,
-                          fontSize:11,fontWeight:600,letterSpacing:-0.3,fontVariantNumeric:'tabular-nums',
-                          color:isNow?'#FF453A':isPast?'rgba(84,84,88,0.5)':'rgba(235,235,245,0.28)' }}>
-                          {label}
-                        </div>
-                        {/* Hour line */}
-                        <div style={{ flex:1,borderTop:`0.5px solid rgba(84,84,88,${isNow?'0':'0.18'})`,position:'relative' }}>
-                          {/* 30-min tick */}
-                          <div style={{ position:'absolute',top:'50%',left:0,right:12,height:'0.5px',background:'rgba(84,84,88,0.09)' }}/>
-                        </div>
-                      </div>
-                    );
-                  })}
-
-                  {/* Event/task blocks — absolute positioned */}
-                  {timedItems.map((it,ii)=>{
-                    const m = timeToMin(it.time);
-                    if (m===null||m/60<START_H||m/60>=END_H) return null;
-                    const top = blockTop(m);
-                    const h   = blockH(m, it.raw?.duration || 55);
-                    const col = itemColor(it);
-                    const isDone = it.kind==='task' && it.raw?.completed;
-                    return (
-                      <div key={it.id} style={{
-                        position:'absolute',
-                        top: top + 1,
-                        left: 54 + ii*2,
-                        right: 8 + ii*2,
-                        height: h,
-                        borderRadius: 10,
-                        background: isDone ? '#2C2C2E' : `${col}22`,
-                        borderLeft: `3.5px solid ${isDone?'rgba(84,84,88,0.5)':col}`,
-                        display:'flex', alignItems:'center', gap:8,
-                        padding:'0 10px 0 9px',
-                        cursor:'pointer',
-                        overflow:'hidden',
-                        opacity: isDone ? 0.5 : 1,
-                        transition:'opacity .15s',
-                      }}>
-                        {/* Icon circle */}
-                        <div style={{
-                          width:24,height:24,borderRadius:8,flexShrink:0,
-                          background:`${col}30`,
-                          display:'flex',alignItems:'center',justifyContent:'center',
-                          color:col,
-                        }}>
-                          <Icon name={itemIcon(it)} size={12} weight={2}/>
-                        </div>
-                        {/* Content */}
-                        <div style={{ flex:1,minWidth:0 }}>
-                          <p style={{ margin:0,fontSize:12,fontWeight:600,color:isDone?'rgba(235,235,245,0.4)':'#FFF',
-                            overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',letterSpacing:-0.2,
-                            textDecoration:isDone?'line-through':'none' }}>
-                            {it.title}
-                          </p>
-                          {h>50&&<p style={{ margin:'1px 0 0',fontSize:10.5,color:`${col}bb`,letterSpacing:-0.1 }}>
-                            {it.time} · {typeLabel(it)}
-                          </p>}
-                        </div>
-                        {/* Task checkbox */}
-                        {it.kind==='task'&&(
-                          <button onClick={e=>{e.stopPropagation();LOData.tasks.toggle(it.raw.id);refresh();}}
-                            style={{ width:18,height:18,borderRadius:5,flexShrink:0,
-                              border:`1.5px solid ${isDone?'rgba(84,84,88,0.5)':col}`,
-                              background:isDone?'#2C2C2E':'transparent',cursor:'pointer',
-                              display:'flex',alignItems:'center',justifyContent:'center',color:'#FFF' }}>
-                            {isDone&&<Icon name="check" size={9} weight={3}/>}
-                          </button>
-                        )}
-                      </div>
-                    );
-                  })}
-
-                  {/* Current time line */}
-                  {nowMin>=START_H*60&&nowMin<=END_H*60&&(
-                    <div style={{ position:'absolute',left:0,right:0,
-                      top: blockTop(nowMin)+1,
-                      display:'flex',alignItems:'center',pointerEvents:'none',zIndex:30 }}>
-                      <div style={{ width:54,display:'flex',justifyContent:'flex-end',paddingRight:5,flexShrink:0 }}>
-                        <div style={{ width:9,height:9,borderRadius:'50%',background:'#FF453A',
-                          boxShadow:'0 0 0 2px #000, 0 0 8px rgba(255,69,58,0.7)' }}/>
-                      </div>
-                      <div style={{ flex:1,height:1,background:'#FF453A',opacity:0.8 }}/>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Empty state */}
-              {timedItems.length===0&&allDayItems.length===0&&(
-                <div style={{ padding:'36px 20px 32px',textAlign:'center' }}>
-                  <div style={{ fontSize:40,marginBottom:12,opacity:0.35 }}>📅</div>
-                  <p style={{ margin:'0 0 4px',fontSize:15,fontWeight:600,color:'#FFF',letterSpacing:-0.3 }}>Tu día está libre</p>
-                  <p style={{ margin:0,fontSize:13,color:'rgba(235,235,245,0.38)' }}>Toca <strong style={{color:'#00C8B1'}}>+</strong> para agregar eventos o tareas</p>
-                </div>
-              )}
-            </div>
-
-            {/* All-day / untimed items */}
-            {allDayItems.length>0&&(
-              <div style={{ marginTop:10 }}>
-                <p style={{ margin:'0 4px 7px',fontSize:11,fontWeight:600,
-                  color:'rgba(235,235,245,0.35)',textTransform:'uppercase',letterSpacing:0.5 }}>
-                  Sin hora · Todo el día
-                </p>
-                <C>
-                  {allDayItems.map((it,idx)=>{
-                    const col=itemColor(it); const isDone=it.kind==='task'&&it.raw?.completed;
-                    return (
-                      <div key={it.id} style={{ display:'flex',alignItems:'center',gap:12,padding:'12px 16px',position:'relative',
-                        opacity:isDone?0.5:1 }}>
-                        <IconTile name={itemIcon(it)} color={col} size={34}/>
-                        <div style={{ flex:1,minWidth:0 }}>
-                          <p style={{ margin:0,fontSize:14,fontWeight:600,color:'#FFF',
-                            overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',letterSpacing:-0.2,
-                            textDecoration:isDone?'line-through':'none' }}>{it.title}</p>
-                          <p style={{ margin:'2px 0 0',fontSize:12,color:'rgba(235,235,245,0.42)' }}>{typeLabel(it)}</p>
-                        </div>
-                        {it.kind==='task'&&(
-                          <button onClick={()=>{LOData.tasks.toggle(it.raw.id);refresh();}}
-                            style={{ width:24,height:24,borderRadius:7,
-                              border:`1.5px solid ${isDone?'rgba(84,84,88,0.4)':col}`,
-                              background:isDone?'#2C2C2E':'transparent',cursor:'pointer',
-                              display:'flex',alignItems:'center',justifyContent:'center',color:'#FFF',flexShrink:0 }}>
-                            {isDone&&<Icon name="check" size={11} weight={3}/>}
-                          </button>
-                        )}
-                        {idx<allDayItems.length-1&&<div style={{position:'absolute',bottom:0,left:62,right:0,height:'0.5px',background:G.sep}}/>}
-                      </div>
-                    );
-                  })}
-                </C>
-              </div>
-            )}
-          </div>
-        );
-      })()}
-
-      {/* Week/month: empty state */}
+      {/* ── WEEK / MONTH: grouped list ── */}
       {period!=='today' && timeline.length===0 && (
-        <C style={{ padding:'30px 18px',marginBottom:12,textAlign:'center' }}>
-          <div style={{ width:52,height:52,borderRadius:15,background:'rgba(0,200,177,0.12)',border:'0.5px solid rgba(0,200,177,0.22)',display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 10px',color:'#00C8B1' }}>
-            <Icon name={period==='week'?'calendar':'chart'} size={22}/>
-          </div>
-          <p style={{ margin:'0 0 4px',fontSize:15,fontWeight:600,color:'#FFF',letterSpacing:-0.2 }}>{period==='week'?'Sin planes esta semana':'Mes despejado'}</p>
-          <p style={{ margin:0,fontSize:13,color:'rgba(235,235,245,0.42)' }}>Crea un evento, tarea o recordatorio</p>
+        <C style={{ padding:'32px 18px',marginBottom:14,textAlign:'center' }}>
+          <div style={{ fontSize:40,marginBottom:12,opacity:0.2 }}>📅</div>
+          <p style={{ margin:'0 0 4px',fontSize:16,fontWeight:600,color:'#FFF',letterSpacing:-0.3 }}>{period==='week'?'Sin planes esta semana':'Mes despejado'}</p>
+          <p style={{ margin:0,fontSize:13,color:'rgba(235,235,245,0.38)' }}>Toca + para agregar</p>
         </C>
       )}
       {period!=='today' && timeline.length>0 && (
-        <div style={{ marginBottom:12 }}>
+        <div style={{ marginBottom:14 }}>
           {grouped.map(g=>(
             <div key={g.date} style={{ marginBottom:14 }}>
-              <p style={{ margin:'0 4px 8px',fontSize:12,fontWeight:700,color:'rgba(235,235,245,0.55)',textTransform:'uppercase',letterSpacing:0.7 }}>{dateLabel(g.date)} · <span style={{ fontWeight:500,color:'rgba(235,235,245,0.35)',textTransform:'none',letterSpacing:0 }}>{g.items.length} {g.items.length===1?'item':'items'}</span></p>
+              <p style={{ margin:'0 4px 8px',fontSize:11,fontWeight:700,color:'rgba(235,235,245,0.4)',textTransform:'uppercase',letterSpacing:0.6 }}>
+                {dateLabel(g.date)} · {g.items.length}
+              </p>
               <C>
                 {g.items.map((it,idx)=>{
-                  const last = idx===g.items.length-1;
-                  let icon='', color='#00C8B1', subInfo='';
-                  if (it.kind==='event')    { color=catColor[it.category]||'#0A84FF'; icon='calendar'; subInfo=it.category+(it.location?(' · '+it.location):''); }
-                  if (it.kind==='task')     { color={urgente:'#FF453A',importante:'#FF9F0A',cuando_pueda:'#30D158'}[it.priority]||'#00C8B1'; icon='check-list'; subInfo='Tarea · '+(it.context||''); }
-                  if (it.kind==='reminder') { const cc={General:'#00C8B1',Salud:'#FF453A',Universidad:'#0A84FF',Trabajo:'#FF9F0A',Personal:'#30D158',Finanzas:'#64D2FF'}; color=cc[it.category]||'#00C8B1'; icon='bell'; subInfo='Recordatorio · '+it.category; }
+                  const col=itemColor(it); const last=idx===g.items.length-1;
                   return (
-                    <div key={it.id} style={{ display:'flex',alignItems:'flex-start',gap:0,position:'relative' }}>
-                      <div style={{ width:56,padding:'14px 0 14px 14px',display:'flex',flexDirection:'column',alignItems:'flex-end',flexShrink:0 }}>
-                        {it.time?<span style={{ fontSize:13,fontWeight:700,color:'#FFF',letterSpacing:-0.2,fontVariantNumeric:'tabular-nums',lineHeight:1.1 }}>{it.time}</span>:<span style={{ fontSize:11,color:'rgba(235,235,245,0.4)',fontWeight:500 }}>sin hora</span>}
+                    <div key={it.id} style={{ display:'flex',alignItems:'center',gap:12,padding:'12px 16px',position:'relative' }}>
+                      <div style={{ width:36,height:36,borderRadius:10,background:col,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,color:'#FFF',boxShadow:`0 3px 10px ${col}44` }}>
+                        <Icon name={it.kind==='event'?'calendar':it.kind==='task'?'check-list':'bell'} size={16} weight={2}/>
                       </div>
-                      <div style={{ width:24,display:'flex',justifyContent:'center',position:'relative',flexShrink:0 }}>
-                        <div style={{ width:2,height:'100%',background:'rgba(84,84,88,0.25)',position:'absolute',top:0,bottom:0 }}/>
-                        <div style={{ width:11,height:11,borderRadius:'50%',background:color,marginTop:18,position:'relative',zIndex:1,boxShadow:`0 0 0 3px rgba(28,28,30,0.95), 0 0 8px ${color}80` }}/>
+                      <div style={{ flex:1,minWidth:0 }}>
+                        <p style={{ margin:0,fontSize:15,fontWeight:600,color:'#FFF',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',letterSpacing:-0.2 }}>{it.title}</p>
+                        <p style={{ margin:'2px 0 0',fontSize:12,color:'rgba(235,235,245,0.42)' }}>{it.time||'Sin hora'} · {it.kind==='event'?it.category:it.kind==='task'?'Tarea':'Recordatorio'}</p>
                       </div>
-                      <div style={{ flex:1,minWidth:0,padding:'12px 16px 12px 10px' }}>
-                        <div style={{ display:'flex',alignItems:'center',gap:8,marginBottom:3 }}>
-                          <div style={{ color,display:'flex' }}><Icon name={icon} size={13} weight={2}/></div>
-                          {it.kind==='task'?(
-                            <button onClick={e=>{e.stopPropagation();LOData.tasks.toggle(it.raw.id);refresh();}} style={{ marginLeft:'auto',width:22,height:22,borderRadius:7,border:`2px solid ${color}`,background:it.raw.completed?color:'transparent',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',color:'#FFF',flexShrink:0 }}>
-                              {it.raw.completed&&<Icon name="check" size={10} weight={3}/>}
-                            </button>
-                          ):<Tag label={it.kind==='event'?'Evento':'Recordar'} color={color}/>}
-                        </div>
-                        <p style={{ margin:'0 0 2px',fontSize:15,fontWeight:600,color:'#FFF',letterSpacing:-0.2,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap' }}>{it.title}</p>
-                        <p style={{ margin:0,fontSize:12,color:'rgba(235,235,245,0.45)',letterSpacing:-0.05 }}>{subInfo}</p>
-                      </div>
-                      {!last&&<div style={{ position:'absolute',bottom:0,left:90,right:0,height:'0.5px',background:G.sep }}/>}
+                      {it.kind==='task'&&(
+                        <button onClick={()=>{LOData.tasks.toggle(it.raw.id);refresh();}} style={{ width:24,height:24,borderRadius:7,border:`1.5px solid ${col}`,background:it.raw?.completed?col:'transparent',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',color:'#FFF',flexShrink:0 }}>
+                          {it.raw?.completed&&<Icon name="check" size={11} weight={3}/>}
+                        </button>
+                      )}
+                      {!last&&<div style={{ position:'absolute',bottom:0,left:64,right:0,height:'0.5px',background:G.sep }}/>}
                     </div>
                   );
                 })}
@@ -539,111 +454,76 @@ const TimelineScreen = ({ onNavigate, onOpenFocus }) => {
         </div>
       )}
 
-      {/* AI Insight */}
-      {aiInsight && (
-        <C style={{ padding:'13px 16px', marginBottom:12, background:'linear-gradient(135deg,rgba(191,90,242,0.13) 0%,#1C1C1E 100%)', border:'0.5px solid rgba(191,90,242,0.22)' }}>
-          <div style={{ display:'flex',gap:11,alignItems:'flex-start' }}>
-            <div style={{ color:'#BF5AF2',marginTop:1 }}><Icon name="sparkle" size={18} weight={1.8}/></div>
-            <p style={{ margin:0,fontSize:14,color:'rgba(235,235,245,0.78)',lineHeight:1.5,letterSpacing:-0.1 }}>{aiInsight}</p>
+      {/* ── COMPACT HABITS STRIP ── */}
+      {period==='today' && habits.length>0 && (
+        <div style={{ marginBottom:14 }}>
+          <div style={{ display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8 }}>
+            <p style={{ margin:0,fontSize:12,fontWeight:700,color:'rgba(235,235,245,0.35)',textTransform:'uppercase',letterSpacing:0.5 }}>
+              Hábitos · {doneH}/{habits.length}
+            </p>
+            <button onClick={()=>onNavigate('habitos')} style={{ background:'none',border:'none',color:'#00C8B1',fontSize:12,fontWeight:600,cursor:'pointer',padding:0 }}>Ver todos</button>
           </div>
-        </C>
-      )}
-
-      {/* Check-in CTA */}
-      {!check && !showCI && (
-        <div onClick={()=>setShowCI(true)} style={{ display:'flex',alignItems:'center',gap:14,padding:'13px 16px',...G.card,border:'0.5px solid rgba(255,200,50,0.22)',marginBottom:12,cursor:'pointer' }}>
-          <IconTile name="sun" color="#FFD60A" size={40}/>
-          <div style={{ flex:1 }}>
-            <p style={{ margin:0,fontSize:15,fontWeight:600,color:'#FFF',letterSpacing:-0.2 }}>Check-in del día</p>
-            <p style={{ margin:'2px 0 0',fontSize:13,color:'rgba(235,235,245,0.42)' }}>¿Cómo llegas hoy?</p>
+          <div style={{ display:'flex',gap:8,overflowX:'auto',paddingBottom:2 }}>
+            {habits.map(h=>{
+              const done=LOData.habits.isToday(h);
+              return (
+                <button key={h.id} onClick={()=>{LOData.habits.toggle(h.id);refresh();window.dispatchEvent(new Event('lo:refresh'));}}
+                  style={{ width:46,height:46,borderRadius:13,flexShrink:0,cursor:'pointer',fontSize:22,
+                    background:done?'rgba(52,199,89,0.18)':'#1C1C1E',
+                    border:done?'1.5px solid rgba(52,199,89,0.55)':'0.5px solid rgba(84,84,88,0.4)',
+                    position:'relative',display:'flex',alignItems:'center',justifyContent:'center',
+                    transition:'all .2s' }}>
+                  {h.icon}
+                  {done&&<div style={{ position:'absolute',top:2,right:2,width:8,height:8,borderRadius:'50%',background:'#34C759',border:'1.5px solid #000' }}/>}
+                </button>
+              );
+            })}
           </div>
-          <Icon name="chevron-r" size={14} color="rgba(235,235,245,0.3)"/>
         </div>
       )}
 
-      {showCI && (
-        <C style={{ padding:18,marginBottom:12,border:'0.5px solid rgba(255,200,50,0.22)' }}>
-          <div style={{ display:'flex',alignItems:'center',gap:10,marginBottom:16 }}>
-            <IconTile name="sun" color="#FFD60A" size={32}/>
-            <p style={{ fontWeight:700,fontSize:17,color:'#FFF',margin:0,letterSpacing:-0.3 }}>¿Cómo llegas hoy?</p>
+      {/* ── COMPACT CHECK-IN ── */}
+      {period==='today' && !check && !showCI && (
+        <div onClick={()=>setShowCI(true)} style={{ display:'flex',alignItems:'center',gap:12,padding:'11px 16px',...G.card,cursor:'pointer',marginBottom:6 }}>
+          <span style={{ fontSize:18 }}>⚡</span>
+          <div style={{ flex:1 }}>
+            <p style={{ margin:0,fontSize:14,fontWeight:600,color:'#FFF',letterSpacing:-0.2 }}>Check-in de energía</p>
+            <p style={{ margin:0,fontSize:12,color:'rgba(235,235,245,0.4)' }}>¿Cómo estás hoy?</p>
           </div>
-          {[['energia','Energía','zap','#FFD60A'],['foco','Foco','target','#00C8B1'],['animo','Ánimo','face-smile','#30D158']].map(([k,l,ic,col])=>(
-            <div key={k} style={{ marginBottom:14 }}>
-              <div style={{ display:'flex',justifyContent:'space-between',marginBottom:6,alignItems:'center' }}>
-                <span style={{ fontSize:14,color:'rgba(235,235,245,0.75)',fontWeight:500,display:'flex',alignItems:'center',gap:6 }}><Icon name={ic} size={14} color={col}/> {l}</span>
-                <span style={{ fontSize:12,color:moodFace(ciForm[k]),fontWeight:700 }}>{moodLabel(ciForm[k])}</span>
+          <Icon name="chevron-r" size={13} color="rgba(235,235,245,0.25)"/>
+        </div>
+      )}
+      {period==='today' && showCI && (
+        <C style={{ padding:16,marginBottom:6,border:'0.5px solid rgba(255,214,10,0.25)' }}>
+          <p style={{ margin:'0 0 14px',fontSize:15,fontWeight:700,color:'#FFF',letterSpacing:-0.3 }}>⚡ ¿Cómo estás hoy?</p>
+          {[['energia','Energía','zap','#FFD60A'],['foco','Foco','target','#00C8B1'],['animo','Ánimo','face-smile','#34C759']].map(([k,l,ic,col])=>(
+            <div key={k} style={{ marginBottom:12 }}>
+              <div style={{ display:'flex',justifyContent:'space-between',marginBottom:5 }}>
+                <span style={{ fontSize:13,color:'rgba(235,235,245,0.7)',display:'flex',alignItems:'center',gap:5 }}><Icon name={ic} size={13} color={col}/> {l}</span>
+                <span style={{ fontSize:12,color:moodC(ciForm[k]),fontWeight:700 }}>{moodL(ciForm[k])}</span>
               </div>
               <input type="range" min="1" max="5" value={ciForm[k]} onChange={e=>setCiForm(f=>({...f,[k]:+e.target.value}))} style={{ width:'100%',accentColor:col }}/>
             </div>
           ))}
-          <input value={ciForm.intencion} onChange={e=>setCiForm(f=>({...f,intencion:e.target.value}))} placeholder="Mi intención de hoy…"
-            style={{ width:'100%',padding:'12px 14px',borderRadius:12,border:'0.5px solid rgba(84,84,88,0.45)',background:'#2C2C2E',color:'#FFF',fontSize:15,marginBottom:14 }}/>
-          <div style={{ display:'flex',gap:10 }}>
-            <button onClick={()=>{ LOData.dailyCheck.setToday(ciForm); setShowCI(false); refresh(); }}
-              style={{ flex:1,padding:12,borderRadius:12,background:'linear-gradient(145deg,#00D4BC,#00B5A0)',color:'#FFF',border:'none',fontWeight:600,fontSize:15,cursor:'pointer',boxShadow:'0 4px 16px rgba(0,200,177,.35)' }}>Guardar</button>
-            <button onClick={()=>setShowCI(false)}
-              style={{ flex:1,padding:12,borderRadius:12,background:'#2C2C2E',color:'rgba(235,235,245,0.55)',border:'0.5px solid rgba(84,84,88,0.45)',fontSize:15,cursor:'pointer' }}>Cancelar</button>
+          <input value={ciForm.intencion} onChange={e=>setCiForm(f=>({...f,intencion:e.target.value}))} placeholder="Intención de hoy…"
+            style={{ width:'100%',padding:'11px 13px',borderRadius:11,border:'0.5px solid rgba(84,84,88,0.45)',background:'#2C2C2E',color:'#FFF',fontSize:14,marginBottom:12,fontFamily:'inherit' }}/>
+          <div style={{ display:'flex',gap:8 }}>
+            <button onClick={()=>{LOData.dailyCheck.setToday(ciForm);setShowCI(false);refresh();}} style={{ flex:1,padding:11,borderRadius:11,background:'linear-gradient(145deg,#00D4BC,#00A896)',color:'#FFF',border:'none',fontWeight:600,fontSize:14,cursor:'pointer' }}>Guardar</button>
+            <button onClick={()=>setShowCI(false)} style={{ flex:1,padding:11,borderRadius:11,background:'#2C2C2E',color:'rgba(235,235,245,0.55)',border:'0.5px solid rgba(84,84,88,0.45)',fontSize:14,cursor:'pointer' }}>Cancelar</button>
           </div>
         </C>
       )}
-
-      {check && (
-        <C style={{ padding:'14px 16px',marginBottom:12 }}>
-          <div style={{ display:'flex',gap:0 }}>
-            {[['Energía',check.energia,'zap'],['Foco',check.foco,'target'],['Ánimo',check.animo,'face-smile']].map(([l,v,ic],i)=>(
-              <div key={l} style={{ flex:1,textAlign:'center',borderRight:i<2?'0.5px solid rgba(84,84,88,0.3)':'none',paddingRight:i<2?8:0,paddingLeft:i>0?8:0 }}>
-                <div style={{ display:'flex',justifyContent:'center',marginBottom:5,color:moodFace(v) }}><Icon name={ic} size={20} weight={2}/></div>
-                <p style={{ margin:'0 0 2px',fontSize:11,color:'rgba(235,235,245,0.42)',fontWeight:600,letterSpacing:-0.1 }}>{l}</p>
-                <p style={{ margin:0,fontSize:11,color:moodFace(v),fontWeight:700 }}>{moodLabel(v)}</p>
-              </div>
-            ))}
-            {check.intencion&&(
-              <div style={{ flex:2.5,paddingLeft:14,borderLeft:'0.5px solid rgba(84,84,88,0.3)',display:'flex',flexDirection:'column',justifyContent:'center' }}>
-                <p style={{ margin:'0 0 3px',fontSize:11,color:'rgba(235,235,245,0.42)',fontWeight:600,textTransform:'uppercase',letterSpacing:0.5 }}>Intención</p>
-                <p style={{ margin:0,fontSize:13,color:'rgba(235,235,245,0.78)',lineHeight:1.4 }}>{check.intencion}</p>
-              </div>
-            )}
-          </div>
-        </C>
+      {period==='today' && check && (
+        <div onClick={()=>setShowCI(true)} style={{ display:'flex',gap:0,...G.card,padding:'10px 16px',cursor:'pointer',marginBottom:6 }}>
+          {[['Energía',check.energia,'zap'],['Foco',check.foco,'target'],['Ánimo',check.animo,'face-smile']].map(([l,v,ic],i)=>(
+            <div key={l} style={{ flex:1,textAlign:'center',borderRight:i<2?'0.5px solid rgba(84,84,88,0.35)':'none' }}>
+              <div style={{ display:'flex',justifyContent:'center',marginBottom:3,color:moodC(v) }}><Icon name={ic} size={14} weight={2}/></div>
+              <p style={{ margin:0,fontSize:11,color:moodC(v),fontWeight:700 }}>{moodL(v)}</p>
+              <p style={{ margin:0,fontSize:10,color:'rgba(235,235,245,0.35)' }}>{l}</p>
+            </div>
+          ))}
+        </div>
       )}
-
-      {/* Inbox */}
-      {inbox.length>0 && (
-        <>
-          <Hdr title="Bandeja · sin procesar" right={<button onClick={()=>onNavigate('inbox')} style={{ background:'none',border:'none',color:'#00C8B1',fontSize:14,cursor:'pointer',padding:0,fontWeight:500 }}>Ver todo ({LOData.captures.getUnprocessed().length})</button>}/>
-          <C style={{ marginBottom:0 }}>
-            {inbox.map((cap,i)=>{
-              const t = CAP_TYPES.find(x=>x.id===cap.type) || CAP_TYPES[0];
-              return (
-                <div key={cap.id} onClick={()=>onNavigate('inbox')} style={{ display:'flex',alignItems:'center',gap:12,padding:'12px 16px',cursor:'pointer',position:'relative' }}>
-                  <IconTile name={t.icon} color={t.color} size={34}/>
-                  <div style={{ flex:1,minWidth:0 }}>
-                    <p style={{ margin:'0 0 3px',fontSize:14,color:'#FFF',lineHeight:1.4,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',letterSpacing:-0.1 }}>{cap.text}</p>
-                    <Tag label={t.label} color={t.color}/>
-                  </div>
-                  <button onClick={(e)=>{ e.stopPropagation(); if(cap.type==='tarea'){ LOData.tasks.add({ title:cap.text, context:'Hoy', priority:'importante' }); } else if(cap.type==='recordatorio'){ LOData.reminders.add({ title:cap.text, time:'09:00', repeat:'once', category:'General' }); } else if(cap.type==='gasto'){ LOData.gastos.add({ amount:0, category:'Otros', note:cap.text }); } LOData.captures.markProcessed(cap.id); refresh(); }} style={{ display:'flex',alignItems:'center',gap:4,padding:'7px 11px',borderRadius:9,background:'rgba(0,200,177,0.14)',border:'0.5px solid rgba(0,200,177,0.3)',color:'#00C8B1',fontSize:12,fontWeight:600,cursor:'pointer',flexShrink:0 }}><Icon name="arrow-right" size={11} weight={2.5}/> Procesar</button>
-                  {i<inbox.length-1&&<div style={{ position:'absolute',bottom:0,left:62,right:0,height:'0.5px',background:G.sep }}/>}
-                </div>
-              );
-            })}
-          </C>
-          <div style={{ height:12 }}/>
-        </>
-      )}
-
-      {/* Focus CTA */}
-      <div onClick={onOpenFocus} style={{ display:'flex',alignItems:'center',gap:14,padding:'14px 16px',...G.card,border:'0.5px solid rgba(0,200,177,0.28)',marginTop:12,cursor:'pointer',background:'linear-gradient(135deg,rgba(0,200,177,0.14) 0%,#1C1C1E 100%)' }}>
-        <div style={{ width:46,height:46,borderRadius:14,background:'linear-gradient(145deg,#00D4BC,#00B5A0)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,boxShadow:'0 4px 16px rgba(0,200,177,.4),inset 0 1px 0 rgba(255,255,255,0.2)',color:'#FFF' }}>
-          <Icon name="target" size={22} weight={2.2}/>
-        </div>
-        <div style={{ flex:1 }}>
-          <p style={{ margin:'0 0 2px',fontWeight:600,color:'#FFF',fontSize:15,letterSpacing:-0.2 }}>Sesión de Focus</p>
-          <p style={{ margin:0,fontSize:13,color:'rgba(235,235,245,0.45)' }}>{focusMins>0?`${focusMins} min hoy · seguir trabajando`:'Arranca un bloque profundo'}</p>
-        </div>
-        <div style={{ width:30,height:30,borderRadius:9,background:'rgba(0,200,177,0.22)',display:'flex',alignItems:'center',justifyContent:'center',color:'#00C8B1' }}>
-          <Icon name="play" size={13} weight={2.2}/>
-        </div>
-      </div>
     </div>
   );
 };
@@ -789,68 +669,57 @@ const InboxScreen = ({ onNavigate }) => {
         <p style={{ margin:0,fontSize:12,color:'rgba(235,235,245,0.32)',letterSpacing:-0.1 }}>Enter = tarea de hoy · Elige abajo para otro tipo</p>
       </C>
 
-      {/* QUICK-ADD ACTIONS — each clearly explains what it does and where the item goes */}
-      <p style={{ margin:'0 4px 10px',fontSize:12,fontWeight:700,color:'rgba(235,235,245,0.4)',textTransform:'uppercase',letterSpacing:0.6 }}>¿A dónde va?</p>
+      {/* QUICK-ADD ACTIONS */}
+      <p style={{ margin:'0 4px 10px',fontSize:12,fontWeight:700,color:'rgba(235,235,245,0.38)',textTransform:'uppercase',letterSpacing:0.6 }}>¿Dónde quieres que vaya?</p>
 
-      {/* Row 1 */}
       <div style={{ display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:10 }}>
 
-        {/* TAREA HOY */}
+        {/* TAREA HOY — blue */}
         <button onClick={doTarea} disabled={!text.trim()}
-          style={{ padding:'14px 14px 12px',borderRadius:14,...G.card,
-            background:text.trim()?'rgba(0,132,255,0.14)':'#1C1C1E',
-            border:`0.5px solid ${text.trim()?'rgba(10,132,255,0.4)':'rgba(84,84,88,0.4)'}`,
-            cursor:text.trim()?'pointer':'default',textAlign:'left',
-            opacity:text.trim()?1:0.45,transition:'all .15s' }}>
-          <div style={{ width:34,height:34,borderRadius:10,background:'rgba(10,132,255,0.2)',
-            display:'flex',alignItems:'center',justifyContent:'center',marginBottom:8,color:'#0A84FF' }}>
-            <Icon name="check-list" size={16} weight={2}/>
+          style={{ padding:'15px 14px 13px',borderRadius:14,textAlign:'left',cursor:text.trim()?'pointer':'default',
+            background:'rgba(10,132,255,0.18)',border:'1px solid rgba(10,132,255,0.38)',
+            opacity:text.trim()?1:0.4,transition:'all .15s' }}>
+          <div style={{ width:38,height:38,borderRadius:11,background:'#0A84FF',display:'flex',alignItems:'center',justifyContent:'center',marginBottom:10,boxShadow:'0 4px 12px rgba(10,132,255,0.45)' }}>
+            <Icon name="check-list" size={18} weight={2} color="#FFF"/>
           </div>
-          <p style={{ margin:'0 0 2px',fontSize:14,fontWeight:700,color:'#FFF',letterSpacing:-0.3 }}>Tarea de hoy</p>
-          <p style={{ margin:0,fontSize:11,color:'rgba(235,235,245,0.45)',lineHeight:1.3 }}>Va a tu lista del día</p>
+          <p style={{ margin:'0 0 3px',fontSize:14,fontWeight:700,color:'#FFF',letterSpacing:-0.3 }}>Tarea de hoy</p>
+          <p style={{ margin:0,fontSize:11,color:'rgba(10,132,255,0.85)',lineHeight:1.3,fontWeight:500 }}>→ Lista del día</p>
         </button>
 
-        {/* RECORDATORIO */}
+        {/* RECORDATORIO — orange */}
         <button onClick={()=>setActiveFlow(activeFlow==='reminder'?null:'reminder')}
-          style={{ padding:'14px 14px 12px',borderRadius:14,...G.card,
-            background:activeFlow==='reminder'?'rgba(255,159,10,0.18)':'#1C1C1E',
-            border:`0.5px solid ${activeFlow==='reminder'?'rgba(255,159,10,0.5)':'rgba(84,84,88,0.4)'}`,
-            cursor:'pointer',textAlign:'left',transition:'all .15s' }}>
-          <div style={{ width:34,height:34,borderRadius:10,background:'rgba(255,159,10,0.2)',
-            display:'flex',alignItems:'center',justifyContent:'center',marginBottom:8,color:'#FF9F0A' }}>
-            <Icon name="bell" size={16} weight={2}/>
+          style={{ padding:'15px 14px 13px',borderRadius:14,textAlign:'left',cursor:'pointer',
+            background:activeFlow==='reminder'?'rgba(255,159,10,0.28)':'rgba(255,159,10,0.14)',
+            border:`1px solid rgba(255,159,10,${activeFlow==='reminder'?'0.6':'0.32'})`,transition:'all .15s' }}>
+          <div style={{ width:38,height:38,borderRadius:11,background:'#FF9F0A',display:'flex',alignItems:'center',justifyContent:'center',marginBottom:10,boxShadow:'0 4px 12px rgba(255,159,10,0.45)' }}>
+            <Icon name="bell" size={18} weight={2} color="#FFF"/>
           </div>
-          <p style={{ margin:'0 0 2px',fontSize:14,fontWeight:700,color:'#FFF',letterSpacing:-0.3 }}>Recordatorio</p>
-          <p style={{ margin:0,fontSize:11,color:'rgba(235,235,245,0.45)',lineHeight:1.3 }}>Con hora y repetición</p>
+          <p style={{ margin:'0 0 3px',fontSize:14,fontWeight:700,color:'#FFF',letterSpacing:-0.3 }}>Recordatorio</p>
+          <p style={{ margin:0,fontSize:11,color:'rgba(255,159,10,0.85)',lineHeight:1.3,fontWeight:500 }}>→ Con hora y alarma</p>
         </button>
 
-        {/* EVENTO / TIMELINE */}
+        {/* EVENTO — green */}
         <button onClick={()=>setActiveFlow(activeFlow==='event'?null:'event')}
-          style={{ padding:'14px 14px 12px',borderRadius:14,...G.card,
-            background:activeFlow==='event'?'rgba(52,199,89,0.18)':'#1C1C1E',
-            border:`0.5px solid ${activeFlow==='event'?'rgba(52,199,89,0.5)':'rgba(84,84,88,0.4)'}`,
-            cursor:'pointer',textAlign:'left',transition:'all .15s' }}>
-          <div style={{ width:34,height:34,borderRadius:10,background:'rgba(52,199,89,0.2)',
-            display:'flex',alignItems:'center',justifyContent:'center',marginBottom:8,color:'#34C759' }}>
-            <Icon name="calendar" size={16} weight={2}/>
+          style={{ padding:'15px 14px 13px',borderRadius:14,textAlign:'left',cursor:'pointer',
+            background:activeFlow==='event'?'rgba(52,199,89,0.25)':'rgba(52,199,89,0.13)',
+            border:`1px solid rgba(52,199,89,${activeFlow==='event'?'0.55':'0.28'})`,transition:'all .15s' }}>
+          <div style={{ width:38,height:38,borderRadius:11,background:'#34C759',display:'flex',alignItems:'center',justifyContent:'center',marginBottom:10,boxShadow:'0 4px 12px rgba(52,199,89,0.45)' }}>
+            <Icon name="calendar" size={18} weight={2} color="#FFF"/>
           </div>
-          <p style={{ margin:'0 0 2px',fontSize:14,fontWeight:700,color:'#FFF',letterSpacing:-0.3 }}>Evento / Timeline</p>
-          <p style={{ margin:0,fontSize:11,color:'rgba(235,235,245,0.45)',lineHeight:1.3 }}>Aparece en tu agenda</p>
+          <p style={{ margin:'0 0 3px',fontSize:14,fontWeight:700,color:'#FFF',letterSpacing:-0.3 }}>Evento / Timeline</p>
+          <p style={{ margin:0,fontSize:11,color:'rgba(52,199,89,0.85)',lineHeight:1.3,fontWeight:500 }}>→ En tu agenda</p>
         </button>
 
-        {/* IDEA */}
+        {/* IDEA — yellow */}
         <button onClick={doIdea} disabled={!text.trim()}
-          style={{ padding:'14px 14px 12px',borderRadius:14,...G.card,
-            background:text.trim()?'rgba(255,214,10,0.12)':'#1C1C1E',
-            border:`0.5px solid ${text.trim()?'rgba(255,214,10,0.38)':'rgba(84,84,88,0.4)'}`,
-            cursor:text.trim()?'pointer':'default',textAlign:'left',
-            opacity:text.trim()?1:0.45,transition:'all .15s' }}>
-          <div style={{ width:34,height:34,borderRadius:10,background:'rgba(255,214,10,0.18)',
-            display:'flex',alignItems:'center',justifyContent:'center',marginBottom:8,color:'#FFD60A' }}>
-            <Icon name="lightbulb" size={16} weight={2}/>
+          style={{ padding:'15px 14px 13px',borderRadius:14,textAlign:'left',cursor:text.trim()?'pointer':'default',
+            background:'rgba(255,214,10,0.13)',border:'1px solid rgba(255,214,10,0.28)',
+            opacity:text.trim()?1:0.4,transition:'all .15s' }}>
+          <div style={{ width:38,height:38,borderRadius:11,background:'#FFD60A',display:'flex',alignItems:'center',justifyContent:'center',marginBottom:10,boxShadow:'0 4px 12px rgba(255,214,10,0.35)' }}>
+            <Icon name="lightbulb" size={18} weight={2} color="#000"/>
           </div>
-          <p style={{ margin:'0 0 2px',fontSize:14,fontWeight:700,color:'#FFF',letterSpacing:-0.3 }}>Idea / Nota</p>
-          <p style={{ margin:0,fontSize:11,color:'rgba(235,235,245,0.45)',lineHeight:1.3 }}>Guarda para revisar</p>
+          <p style={{ margin:'0 0 3px',fontSize:14,fontWeight:700,color:'#FFF',letterSpacing:-0.3 }}>Idea / Nota</p>
+          <p style={{ margin:0,fontSize:11,color:'rgba(255,214,10,0.8)',lineHeight:1.3,fontWeight:500 }}>→ Guarda para después</p>
         </button>
       </div>
 
@@ -949,10 +818,12 @@ const InboxScreen = ({ onNavigate }) => {
 
       {/* Empty state */}
       {pending.length===0&&!text&&(
-        <div style={{ textAlign:'center',padding:'48px 0 24px' }}>
-          <div style={{ fontSize:48,marginBottom:10,opacity:0.25 }}>📥</div>
-          <p style={{ margin:'0 0 5px',fontSize:16,fontWeight:600,color:'rgba(235,235,245,0.45)' }}>Inbox vacío</p>
-          <p style={{ margin:0,fontSize:13,color:'rgba(235,235,245,0.28)' }}>Escribe arriba para empezar</p>
+        <div style={{ textAlign:'center',padding:'40px 0 20px' }}>
+          <div style={{ width:72,height:72,borderRadius:22,background:'rgba(0,200,177,0.1)',border:'0.5px solid rgba(0,200,177,0.2)',display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 14px',color:'#00C8B1' }}>
+            <Icon name="plus" size={32} weight={2}/>
+          </div>
+          <p style={{ margin:'0 0 5px',fontSize:16,fontWeight:700,color:'rgba(235,235,245,0.5)',letterSpacing:-0.3 }}>Listo para capturar</p>
+          <p style={{ margin:0,fontSize:13,color:'rgba(235,235,245,0.28)',lineHeight:1.4 }}>Escribe algo arriba y elige<br/>dónde quieres que vaya</p>
         </div>
       )}
     </div>
