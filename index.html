@@ -182,17 +182,17 @@
 <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
-<script src="lo-data.js?v=2"></script>
-<script src="lo-ai.js?v=2"></script>
+<script src="lo-data.js?v=4"></script>
+<script src="lo-ai.js?v=4"></script>
 </head>
 <body>
 <div id="root"></div>
-<script type="text/babel" src="lo-icons.jsx?v=3"></script>
-<script type="text/babel" src="lo-screens-1.jsx?v=3"></script>
-<script type="text/babel" src="lo-screens-2.jsx?v=3"></script>
-<script type="text/babel" src="lo-screens-3.jsx?v=3"></script>
-<script type="text/babel" src="lo-screens-4.jsx?v=3"></script>
-<script type="text/babel" src="lo-screens-docs.jsx?v=3"></script>
+<script type="text/babel" src="lo-icons.jsx?v=4"></script>
+<script type="text/babel" src="lo-screens-1.jsx?v=4"></script>
+<script type="text/babel" src="lo-screens-2.jsx?v=4"></script>
+<script type="text/babel" src="lo-screens-3.jsx?v=4"></script>
+<script type="text/babel" src="lo-screens-4.jsx?v=4"></script>
+<script type="text/babel" src="lo-screens-docs.jsx?v=4"></script>
 <script type="text/babel">
 
 /* ── ONBOARDING TOUR (multi-step, LifeOS-style) ─────────── */
@@ -429,28 +429,26 @@ const Onboarding = ({ onDone }) => {
 
 /* ── NAV ICONS ── */
 const NAV_ICONS = {
-  hoy:        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>,
-  captura:    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>,
-  calendario: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="3"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>,
-  tareas:     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>,
-  mas:        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="8" cy="8" r="2"/><circle cx="16" cy="8" r="2"/><circle cx="8" cy="16" r="2"/><circle cx="16" cy="16" r="2"/></svg>,
+  inbox:    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>,
+  timeline: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="3"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="14" x2="8.01" y2="14"/><line x1="12" y1="14" x2="12.01" y2="14"/><line x1="16" y1="14" x2="16.01" y2="14"/></svg>,
+  ai:       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3l1.5 5L19 9.5 13.5 11 12 16 10.5 11 5 9.5 10.5 8z"/><path d="M19 16l.6 2 2 .6-2 .6L19 21l-.6-1.8-2-.6 2-.6z"/></svg>,
+  settings: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>,
 };
 
 /* ── MAIN TABS ───────────────────────────────────────────────── */
 const MAIN_TABS = [
-  { id:'hoy',        label:'Hoy'    },
-  { id:'captura',    label:'Cap.'   },
-  { id:'calendario', label:'Agenda' },
-  { id:'tareas',     label:'Tareas' },
-  { id:'mas',        label:'Más'    },
+  { id:'inbox',    label:'Inbox'   },
+  { id:'timeline', label:'Agenda'  },
+  { id:'ai',       label:'IA'      },
+  { id:'settings', label:'Config.' },
 ];
-const MAS_SCREENS = ['habitos','vida','recordar','focus-hub','ai-settings','gastos','docs'];
+const SETTINGS_SCREENS = ['habitos','vida','recordar','focus-hub','ai-settings','gastos','docs','energia','replan','tareas','calendario'];
 
 /* ── APP ─────────────────────────────────────────────────────── */
 const App = () => {
   const [onboarded, setOnboarded] = React.useState(()=>!!LOData.settings.get().onboarded);
-  const [tab, setTab]       = React.useState(()=>{ const t=localStorage.getItem('lo_tab')||'hoy'; return MAS_SCREENS.includes(t)?'mas':t; });
-  const [subScreen, setSub] = React.useState(()=>{ const t=localStorage.getItem('lo_tab'); return MAS_SCREENS.includes(t)?t:null; });
+  const [tab, setTab]       = React.useState(()=>{ const t=localStorage.getItem('lo_tab')||'timeline'; return SETTINGS_SCREENS.includes(t)?'settings':t; });
+  const [subScreen, setSub] = React.useState(()=>{ const t=localStorage.getItem('lo_tab'); return SETTINGS_SCREENS.includes(t)?t:null; });
   const [showFocus, setShowFocus] = React.useState(false);
   const [unproc, setUnproc]       = React.useState(0);
   const [screenKey, setKey]       = React.useState(0);
@@ -459,8 +457,8 @@ const App = () => {
   React.useEffect(()=>{ refresh(); window.addEventListener('lo:refresh',refresh); return()=>window.removeEventListener('lo:refresh',refresh); },[]);
 
   const navigate = dest => {
-    if(MAS_SCREENS.includes(dest)){
-      setTab('mas'); setSub(dest); localStorage.setItem('lo_tab',dest);
+    if(SETTINGS_SCREENS.includes(dest)){
+      setTab('settings'); setSub(dest); localStorage.setItem('lo_tab',dest);
     } else if(dest==='focus'){
       setShowFocus(true);
     } else {
@@ -469,13 +467,13 @@ const App = () => {
     setKey(k=>k+1);
   };
 
-  const goMas = () => { setTab('mas'); setSub(null); localStorage.setItem('lo_tab','mas'); setKey(k=>k+1); };
-  const onTabClick = t => { if(t==='mas'&&tab==='mas') setSub(null); navigate(t); };
+  const goSettings = () => { setTab('settings'); setSub(null); localStorage.setItem('lo_tab','settings'); setKey(k=>k+1); };
+  const onTabClick = t => { if(t==='settings'&&tab==='settings') setSub(null); navigate(t); };
   const finish = name => { LOData.settings.save({ name:name||'Tomás', onboarded:true }); setOnboarded(true); };
 
   if(!onboarded) return <Onboarding onDone={finish}/>;
 
-  const activeTab = MAS_SCREENS.includes(tab)?'mas':tab;
+  const activeTab = SETTINGS_SCREENS.includes(tab)?'settings':tab;
 
   return (
     <div id="shell">
@@ -484,25 +482,28 @@ const App = () => {
       <div className="screen">
         <div key={screenKey} className="screen-pad fade-up">
 
-          {tab==='mas' && subScreen && (
-            <button className="back-btn" onClick={goMas}>
+          {tab==='settings' && subScreen && (
+            <button className="back-btn" onClick={goSettings}>
               <svg width="10" height="16" viewBox="0 0 10 16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M8 1L2 8l6 7"/></svg>
-              Más
+              Config.
             </button>
           )}
 
-          {tab==='hoy'        && <HoyScreen onNavigate={navigate} onOpenFocus={()=>setShowFocus(true)}/>}
-          {tab==='captura'    && <CapturaScreen onNavigate={navigate}/>}
-          {tab==='calendario' && <CalendarioScreen/>}
-          {tab==='tareas'     && <TareasScreen/>}
-          {tab==='mas' && !subScreen    && <MasHub onNavigate={navigate}/>}
-          {tab==='mas' && subScreen==='habitos'   && <HabitosScreen/>}
-          {tab==='mas' && subScreen==='vida'      && <VidaScreen/>}
-          {tab==='mas' && subScreen==='recordar'    && <RecordatoriosScreen/>}
-          {tab==='mas' && subScreen==='gastos'      && <GastosScreen/>}
-          {tab==='mas' && subScreen==='ai-settings' && <AISettingsScreen/>}
-          {tab==='mas' && subScreen==='docs'        && <DocsScreen/>}
-          {tab==='mas' && subScreen==='focus-hub' && (
+          {tab==='inbox'    && <InboxScreen onNavigate={navigate}/>}
+          {tab==='timeline' && <TimelineScreen onNavigate={navigate} onOpenFocus={()=>setShowFocus(true)}/>}
+          {tab==='ai'       && <AIScreen onNavigate={navigate}/>}
+          {tab==='settings' && !subScreen        && <SettingsScreen onNavigate={navigate}/>}
+          {tab==='settings' && subScreen==='habitos'    && <HabitosScreen/>}
+          {tab==='settings' && subScreen==='vida'       && <VidaScreen/>}
+          {tab==='settings' && subScreen==='recordar'   && <RecordatoriosScreen/>}
+          {tab==='settings' && subScreen==='gastos'     && <GastosScreen/>}
+          {tab==='settings' && subScreen==='ai-settings'&& <AISettingsScreen/>}
+          {tab==='settings' && subScreen==='docs'       && <DocsScreen/>}
+          {tab==='settings' && subScreen==='energia'    && <EnergyScreen/>}
+          {tab==='settings' && subScreen==='replan'     && <ReplanScreen onNavigate={navigate}/>}
+          {tab==='settings' && subScreen==='tareas'     && <TareasScreen/>}
+          {tab==='settings' && subScreen==='calendario' && <CalendarioScreen/>}
+          {tab==='settings' && subScreen==='focus-hub'  && (
             <div style={{ display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',minHeight:'60vh',gap:18 }}>
               <div style={{ width:88,height:88,borderRadius:26,background:'linear-gradient(145deg,#7877F0,#5E5CE6)',display:'flex',alignItems:'center',justifyContent:'center',color:'#FFF',boxShadow:'0 12px 36px rgba(94,92,230,0.5),inset 0 1px 0 rgba(255,255,255,0.2)' }}>
                 <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg>
@@ -519,10 +520,10 @@ const App = () => {
         </div>
       </div>
 
-      {/* FAB */}
-      {tab!=='captura' && (
-        <button className="fab" onClick={()=>navigate('captura')}>
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      {/* FAB — quick capture, hidden on inbox (already has input) */}
+      {tab!=='inbox' && (
+        <button className="fab" onClick={()=>navigate('inbox')}>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         </button>
       )}
 
@@ -530,7 +531,7 @@ const App = () => {
       <nav className="nav">
         {MAIN_TABS.map(t=>(
           <button key={t.id} className={`nav-btn${activeTab===t.id?' active':''}`} onClick={()=>onTabClick(t.id)}>
-            {t.id==='captura' && unproc>0 && <div className="nav-dot"/>}
+            {t.id==='inbox' && unproc>0 && <div className="nav-dot"/>}
             <div className="nav-icon-wrap" style={{ color:activeTab===t.id?'#6B6AEA':'rgba(235,235,245,0.42)' }}>
               {NAV_ICONS[t.id]}
             </div>

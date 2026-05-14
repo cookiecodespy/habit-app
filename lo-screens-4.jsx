@@ -628,46 +628,322 @@ const AISettingsScreen = () => {
 /* ══════════════════════════════════════════════════════════════
    MÁS HUB
 ══════════════════════════════════════════════════════════════ */
-const MasHub = ({ onNavigate }) => {
-  const aiEnabled = window.LOAI?.getSettings().enabled;
-  const monthTotal = LOData.gastos ? LOData.gastos.getMonthTotal(LOData.gastos.getCurrentMonth()) : 0;
-  const fmt = n => n>=1000?`$${(n/1000).toFixed(0)}k`:`$${n.toFixed(0)}`;
+/* ══════════════════════════════════════════════════════════════
+   AI SCREEN — planner IA con modo local + Ollama
+══════════════════════════════════════════════════════════════ */
+const AIScreen = ({ onNavigate }) => {
+  const [input, setInput]   = React.useState('');
+  const [plan, setPlan]     = React.useState(null);
+  const [loading, setLoad]  = React.useState(false);
 
-  const SECTIONS = [
-    { id:'gastos',      icon:'wallet',  title:'Gastos',         sub: monthTotal>0?`${fmt(monthTotal)} este mes`:'Control de finanzas',  color:'#30D158' },
-    { id:'recordar',    icon:'bell',    title:'Recordatorios',  sub:'No olvides nada',                                                  color:'#FF9F0A' },
-    { id:'habitos',     icon:'leaf',    title:'Hábitos',         sub:'Constancia real',                                                  color:'#34C759' },
-    { id:'vida',        icon:'compass', title:'Vida',            sub:'Balance y propósito',                                              color:'#BF5AF2' },
-    { id:'focus-hub',   icon:'target',  title:'Focus',           sub:'Trabajo profundo',                                                 color:'#6B6AEA' },
-    { id:'ai-settings', icon:'cpu',     title:'IA Local',        sub:aiEnabled?'Ollama activo':'Conectar Gemma / Ollama',                color:'#64D2FF' },
-    { id:'docs',        icon:'book',    title:'Docs',            sub:'Cómo usar LifeOS',                                                color:'#7B7AEE' },
+  const PROMPTS = [
+    { id:'dia', icon:'sun',       text:'Planear mi día de hoy',    color:'#FFD60A' },
+    { id:'sem', icon:'calendar',  text:'Organizar esta semana',    color:'#0A84FF' },
+    { id:'rep', icon:'reset',     text:'Replanear tareas de hoy',  color:'#FF9F0A' },
+    { id:'pri', icon:'target',    text:'Priorizar mis pendientes', color:'#6B6AEA' },
+    { id:'rut', icon:'flame',     text:'Crear rutina matutina',    color:'#FF453A' },
+    { id:'rev', icon:'star',      text:'Revisión semanal',         color:'#BF5AF2' },
   ];
+
+  const MOCK = {
+    dia:[
+      {time:'07:00',title:'Revisión del plan',dur:'15 min',col:'#6B6AEA'},
+      {time:'08:00',title:'Bloque de trabajo profundo',dur:'2 h',col:'#0A84FF'},
+      {time:'10:00',title:'Responder mensajes',dur:'30 min',col:'#FF9F0A'},
+      {time:'14:00',title:'Tareas urgentes pendientes',dur:'1 h',col:'#FF453A'},
+      {time:'16:00',title:'Focus — proyecto principal',dur:'1.5 h',col:'#6B6AEA'},
+      {time:'18:00',title:'Cierre y planificación mañana',dur:'15 min',col:'#30D158'},
+    ],
+    sem:[
+      {time:'',title:'Lunes — Planificación semanal',dur:'Mañana',col:'#6B6AEA'},
+      {time:'',title:'Martes/Miércoles — Deep work',dur:'Todo el día',col:'#0A84FF'},
+      {time:'',title:'Jueves — Reuniones y colaboración',dur:'Tarde',col:'#FF9F0A'},
+      {time:'',title:'Viernes — Revisión y cierre',dur:'Mañana',col:'#30D158'},
+    ],
+    rep:[
+      {time:'',title:'Revisar tareas sin completar',dur:'10 min',col:'#FF453A'},
+      {time:'',title:'Mover no urgentes a mañana',dur:'5 min',col:'#FF9F0A'},
+      {time:'',title:'Elegir 3 tareas para hoy',dur:'5 min',col:'#6B6AEA'},
+    ],
+    pri:[
+      {time:'',title:'🔴 Urgente: Entregar informe',dur:'Hoy',col:'#FF453A'},
+      {time:'',title:'🟡 Importante: Preparar presentación',dur:'Mañana',col:'#FF9F0A'},
+      {time:'',title:'🟢 Cuando pueda: Organizar archivos',dur:'Esta semana',col:'#30D158'},
+    ],
+    rut:[
+      {time:'06:00',title:'Agua + movimiento (10 min)',dur:'10 min',col:'#30D158'},
+      {time:'06:15',title:'Journaling o meditación',dur:'15 min',col:'#BF5AF2'},
+      {time:'06:30',title:'Revisar el plan del día',dur:'10 min',col:'#6B6AEA'},
+      {time:'07:00',title:'Bloque de trabajo sin distracciones',dur:'2 h',col:'#0A84FF'},
+    ],
+    rev:[
+      {time:'',title:'¿Qué salió bien esta semana?',dur:'Revisar',col:'#30D158'},
+      {time:'',title:'¿Qué quedó pendiente?',dur:'Revisar',col:'#FF9F0A'},
+      {time:'',title:'¿Qué aprendiste?',dur:'Revisar',col:'#BF5AF2'},
+      {time:'',title:'Plan de la próxima semana',dur:'Definir',col:'#6B6AEA'},
+    ],
+    custom:[
+      {time:'',title:'Bloque de planificación',dur:'30 min',col:'#6B6AEA'},
+      {time:'',title:'Tareas más importantes del día',dur:'2 h',col:'#0A84FF'},
+      {time:'',title:'Revisión y ajuste',dur:'15 min',col:'#30D158'},
+    ],
+  };
+
+  const generatePlan = async (promptId, txt) => {
+    setLoad(true);
+    await new Promise(r=>setTimeout(r,1100));
+    const aiEnabled = window.LOAI?.getSettings().enabled;
+    const items = MOCK[promptId] || MOCK.custom;
+    setPlan({ items, promptId, text:txt||PROMPTS.find(p=>p.id===promptId)?.text||'Plan IA' });
+    setLoad(false);
+  };
+
+  const addToTimeline = () => {
+    if (!plan) return;
+    const today = LOData.today();
+    plan.items.forEach(item => {
+      if (item.time) {
+        LOData.events.add({ title:item.title, date:today, time:item.time, category:'Personal', notes:item.dur });
+      } else {
+        LOData.tasks.add({ title:item.title, context:'Hoy', priority:'importante' });
+      }
+    });
+    window.dispatchEvent(new Event('lo:refresh'));
+    setPlan(null);
+    onNavigate('timeline');
+  };
+
+  const aiEnabled = window.LOAI?.getSettings().enabled;
 
   return (
     <div style={{ paddingBottom:20 }}>
-      <Title title="Más" sub="Todas tus herramientas"/>
-      <div style={{ display:'flex',flexDirection:'column',gap:10 }}>
-        {SECTIONS.map(s=>(
-          <div key={s.id} onClick={()=>onNavigate(s.id)}
-            style={{ display:'flex',alignItems:'center',gap:14,padding:'14px 16px',...G.card,cursor:'pointer',
-              background:`linear-gradient(130deg,${s.color}14 0%,rgba(28,28,30,0.85) 60%)`,
-              transition:'transform .18s cubic-bezier(.34,1.4,.64,1)' }}
-            onTouchStart={e=>e.currentTarget.style.transform='scale(0.975)'}
-            onTouchEnd={e=>e.currentTarget.style.transform='scale(1)'}
-            onMouseDown={e=>e.currentTarget.style.transform='scale(0.975)'}
-            onMouseUp={e=>e.currentTarget.style.transform='scale(1)'}
-            onMouseLeave={e=>e.currentTarget.style.transform='scale(1)'}>
-            <IconTile name={s.icon} color={s.color} size={48} weight={2}/>
-            <div style={{ flex:1,minWidth:0 }}>
-              <p style={{ margin:'0 0 3px',fontSize:17,fontWeight:600,color:'#FFF',letterSpacing:-0.3 }}>{s.title}</p>
-              <p style={{ margin:0,fontSize:13,color:'rgba(235,235,245,0.42)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap' }}>{s.sub}</p>
-            </div>
-            <div style={{ color:s.color,opacity:0.7,display:'flex' }}><Icon name="chevron-r" size={14} weight={2.2}/></div>
+      {/* Header */}
+      <div style={{ display:'flex',alignItems:'center',gap:12,marginBottom:22 }}>
+        <div style={{ width:44,height:44,borderRadius:13,background:'linear-gradient(145deg,#BF5AF2,#7877F0)',display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 6px 20px rgba(191,90,242,0.4),inset 0 1px 0 rgba(255,255,255,0.2)' }}>
+          <Icon name="sparkle" size={20} color="#FFF" weight={1.8}/>
+        </div>
+        <div>
+          <h1 style={{ fontSize:28,fontWeight:700,color:'#FFF',margin:0,letterSpacing:-0.7,lineHeight:1.1 }}>LifeOS AI</h1>
+          <p style={{ margin:0,fontSize:13,color:'rgba(235,235,245,0.42)',letterSpacing:-0.1 }}>Tu asistente de planificación</p>
+        </div>
+      </div>
+
+      {!plan && !loading && (
+        <>
+          {/* Free-text input */}
+          <C style={{ padding:'14px 16px',marginBottom:14,border:'0.5px solid rgba(191,90,242,0.2)' }}>
+            <p style={{ margin:'0 0 8px',fontSize:12,fontWeight:600,color:'rgba(235,235,245,0.45)',textTransform:'uppercase',letterSpacing:0.5 }}>¿Qué necesitas planear?</p>
+            <textarea value={input} onChange={e=>setInput(e.target.value)} placeholder="Escribe lo que necesitas organizar, planear o priorizar…" rows={3}
+              style={{ width:'100%',padding:'11px 13px',borderRadius:12,border:'0.5px solid rgba(255,255,255,0.08)',background:'rgba(44,44,46,0.7)',color:'#FFF',fontSize:15,resize:'none',fontFamily:'inherit',lineHeight:1.5,letterSpacing:-0.1 }}/>
+            {input.trim() && (
+              <button onClick={()=>generatePlan('custom',input)} style={{ width:'100%',marginTop:10,padding:12,borderRadius:12,background:'linear-gradient(145deg,#BF5AF2,#7877F0)',color:'#FFF',border:'0.5px solid rgba(255,255,255,0.2)',fontSize:15,fontWeight:600,cursor:'pointer',boxShadow:'0 5px 18px rgba(191,90,242,.38)',display:'flex',alignItems:'center',justifyContent:'center',gap:8 }}>
+                <Icon name="sparkle" size={15} weight={1.8}/> Generar plan
+              </button>
+            )}
+          </C>
+
+          {/* Quick prompts grid */}
+          <Hdr title="Acciones rápidas" mt={0}/>
+          <div style={{ display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:14 }}>
+            {PROMPTS.map(p=>(
+              <div key={p.id} onClick={()=>generatePlan(p.id)}
+                style={{ display:'flex',alignItems:'center',gap:10,padding:'13px 14px',...G.card,background:`linear-gradient(130deg,${p.color}14 0%,rgba(28,28,30,0.85) 60%)`,border:`0.5px solid ${p.color}22`,cursor:'pointer',transition:'transform .18s cubic-bezier(.34,1.4,.64,1)' }}
+                onMouseDown={e=>e.currentTarget.style.transform='scale(0.96)'}
+                onMouseUp={e=>e.currentTarget.style.transform='scale(1)'}
+                onMouseLeave={e=>e.currentTarget.style.transform='scale(1)'}
+                onTouchStart={e=>e.currentTarget.style.transform='scale(0.96)'}
+                onTouchEnd={e=>e.currentTarget.style.transform='scale(1)'}>
+                <div style={{ width:34,height:34,borderRadius:10,background:`${p.color}22`,border:`0.5px solid ${p.color}30`,display:'flex',alignItems:'center',justifyContent:'center',color:p.color,flexShrink:0 }}>
+                  <Icon name={p.icon} size={15}/>
+                </div>
+                <p style={{ margin:0,fontSize:13,fontWeight:600,color:'#FFF',lineHeight:1.3,letterSpacing:-0.1 }}>{p.text}</p>
+              </div>
+            ))}
           </div>
-        ))}
+
+          {/* AI status */}
+          {!aiEnabled && (
+            <C style={{ padding:'12px 16px',border:'0.5px solid rgba(100,210,255,0.22)',background:'linear-gradient(135deg,rgba(100,210,255,0.08) 0%,rgba(28,28,30,0.78) 100%)' }}>
+              <div style={{ display:'flex',gap:10,alignItems:'flex-start' }}>
+                <Icon name="cpu" size={15} color="#64D2FF"/>
+                <div>
+                  <p style={{ margin:'0 0 2px',fontSize:14,fontWeight:600,color:'#FFF',letterSpacing:-0.2 }}>Modo local activo</p>
+                  <p style={{ margin:0,fontSize:13,color:'rgba(235,235,245,0.55)',lineHeight:1.4 }}>Planes generados localmente. Conecta Ollama en Configuración para IA real.</p>
+                  <button onClick={()=>onNavigate('ai-settings')} style={{ marginTop:8,background:'none',border:'none',color:'#64D2FF',fontSize:13,fontWeight:600,cursor:'pointer',padding:0,display:'flex',alignItems:'center',gap:4 }}>
+                    Configurar IA <Icon name="chevron-r" size={11} weight={2.2}/>
+                  </button>
+                </div>
+              </div>
+            </C>
+          )}
+        </>
+      )}
+
+      {/* Loading */}
+      {loading && (
+        <div style={{ display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'64px 0',gap:20 }}>
+          <div style={{ width:76,height:76,borderRadius:22,background:'linear-gradient(145deg,#BF5AF2,#7877F0)',display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 14px 38px rgba(191,90,242,0.45),inset 0 1px 0 rgba(255,255,255,0.2)',animation:'pulse 1.3s ease-in-out infinite' }}>
+            <Icon name="sparkle" size={34} color="#FFF" weight={1.8}/>
+          </div>
+          <div style={{ textAlign:'center' }}>
+            <p style={{ margin:'0 0 4px',fontSize:17,fontWeight:600,color:'#FFF',letterSpacing:-0.3 }}>Generando tu plan…</p>
+            <p style={{ margin:0,fontSize:14,color:'rgba(235,235,245,0.45)' }}>Analizando tareas y prioridades</p>
+          </div>
+        </div>
+      )}
+
+      {/* Generated plan */}
+      {plan && !loading && (
+        <>
+          <div style={{ display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:14 }}>
+            <div>
+              <p style={{ margin:'0 0 2px',fontSize:19,fontWeight:700,color:'#FFF',letterSpacing:-0.5 }}>Plan generado</p>
+              <p style={{ margin:0,fontSize:13,color:'rgba(235,235,245,0.45)' }}>{plan.items.length} bloques · {plan.text}</p>
+            </div>
+            <button onClick={()=>setPlan(null)} style={{ background:'rgba(44,44,46,0.7)',border:'0.5px solid rgba(255,255,255,0.08)',borderRadius:10,padding:'8px 14px',color:'rgba(235,235,245,0.7)',cursor:'pointer',fontSize:13,fontWeight:500 }}>Nuevo</button>
+          </div>
+          <div style={{ display:'flex',flexDirection:'column',gap:8,marginBottom:16 }}>
+            {plan.items.map((item,i)=>(
+              <div key={i} style={{ display:'flex',alignItems:'center',gap:12,padding:'13px 16px',...G.card,background:`linear-gradient(130deg,${item.col}12 0%,rgba(28,28,30,0.85) 70%)`,borderLeft:`3px solid ${item.col}` }}>
+                {item.time&&<span style={{ fontSize:12,fontWeight:700,color:item.col,fontVariantNumeric:'tabular-nums',flexShrink:0,minWidth:42 }}>{item.time}</span>}
+                <div style={{ flex:1,minWidth:0 }}>
+                  <p style={{ margin:0,fontSize:15,fontWeight:600,color:'#FFF',letterSpacing:-0.2 }}>{item.title}</p>
+                  <p style={{ margin:'2px 0 0',fontSize:12,color:'rgba(235,235,245,0.45)' }}>{item.dur}</p>
+                </div>
+                <div style={{ width:8,height:8,borderRadius:'50%',background:item.col,boxShadow:`0 0 8px ${item.col}80`,flexShrink:0 }}/>
+              </div>
+            ))}
+          </div>
+          <div style={{ display:'flex',gap:10 }}>
+            <button onClick={addToTimeline} style={{ flex:1,padding:14,borderRadius:14,background:'linear-gradient(145deg,#7877F0,#5E5CE6)',color:'#FFF',border:'0.5px solid rgba(255,255,255,0.2)',fontSize:15,fontWeight:600,cursor:'pointer',boxShadow:'0 6px 20px rgba(94,92,230,.4)',display:'flex',alignItems:'center',justifyContent:'center',gap:8 }}>
+              <Icon name="calendar" size={15}/> Agregar al Timeline
+            </button>
+            <button onClick={()=>setPlan(null)} style={{ padding:14,borderRadius:14,background:'rgba(44,44,46,0.7)',color:'rgba(235,235,245,0.7)',border:'0.5px solid rgba(255,255,255,0.08)',fontSize:15,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center' }}>
+              <Icon name="close" size={16}/>
+            </button>
+          </div>
+        </>
+      )}
+    </div>
+  );
+};
+
+/* ══════════════════════════════════════════════════════════════
+   SETTINGS SCREEN — configuración completa LifeOS
+══════════════════════════════════════════════════════════════ */
+const SettingsScreen = ({ onNavigate }) => {
+  const s      = LOData.settings.get();
+  const name   = s.name || 'Usuario';
+  const points = s.points || 0;
+  const monthTotal = LOData.gastos?.getMonthTotal(LOData.gastos.getCurrentMonth()) || 0;
+  const fmt = n => n>=1000?`$${(n/1000).toFixed(0)}k`:`$${n.toFixed(0)}`;
+
+  const Sec = ({ title, children }) => (
+    <div style={{ marginBottom:20 }}>
+      <p style={{ margin:'0 4px 8px',fontSize:12,fontWeight:600,color:'rgba(235,235,245,0.42)',textTransform:'uppercase',letterSpacing:0.6 }}>{title}</p>
+      <C style={{ padding:0 }}>{children}</C>
+    </div>
+  );
+  const SRow = ({ icon, color, title, sub, badge, onClick, last }) => (
+    <div onClick={onClick} style={{ display:'flex',alignItems:'center',gap:12,padding:'13px 16px',cursor:onClick?'pointer':'default',position:'relative' }}
+      onMouseDown={e=>onClick&&(e.currentTarget.style.background='rgba(255,255,255,0.04)')}
+      onMouseUp={e=>(e.currentTarget.style.background='')}
+      onMouseLeave={e=>(e.currentTarget.style.background='')}>
+      <IconTile name={icon} color={color} size={36}/>
+      <div style={{ flex:1,minWidth:0 }}>
+        <p style={{ margin:0,fontSize:16,color:'#FFF',letterSpacing:-0.2,lineHeight:1.3 }}>{title}</p>
+        {sub&&<p style={{ margin:'2px 0 0',fontSize:12,color:'rgba(235,235,245,0.42)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap' }}>{sub}</p>}
+      </div>
+      {badge&&<Tag label={badge} color={color}/>}
+      {onClick&&!badge&&<Icon name="chevron-r" size={14} color="rgba(235,235,245,0.3)" weight={2}/>}
+      {!last&&<div style={{ position:'absolute',bottom:0,left:64,right:0,height:'0.5px',background:G.sep }}/>}
+    </div>
+  );
+
+  return (
+    <div style={{ paddingBottom:20 }}>
+      <Title title="Configuración" sub="LifeOS · Tu sistema personal"/>
+
+      {/* Profile */}
+      <C style={{ padding:'15px 16px',marginBottom:20,background:'linear-gradient(130deg,rgba(107,106,234,0.14) 0%,rgba(28,28,30,0.85) 70%)' }}>
+        <div style={{ display:'flex',alignItems:'center',gap:14 }}>
+          <div style={{ width:54,height:54,borderRadius:16,background:'linear-gradient(145deg,#7877F0,#BF5AF2)',display:'flex',alignItems:'center',justifyContent:'center',color:'#FFF',fontSize:24,fontWeight:700,flexShrink:0,boxShadow:'0 6px 20px rgba(94,92,230,.4),inset 0 1px 0 rgba(255,255,255,0.2)' }}>
+            {name.charAt(0).toUpperCase()}
+          </div>
+          <div style={{ flex:1,minWidth:0 }}>
+            <p style={{ margin:0,fontSize:18,fontWeight:700,color:'#FFF',letterSpacing:-0.5 }}>{name}</p>
+            <p style={{ margin:'2px 0 0',fontSize:13,color:'rgba(235,235,245,0.45)' }}>{points} puntos · LifeOS Free</p>
+          </div>
+          <Tag label="Free" color="#6B6AEA"/>
+        </div>
+      </C>
+
+      {/* Pro banner */}
+      <div style={{ marginBottom:20,padding:'16px 20px',borderRadius:18,background:'linear-gradient(135deg,#7877F0 0%,#BF5AF2 100%)',border:'0.5px solid rgba(255,255,255,0.2)',boxShadow:'0 8px 28px rgba(94,92,230,.35),inset 0 1px 0 rgba(255,255,255,0.18)' }}>
+        <div style={{ display:'flex',justifyContent:'space-between',alignItems:'center' }}>
+          <div>
+            <p style={{ margin:'0 0 4px',fontSize:17,fontWeight:700,color:'#FFF',letterSpacing:-0.4 }}>LifeOS Pro</p>
+            <p style={{ margin:0,fontSize:13,color:'rgba(255,255,255,0.78)',lineHeight:1.4 }}>IA ilimitada, Cloud sync,<br/>análisis avanzado y más</p>
+          </div>
+          <div style={{ padding:'9px 16px',borderRadius:12,background:'rgba(255,255,255,0.22)',border:'0.5px solid rgba(255,255,255,0.3)' }}>
+            <p style={{ margin:0,fontSize:13,fontWeight:700,color:'#FFF' }}>Próximo</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Cloud */}
+      <Sec title="Cloud y Sincronización">
+        <SRow icon="cloud" color="#0A84FF" title="LifeOS Cloud" sub="Sincroniza entre dispositivos · Próximamente" badge="Pronto" last/>
+      </Sec>
+
+      {/* Features */}
+      <Sec title="Funciones">
+        <SRow icon="leaf"    color="#30D158" title="Hábitos"       sub="Constancia real"              onClick={()=>onNavigate('habitos')}/>
+        <SRow icon="bell"    color="#FF9F0A" title="Recordatorios" sub="No olvides nada"              onClick={()=>onNavigate('recordar')}/>
+        <SRow icon="target"  color="#6B6AEA" title="Focus"         sub="Trabajo profundo · Pomodoro"  onClick={()=>onNavigate('focus-hub')}/>
+        <SRow icon="zap"     color="#FFD60A" title="Monitor de Energía" sub="Estado diario de energía y ánimo" onClick={()=>onNavigate('energia')}/>
+        <SRow icon="reset"   color="#FF9F0A" title="Replanear"     sub="Reorganiza tareas del día"    onClick={()=>onNavigate('replan')} last/>
+      </Sec>
+
+      {/* Agenda */}
+      <Sec title="Agenda y Tareas">
+        <SRow icon="calendar" color="#0A84FF" title="Calendario"   sub="Vista mensual de eventos"      onClick={()=>onNavigate('calendario')}/>
+        <SRow icon="check-list" color="#FF9F0A" title="Tareas"     sub="Todos los contextos"           onClick={()=>onNavigate('tareas')} last/>
+      </Sec>
+
+      {/* Finances */}
+      <Sec title="Finanzas">
+        <SRow icon="wallet"  color="#30D158" title="Gastos"        sub={monthTotal>0?`${fmt(monthTotal)} este mes`:'Control financiero personal'} onClick={()=>onNavigate('gastos')} last/>
+      </Sec>
+
+      {/* Integrations */}
+      <Sec title="Integraciones">
+        <SRow icon="calendar" color="#BF5AF2" title="Calendarios"  sub="Importar eventos · Próximamente" badge="Pronto"/>
+        <SRow icon="bell"     color="#FF453A" title="Recordatorios nativos" sub="Integración nativa · Próximamente" badge="Pronto" last/>
+      </Sec>
+
+      {/* AI */}
+      <Sec title="Inteligencia Artificial">
+        <SRow icon="cpu"     color="#64D2FF" title="IA Local (Ollama)" sub={window.LOAI?.getSettings().enabled?'Ollama activo · Conectado':'Conectar Gemma / Ollama localmente'} onClick={()=>onNavigate('ai-settings')} last/>
+      </Sec>
+
+      {/* Life balance */}
+      <Sec title="Balance y Propósito">
+        <SRow icon="compass" color="#BF5AF2" title="Vida"          sub="Radar de áreas de vida"        onClick={()=>onNavigate('vida')} last/>
+      </Sec>
+
+      {/* Support */}
+      <Sec title="Soporte">
+        <SRow icon="book"    color="#7B7AEE" title="Documentación" sub="Cómo usar LifeOS"              onClick={()=>onNavigate('docs')} last/>
+      </Sec>
+
+      {/* Footer */}
+      <div style={{ textAlign:'center',padding:'10px 0 6px' }}>
+        <p style={{ margin:0,fontSize:13,color:'rgba(235,235,245,0.25)',letterSpacing:-0.1 }}>LifeOS · Versión 4.0</p>
+        <p style={{ margin:'3px 0 0',fontSize:12,color:'rgba(235,235,245,0.18)' }}>Tu sistema. Tus datos. Sin límites.</p>
       </div>
     </div>
   );
 };
 
-Object.assign(window, { HabitosScreen, VidaScreen, GastosScreen, MasHub, WeeklyReview, AISettingsScreen });
+Object.assign(window, { HabitosScreen, VidaScreen, GastosScreen, AIScreen, SettingsScreen, WeeklyReview, AISettingsScreen });

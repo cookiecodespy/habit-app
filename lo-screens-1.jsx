@@ -1,4 +1,4 @@
-// lo-screens-1.jsx — Shared UI + Hoy + Captura  [v3: iOS premium, SF Symbols icons]
+// lo-screens-1.jsx — Shared UI + Timeline + Inbox  [v4: LifeOS 4.0]
 
 /* ── DESIGN TOKENS ── */
 const G = {
@@ -155,9 +155,9 @@ const buildTimeline = (period) => {
 window.buildTimeline = buildTimeline;
 
 /* ══════════════════════════════════════════════════════════════
-   HOY SCREEN — dashboard sincronizado tipo LifeOS
+   TIMELINE SCREEN — visual time-block day / week / month view
 ══════════════════════════════════════════════════════════════ */
-const HoyScreen = ({ onNavigate, onOpenFocus }) => {
+const TimelineScreen = ({ onNavigate, onOpenFocus }) => {
   const [habits, setHabits]       = React.useState([]);
   const [focusMins, setFocusMins] = React.useState(0);
   const [check, setCheck]         = React.useState(null);
@@ -167,6 +167,8 @@ const HoyScreen = ({ onNavigate, onOpenFocus }) => {
   const [inbox, setInbox]         = React.useState([]);
   const [period, setPeriod]       = React.useState('today');
   const [timeline, setTimeline]   = React.useState([]);
+  const [nowMin, setNowMin]       = React.useState(()=>{ const n=new Date(); return n.getHours()*60+n.getMinutes(); });
+  const scrollRef                 = React.useRef(null);
 
   const name    = LOData.settings.getName();
   const greet   = () => { const h=new Date().getHours(); return h<12?`Buenos días`:`${h<19?'Buenas tardes':'Buenas noches'}`; };
@@ -178,20 +180,31 @@ const HoyScreen = ({ onNavigate, onOpenFocus }) => {
     setCheck(LOData.dailyCheck.getToday());
     setInbox(LOData.captures.getUnprocessed().slice(0,4));
     setTimeline(buildTimeline(period));
+    const n=new Date(); setNowMin(n.getHours()*60+n.getMinutes());
   };
   React.useEffect(()=>{
     refresh();
     window.addEventListener('lo:refresh',refresh);
+    const ticker = setInterval(()=>{ const n=new Date(); setNowMin(n.getHours()*60+n.getMinutes()); }, 60000);
     const ai = window.LOAI?.getSettings();
     if (ai?.enabled) {
-      const habits = LOData.habits.getAll();
-      const done   = habits.filter(h=>LOData.habits.isToday(h)).length;
-      const ctx    = `Hábitos: ${done}/${habits.length}. Focus hoy: ${LOData.focus.getTodayMinutes()} min. Tareas pendientes: ${LOData.tasks.getAll().filter(t=>!t.completed).length}.`;
+      const allH = LOData.habits.getAll();
+      const done  = allH.filter(h=>LOData.habits.isToday(h)).length;
+      const ctx   = `Hábitos: ${done}/${allH.length}. Focus hoy: ${LOData.focus.getTodayMinutes()} min. Tareas pendientes: ${LOData.tasks.getAll().filter(t=>!t.completed).length}.`;
       LOAI.getDailyInsight(ctx).then(r=>r&&setAiInsight(r));
     }
-    return()=>window.removeEventListener('lo:refresh',refresh);
+    return()=>{ window.removeEventListener('lo:refresh',refresh); clearInterval(ticker); };
   },[]);
   React.useEffect(()=>{ setTimeline(buildTimeline(period)); },[period]);
+
+  // Scroll to current time when viewing today
+  React.useEffect(()=>{
+    if (period==='today' && scrollRef.current) {
+      const SLOT_H=64, START_H=5;
+      const scrollTo = Math.max(0, (nowMin/60 - START_H - 1)) * SLOT_H;
+      setTimeout(()=>{ if(scrollRef.current) scrollRef.current.scrollTop = scrollTo; }, 120);
+    }
+  }, [period]);
 
   const doneH      = habits.filter(h=>LOData.habits.isToday(h)).length;
   const totalTasks = LOData.tasks.getAll().filter(t=>t.context==='Hoy').length;
@@ -288,60 +301,151 @@ const HoyScreen = ({ onNavigate, onOpenFocus }) => {
         ))}
       </div>
 
-      {/* ── TIMELINE: events + tasks + reminders unified ── */}
-      {timeline.length===0 ? (
+      {/* ── TIMELINE: visual day view or grouped list ── */}
+      {period==='today' && (() => {
+        // Visual time-block day view
+        const SLOT_H=64, START_H=5, END_H=23;
+        const HOURS = Array.from({length:END_H-START_H},(_,i)=>i+START_H);
+        const timeToMin = t => { if(!t) return null; const [hh,mm]=t.split(':').map(Number); return hh*60+(mm||0); };
+        const todayItems = timeline.filter(it=>it.date===LOData.today());
+        const timedItems = todayItems.filter(it=>it.time);
+        const allDayItems = todayItems.filter(it=>!it.time);
+
+        const itemColor = it => {
+          if(it.kind==='event') return catColor[it.category]||'#0A84FF';
+          if(it.kind==='task')  return {urgente:'#FF453A',importante:'#FF9F0A',cuando_pueda:'#30D158'}[it.priority]||'#6B6AEA';
+          return '#FF453A';
+        };
+        const itemIcon = it => it.kind==='event'?'calendar':it.kind==='task'?'check-list':'bell';
+        const itemSub  = it => it.kind==='event'?(it.category+(it.location?' · '+it.location:''))
+          :it.kind==='task'?('Tarea · '+(it.context||'')):'Recordatorio';
+
+        return (
+          <div style={{ marginBottom:14 }}>
+            {/* Time-block grid */}
+            <div style={{ ...G.card,borderRadius:18,overflow:'hidden',marginBottom:allDayItems.length?10:0 }}>
+              <div ref={scrollRef} style={{ maxHeight:420,overflowY:'auto',position:'relative' }}>
+                <div style={{ position:'relative',paddingTop:8,paddingBottom:8 }}>
+                  {HOURS.map(h=>{
+                    const isNowHour = Math.floor(nowMin/60)===h;
+                    const hourItems = timedItems.filter(it=>{ const m=timeToMin(it.time); return m!==null&&Math.floor(m/60)===h; });
+                    return (
+                      <div key={h} style={{ display:'flex',alignItems:'flex-start',height:SLOT_H,position:'relative',borderBottom:h<END_H-1?'0.5px solid rgba(84,84,88,0.12)':'none' }}>
+                        <div style={{ width:52,paddingRight:6,paddingTop:8,textAlign:'right',flexShrink:0,fontSize:11,fontWeight:600,color:isNowHour?'#FF453A':'rgba(235,235,245,0.28)',fontVariantNumeric:'tabular-nums',letterSpacing:-0.2 }}>
+                          {h===0?'12am':h<12?`${h}am`:h===12?'12pm':`${h-12}pm`}
+                        </div>
+                        <div style={{ flex:1,position:'relative',paddingRight:10,paddingTop:6 }}>
+                          {hourItems.map((it,ii)=>{
+                            const m=timeToMin(it.time); const topOff=((m%60)/60)*(SLOT_H-4);
+                            const col=itemColor(it);
+                            return (
+                              <div key={it.id} style={{ position:'absolute',top:topOff+2,left:ii*2,right:0,minHeight:36,padding:'4px 8px',background:`linear-gradient(135deg,${col}26 0%,${col}12 100%)`,borderLeft:`3px solid ${col}`,borderRadius:'0 10px 10px 0',display:'flex',alignItems:'center',gap:7,cursor:'pointer',zIndex:ii+2,boxShadow:`0 2px 8px rgba(0,0,0,0.2)` }}>
+                                <div style={{color:col,flexShrink:0}}><Icon name={itemIcon(it)} size={11} weight={2}/></div>
+                                <div style={{flex:1,minWidth:0}}>
+                                  <p style={{margin:0,fontSize:11.5,fontWeight:600,color:'#FFF',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',letterSpacing:-0.1}}>{it.title}</p>
+                                  <p style={{margin:0,fontSize:10,color:`${col}cc`,letterSpacing:-0.1}}>{it.time} · {itemSub(it)}</p>
+                                </div>
+                                {it.kind==='task'&&(
+                                  <button onClick={e=>{e.stopPropagation();LOData.tasks.toggle(it.raw.id);refresh();}} style={{width:18,height:18,borderRadius:5,border:`1.5px solid ${col}`,background:it.raw.completed?col:'transparent',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',color:'#FFF',flexShrink:0}}>
+                                    {it.raw.completed&&<Icon name="check" size={9} weight={3}/>}
+                                  </button>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })}
+                  {/* Current time indicator */}
+                  {nowMin>=START_H*60&&nowMin<=END_H*60&&(
+                    <div style={{ position:'absolute',left:0,right:0,top:((nowMin/60-START_H)*SLOT_H)+8,display:'flex',alignItems:'center',pointerEvents:'none',zIndex:20 }}>
+                      <div style={{width:52,display:'flex',justifyContent:'flex-end',paddingRight:3}}><div style={{width:10,height:10,borderRadius:'50%',background:'#FF453A',boxShadow:'0 0 10px rgba(255,69,58,0.7)',marginRight:-1}}/></div>
+                      <div style={{flex:1,height:1.5,background:'rgba(255,69,58,0.85)',boxShadow:'0 0 6px rgba(255,69,58,0.4)'}}/>
+                    </div>
+                  )}
+                </div>
+              </div>
+              {/* Empty today state (inside grid) */}
+              {timedItems.length===0&&allDayItems.length===0&&(
+                <div style={{ padding:'28px 18px',textAlign:'center' }}>
+                  <div style={{ width:48,height:48,borderRadius:14,background:'rgba(107,106,234,0.12)',border:'0.5px solid rgba(107,106,234,0.2)',display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 10px',color:'#7B7AEE' }}>
+                    <Icon name="sun" size={20}/>
+                  </div>
+                  <p style={{ margin:'0 0 3px',fontSize:15,fontWeight:600,color:'#FFF',letterSpacing:-0.2 }}>Tu día está libre</p>
+                  <p style={{ margin:0,fontSize:13,color:'rgba(235,235,245,0.42)' }}>Toca + para agregar eventos o tareas</p>
+                </div>
+              )}
+            </div>
+            {/* All-day items */}
+            {allDayItems.length>0&&(
+              <div>
+                <p style={{margin:'0 4px 6px',fontSize:11,fontWeight:600,color:'rgba(235,235,245,0.38)',textTransform:'uppercase',letterSpacing:0.5}}>Sin hora · Todo el día</p>
+                <C>
+                  {allDayItems.map((it,idx)=>{
+                    const col=itemColor(it);
+                    return (
+                      <div key={it.id} style={{display:'flex',alignItems:'center',gap:12,padding:'11px 16px',position:'relative'}}>
+                        <IconTile name={itemIcon(it)} color={col} size={32}/>
+                        <div style={{flex:1,minWidth:0}}>
+                          <p style={{margin:0,fontSize:14,fontWeight:600,color:'#FFF',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',letterSpacing:-0.2}}>{it.title}</p>
+                          <p style={{margin:'2px 0 0',fontSize:12,color:'rgba(235,235,245,0.42)'}}>{itemSub(it)}</p>
+                        </div>
+                        {it.kind==='task'&&(
+                          <button onClick={()=>{LOData.tasks.toggle(it.raw.id);refresh();}} style={{width:24,height:24,borderRadius:7,border:`1.5px solid ${col}`,background:it.raw.completed?col:'transparent',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',color:'#FFF',flexShrink:0}}>
+                            {it.raw.completed&&<Icon name="check" size={11} weight={3}/>}
+                          </button>
+                        )}
+                        {idx<allDayItems.length-1&&<div style={{position:'absolute',bottom:0,left:60,right:0,height:'0.5px',background:G.sep}}/>}
+                      </div>
+                    );
+                  })}
+                </C>
+              </div>
+            )}
+          </div>
+        );
+      })()}
+
+      {/* Week/month: empty state */}
+      {period!=='today' && timeline.length===0 && (
         <C style={{ padding:'30px 18px',marginBottom:12,textAlign:'center' }}>
           <div style={{ width:52,height:52,borderRadius:15,background:'rgba(107,106,234,0.12)',border:'0.5px solid rgba(107,106,234,0.22)',display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 10px',color:'#7B7AEE' }}>
-            <Icon name={period==='today'?'sun':period==='week'?'calendar':'chart'} size={22}/>
+            <Icon name={period==='week'?'calendar':'chart'} size={22}/>
           </div>
-          <p style={{ margin:'0 0 4px',fontSize:15,fontWeight:600,color:'#FFF',letterSpacing:-0.2 }}>{period==='today'?'Tu día está libre':period==='week'?'Sin planes esta semana':'Mes despejado'}</p>
+          <p style={{ margin:'0 0 4px',fontSize:15,fontWeight:600,color:'#FFF',letterSpacing:-0.2 }}>{period==='week'?'Sin planes esta semana':'Mes despejado'}</p>
           <p style={{ margin:0,fontSize:13,color:'rgba(235,235,245,0.42)' }}>Crea un evento, tarea o recordatorio</p>
         </C>
-      ) : (
+      )}
+      {period!=='today' && timeline.length>0 && (
         <div style={{ marginBottom:12 }}>
           {grouped.map(g=>(
-            <div key={g.date} style={{ marginBottom:period==='today'?0:14 }}>
-              {period!=='today' && (
-                <p style={{ margin:'0 4px 8px',fontSize:12,fontWeight:700,color:'rgba(235,235,245,0.55)',textTransform:'uppercase',letterSpacing:0.7 }}>{dateLabel(g.date)} · <span style={{ fontWeight:500,color:'rgba(235,235,245,0.35)',textTransform:'none',letterSpacing:0 }}>{g.items.length} {g.items.length===1?'item':'items'}</span></p>
-              )}
+            <div key={g.date} style={{ marginBottom:14 }}>
+              <p style={{ margin:'0 4px 8px',fontSize:12,fontWeight:700,color:'rgba(235,235,245,0.55)',textTransform:'uppercase',letterSpacing:0.7 }}>{dateLabel(g.date)} · <span style={{ fontWeight:500,color:'rgba(235,235,245,0.35)',textTransform:'none',letterSpacing:0 }}>{g.items.length} {g.items.length===1?'item':'items'}</span></p>
               <C>
                 {g.items.map((it,idx)=>{
                   const last = idx===g.items.length-1;
                   let icon='', color='#6B6AEA', subInfo='';
-                  if (it.kind==='event')      { color=catColor[it.category]||'#0A84FF'; icon='calendar'; subInfo=it.category+(it.location?(' · '+it.location):''); }
-                  if (it.kind==='task')       { color={urgente:'#FF453A',importante:'#FF9F0A',cuando_pueda:'#30D158'}[it.priority]||'#6B6AEA'; icon='check-list'; subInfo='Tarea · '+(it.context||''); }
-                  if (it.kind==='reminder')   { const cc={ General:'#6B6AEA', Salud:'#FF453A', Universidad:'#0A84FF', Trabajo:'#FF9F0A', Personal:'#30D158', Finanzas:'#64D2FF' }; color=cc[it.category]||'#6B6AEA'; icon='bell'; subInfo='Recordatorio · '+it.category; }
-
+                  if (it.kind==='event')    { color=catColor[it.category]||'#0A84FF'; icon='calendar'; subInfo=it.category+(it.location?(' · '+it.location):''); }
+                  if (it.kind==='task')     { color={urgente:'#FF453A',importante:'#FF9F0A',cuando_pueda:'#30D158'}[it.priority]||'#6B6AEA'; icon='check-list'; subInfo='Tarea · '+(it.context||''); }
+                  if (it.kind==='reminder') { const cc={General:'#6B6AEA',Salud:'#FF453A',Universidad:'#0A84FF',Trabajo:'#FF9F0A',Personal:'#30D158',Finanzas:'#64D2FF'}; color=cc[it.category]||'#6B6AEA'; icon='bell'; subInfo='Recordatorio · '+it.category; }
                   return (
                     <div key={it.id} style={{ display:'flex',alignItems:'flex-start',gap:0,position:'relative' }}>
-                      {/* Time column */}
                       <div style={{ width:56,padding:'14px 0 14px 14px',display:'flex',flexDirection:'column',alignItems:'flex-end',flexShrink:0 }}>
-                        {it.time ? (
-                          <>
-                            <span style={{ fontSize:13,fontWeight:700,color:'#FFF',letterSpacing:-0.2,fontVariantNumeric:'tabular-nums',lineHeight:1.1 }}>{it.time}</span>
-                          </>
-                        ) : (
-                          <span style={{ fontSize:11,color:'rgba(235,235,245,0.4)',fontWeight:500 }}>sin hora</span>
-                        )}
+                        {it.time?<span style={{ fontSize:13,fontWeight:700,color:'#FFF',letterSpacing:-0.2,fontVariantNumeric:'tabular-nums',lineHeight:1.1 }}>{it.time}</span>:<span style={{ fontSize:11,color:'rgba(235,235,245,0.4)',fontWeight:500 }}>sin hora</span>}
                       </div>
-                      {/* Color rail */}
                       <div style={{ width:24,display:'flex',justifyContent:'center',position:'relative',flexShrink:0 }}>
                         <div style={{ width:2,height:'100%',background:'rgba(84,84,88,0.25)',position:'absolute',top:0,bottom:0 }}/>
                         <div style={{ width:11,height:11,borderRadius:'50%',background:color,marginTop:18,position:'relative',zIndex:1,boxShadow:`0 0 0 3px rgba(28,28,30,0.95), 0 0 8px ${color}80` }}/>
                       </div>
-                      {/* Content */}
-                      <div style={{ flex:1,minWidth:0,padding:'12px 16px 12px 10px' }} onClick={()=>{
-                        if(it.kind==='event')    onNavigate('calendario');
-                        if(it.kind==='task')     onNavigate('tareas');
-                        if(it.kind==='reminder') onNavigate('recordar');
-                      }}>
+                      <div style={{ flex:1,minWidth:0,padding:'12px 16px 12px 10px' }}>
                         <div style={{ display:'flex',alignItems:'center',gap:8,marginBottom:3 }}>
                           <div style={{ color,display:'flex' }}><Icon name={icon} size={13} weight={2}/></div>
-                          {it.kind==='task' ? (
-                            <button onClick={(e)=>{ e.stopPropagation(); LOData.tasks.toggle(it.raw.id); refresh(); }} style={{ marginLeft:'auto',width:22,height:22,borderRadius:7,border:`2px solid ${color}`,background:'transparent',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',color:'#FFF',flexShrink:0 }}/>
-                          ) : (
-                            <Tag label={it.kind==='event'?'Evento':'Recordar'} color={color}/>
-                          )}
+                          {it.kind==='task'?(
+                            <button onClick={e=>{e.stopPropagation();LOData.tasks.toggle(it.raw.id);refresh();}} style={{ marginLeft:'auto',width:22,height:22,borderRadius:7,border:`2px solid ${color}`,background:it.raw.completed?color:'transparent',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',color:'#FFF',flexShrink:0 }}>
+                              {it.raw.completed&&<Icon name="check" size={10} weight={3}/>}
+                            </button>
+                          ):<Tag label={it.kind==='event'?'Evento':'Recordar'} color={color}/>}
                         </div>
                         <p style={{ margin:'0 0 2px',fontSize:15,fontWeight:600,color:'#FFF',letterSpacing:-0.2,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap' }}>{it.title}</p>
                         <p style={{ margin:0,fontSize:12,color:'rgba(235,235,245,0.45)',letterSpacing:-0.05 }}>{subInfo}</p>
@@ -427,12 +531,12 @@ const HoyScreen = ({ onNavigate, onOpenFocus }) => {
       {/* Inbox */}
       {inbox.length>0 && (
         <>
-          <Hdr title="Bandeja · sin procesar" right={<button onClick={()=>onNavigate('captura')} style={{ background:'none',border:'none',color:'#6B6AEA',fontSize:14,cursor:'pointer',padding:0,fontWeight:500 }}>Ver todo ({LOData.captures.getUnprocessed().length})</button>}/>
+          <Hdr title="Bandeja · sin procesar" right={<button onClick={()=>onNavigate('inbox')} style={{ background:'none',border:'none',color:'#6B6AEA',fontSize:14,cursor:'pointer',padding:0,fontWeight:500 }}>Ver todo ({LOData.captures.getUnprocessed().length})</button>}/>
           <C style={{ marginBottom:0 }}>
             {inbox.map((cap,i)=>{
               const t = CAP_TYPES.find(x=>x.id===cap.type) || CAP_TYPES[0];
               return (
-                <div key={cap.id} onClick={()=>onNavigate('captura')} style={{ display:'flex',alignItems:'center',gap:12,padding:'12px 16px',cursor:'pointer',position:'relative' }}>
+                <div key={cap.id} onClick={()=>onNavigate('inbox')} style={{ display:'flex',alignItems:'center',gap:12,padding:'12px 16px',cursor:'pointer',position:'relative' }}>
                   <IconTile name={t.icon} color={t.color} size={34}/>
                   <div style={{ flex:1,minWidth:0 }}>
                     <p style={{ margin:'0 0 3px',fontSize:14,color:'#FFF',lineHeight:1.4,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',letterSpacing:-0.1 }}>{cap.text}</p>
@@ -466,9 +570,9 @@ const HoyScreen = ({ onNavigate, onOpenFocus }) => {
 };
 
 /* ══════════════════════════════════════════════════════════════
-   CAPTURA SCREEN
+   INBOX SCREEN — captura rápida y procesamiento
 ══════════════════════════════════════════════════════════════ */
-const CapturaScreen = ({ onNavigate }) => {
+const InboxScreen = ({ onNavigate }) => {
   const [items, setItems]         = React.useState([]);
   const [text, setText]           = React.useState('');
   const [type, setType]           = React.useState('idea');
@@ -554,7 +658,7 @@ const CapturaScreen = ({ onNavigate }) => {
 
   return (
     <div style={{ paddingBottom:20 }}>
-      <Title title="Captura" sub="Anota rápido. Decide después."/>
+      <Title title="Inbox" sub="Captura rápido. Procesa después."/>
 
       {/* Quick reference */}
       <div style={{ display:'flex',gap:8,marginBottom:14,padding:'11px 13px',borderRadius:13,background:'rgba(107,106,234,0.07)',border:'0.5px solid rgba(107,106,234,0.18)' }}>
@@ -675,4 +779,4 @@ const CapturaScreen = ({ onNavigate }) => {
   );
 };
 
-Object.assign(window, { HoyScreen, CapturaScreen });
+Object.assign(window, { TimelineScreen, InboxScreen });
