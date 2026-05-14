@@ -10,7 +10,7 @@ const RecordatoriosScreen = () => {
 
   const CATS    = ['General','Salud','Universidad','Trabajo','Personal','Finanzas'];
   const catIcon = { General:'bell', Salud:'pill', Universidad:'book', Trabajo:'briefcase', Personal:'leaf', Finanzas:'wallet' };
-  const catColor= { General:'#6B6AEA', Salud:'#FF453A', Universidad:'#0A84FF', Trabajo:'#FF9F0A', Personal:'#30D158', Finanzas:'#64D2FF' };
+  const catColor= { General:'#00C8B1', Salud:'#FF453A', Universidad:'#0A84FF', Trabajo:'#FF9F0A', Personal:'#30D158', Finanzas:'#64D2FF' };
   const rptLabel= { daily:'Cada día', weekly:'Semanal', once:'Una vez', weekdays:'Lun–Vie' };
 
   const refresh = () => setItems(LOData.reminders.getAll());
@@ -33,7 +33,7 @@ const RecordatoriosScreen = () => {
   const consistency = active.length>0 ? Math.round((weekData.filter(d=>d.val).length/7)*100) : 0;
 
   const RItem = ({ r, last }) => {
-    const col = catColor[r.category]||'#6B6AEA';
+    const col = catColor[r.category]||'#00C8B1';
     return (
       <div style={{ display:'flex',alignItems:'center',gap:12,padding:'12px 16px',opacity:r.active?1:0.45,position:'relative' }}>
         <IconTile name={catIcon[r.category]||'bell'} color={col} size={36}/>
@@ -41,14 +41,14 @@ const RecordatoriosScreen = () => {
           <p style={{ margin:'0 0 3px',fontSize:16,color:'#FFF',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis',letterSpacing:-0.2 }}>{r.title}</p>
           <div style={{ display:'flex',gap:6,alignItems:'center',flexWrap:'wrap' }}>
             {r.time&&<span style={{ display:'inline-flex',alignItems:'center',gap:3,fontSize:12,fontWeight:600,color:col,fontVariantNumeric:'tabular-nums' }}><Icon name="clock" size={11}/> {r.time}</span>}
-            {r.repeat&&<Tag label={rptLabel[r.repeat]||r.repeat} color="#6B6AEA"/>}
+            {r.repeat&&<Tag label={rptLabel[r.repeat]||r.repeat} color="#00C8B1"/>}
             <Tag label={r.category} color={col}/>
           </div>
           {r.notes&&<p style={{ margin:'3px 0 0',fontSize:13,color:'rgba(235,235,245,0.4)' }}>{r.notes}</p>}
         </div>
         <div style={{ display:'flex',flexDirection:'column',gap:8,alignItems:'flex-end',flexShrink:0 }}>
           <button onClick={()=>del(r.id)} style={{ background:'none',border:'none',color:'rgba(235,235,245,0.3)',cursor:'pointer',padding:2,display:'flex' }}><Icon name="trash" size={14} weight={2}/></button>
-          <div onClick={()=>toggle(r.id)} style={{ width:48,height:28,borderRadius:15,background:r.active?'#30D158':'rgba(84,84,88,0.5)',cursor:'pointer',position:'relative',transition:'background .25s',flexShrink:0,border:'0.5px solid rgba(255,255,255,0.08)' }}>
+          <div onClick={()=>toggle(r.id)} style={{ width:48,height:28,borderRadius:15,background:r.active?'#30D158':'rgba(84,84,88,0.5)',cursor:'pointer',position:'relative',transition:'background .25s',flexShrink:0,border:'0.5px solid rgba(84,84,88,0.45)' }}>
             <div style={{ width:24,height:24,borderRadius:12,background:'#FFF',position:'absolute',top:1.5,left:r.active?22:1.5,transition:'left .25s cubic-bezier(.34,1.4,.64,1)',boxShadow:'0 2px 6px rgba(0,0,0,.35)' }}/>
           </div>
         </div>
@@ -67,7 +67,7 @@ const RecordatoriosScreen = () => {
           <p style={{ margin:0,fontSize:12,fontWeight:600,color:'rgba(235,235,245,0.45)',textTransform:'uppercase',letterSpacing:0.6,display:'flex',alignItems:'center',gap:6 }}>
             {icon&&<Icon name={icon} size={12}/>} {title} <span style={{ background:'rgba(84,84,88,0.35)',borderRadius:6,padding:'1px 7px',fontSize:11 }}>{data.length}</span>
           </p>
-          {data.length>3&&<button onClick={()=>setExp(!exp)} style={{ background:'none',border:'none',color:'#6B6AEA',fontSize:13,cursor:'pointer',fontWeight:500,display:'flex',alignItems:'center',gap:3 }}>Ver todos ({data.length}) <Icon name="chevron-r" size={11} weight={2.5}/></button>}
+          {data.length>3&&<button onClick={()=>setExp(!exp)} style={{ background:'none',border:'none',color:'#00C8B1',fontSize:13,cursor:'pointer',fontWeight:500,display:'flex',alignItems:'center',gap:3 }}>Ver todos ({data.length}) <Icon name="chevron-r" size={11} weight={2.5}/></button>}
         </div>
         <C>{visible.map((r,i)=><RItem key={r.id} r={r} last={i===visible.length-1}/>)}</C>
       </div>
@@ -79,28 +79,28 @@ const RecordatoriosScreen = () => {
       <Title title="Recordatorios" sub="No olvides nada" right={<PlusBtn onClick={()=>setShowAdd(!showAdd)}/>}/>
 
       {showAdd && (
-        <C style={{ padding:16,marginBottom:14,border:'0.5px solid rgba(107,106,234,0.3)' }}>
+        <C style={{ padding:16,marginBottom:14,border:'0.5px solid rgba(0,200,177,0.3)' }}>
           <p style={{ fontWeight:700,fontSize:16,color:'#FFF',marginBottom:14,letterSpacing:-0.3 }}>Nuevo recordatorio</p>
           <input value={form.title} onChange={e=>setForm(f=>({...f,title:e.target.value}))} placeholder="¿Qué necesitas recordar?"
-            style={{ width:'100%',padding:'12px 14px',borderRadius:12,border:'0.5px solid rgba(255,255,255,0.08)',background:'rgba(44,44,46,0.7)',color:'#FFF',fontSize:15,marginBottom:10 }} autoFocus/>
+            style={{ width:'100%',padding:'12px 14px',borderRadius:12,border:'0.5px solid rgba(84,84,88,0.45)',background:'#2C2C2E',color:'#FFF',fontSize:15,marginBottom:10 }} autoFocus/>
           <div style={{ display:'grid',gridTemplateColumns:'1fr 1fr',gap:8,marginBottom:10 }}>
             <input type="time" value={form.time} onChange={e=>setForm(f=>({...f,time:e.target.value}))}
-              style={{ padding:'11px 12px',borderRadius:12,border:'0.5px solid rgba(255,255,255,0.08)',background:'rgba(44,44,46,0.7)',color:'#FFF',fontSize:14 }}/>
+              style={{ padding:'11px 12px',borderRadius:12,border:'0.5px solid rgba(84,84,88,0.45)',background:'#2C2C2E',color:'#FFF',fontSize:14 }}/>
             <select value={form.repeat} onChange={e=>setForm(f=>({...f,repeat:e.target.value}))}
-              style={{ padding:'11px 12px',borderRadius:12,border:'0.5px solid rgba(255,255,255,0.08)',background:'rgba(44,44,46,0.7)',color:'#FFF',fontSize:13 }}>
+              style={{ padding:'11px 12px',borderRadius:12,border:'0.5px solid rgba(84,84,88,0.45)',background:'#2C2C2E',color:'#FFF',fontSize:13 }}>
               {Object.entries(rptLabel).map(([v,l])=><option key={v} value={v}>{l}</option>)}
             </select>
           </div>
           <div style={{ display:'flex',gap:6,flexWrap:'wrap',marginBottom:12 }}>
             {CATS.map(c=>(
-              <button key={c} onClick={()=>setForm(f=>({...f,category:c}))} style={{ display:'flex',alignItems:'center',gap:5,padding:'7px 11px',borderRadius:10,border:form.category===c?`0.5px solid ${catColor[c]}`:'0.5px solid transparent',cursor:'pointer',fontSize:12,fontWeight:600,background:form.category===c?`${catColor[c]}22`:'rgba(44,44,46,0.7)',color:form.category===c?catColor[c]:'rgba(235,235,245,0.5)' }}><Icon name={catIcon[c]} size={11}/> {c}</button>
+              <button key={c} onClick={()=>setForm(f=>({...f,category:c}))} style={{ display:'flex',alignItems:'center',gap:5,padding:'7px 11px',borderRadius:10,border:form.category===c?`0.5px solid ${catColor[c]}`:'0.5px solid transparent',cursor:'pointer',fontSize:12,fontWeight:600,background:form.category===c?`${catColor[c]}22`:'#2C2C2E',color:form.category===c?catColor[c]:'rgba(235,235,245,0.5)' }}><Icon name={catIcon[c]} size={11}/> {c}</button>
             ))}
           </div>
           <input value={form.notes} onChange={e=>setForm(f=>({...f,notes:e.target.value}))} placeholder="Nota adicional (opcional)"
-            style={{ width:'100%',padding:'12px 14px',borderRadius:12,border:'0.5px solid rgba(255,255,255,0.08)',background:'rgba(44,44,46,0.7)',color:'#FFF',fontSize:13,marginBottom:14 }}/>
+            style={{ width:'100%',padding:'12px 14px',borderRadius:12,border:'0.5px solid rgba(84,84,88,0.45)',background:'#2C2C2E',color:'#FFF',fontSize:13,marginBottom:14 }}/>
           <div style={{ display:'flex',gap:8 }}>
-            <button onClick={add} style={{ flex:1,padding:12,borderRadius:12,background:'linear-gradient(145deg,#7877F0,#5E5CE6)',color:'#FFF',border:'none',fontWeight:600,cursor:'pointer',boxShadow:'0 4px 14px rgba(94,92,230,.35)' }}>Agregar</button>
-            <button onClick={()=>setShowAdd(false)} style={{ flex:1,padding:12,borderRadius:12,background:'rgba(44,44,46,0.7)',color:'rgba(235,235,245,0.55)',border:'0.5px solid rgba(255,255,255,0.08)',cursor:'pointer' }}>Cancelar</button>
+            <button onClick={add} style={{ flex:1,padding:12,borderRadius:12,background:'linear-gradient(145deg,#00D4BC,#00B5A0)',color:'#FFF',border:'none',fontWeight:600,cursor:'pointer',boxShadow:'0 4px 14px rgba(0,200,177,.35)' }}>Agregar</button>
+            <button onClick={()=>setShowAdd(false)} style={{ flex:1,padding:12,borderRadius:12,background:'#2C2C2E',color:'rgba(235,235,245,0.55)',border:'0.5px solid rgba(84,84,88,0.45)',cursor:'pointer' }}>Cancelar</button>
           </div>
         </C>
       )}
@@ -117,12 +117,12 @@ const RecordatoriosScreen = () => {
             <p style={{ margin:'0 0 2px',fontSize:30,fontWeight:700,color:'#FFF',letterSpacing:-1,fontVariantNumeric:'tabular-nums',lineHeight:1 }}>{consistency}<span style={{ fontSize:18,fontWeight:500,color:'rgba(235,235,245,0.4)' }}>%</span></p>
             <p style={{ margin:'4px 0 0',fontSize:13,color:'rgba(235,235,245,0.42)' }}>{active.length} recordatorios activos</p>
           </div>
-          <IconTile name="chart" color="#6B6AEA" size={44}/>
+          <IconTile name="chart" color="#00C8B1" size={44}/>
         </div>
         <div style={{ display:'flex',gap:4,alignItems:'flex-end',height:52 }}>
           {weekData.map((d,i)=>(
             <div key={i} style={{ flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:4 }}>
-              <div style={{ width:'100%',borderRadius:'4px 4px 0 0',background:d.val?'#6B6AEA':'rgba(44,44,46,0.7)',height:d.val?44:14,transition:'height .3s ease',boxShadow:d.val?'0 0 8px rgba(107,106,234,.35)':'none' }}/>
+              <div style={{ width:'100%',borderRadius:'4px 4px 0 0',background:d.val?'#00C8B1':'#2C2C2E',height:d.val?44:14,transition:'height .3s ease',boxShadow:d.val?'0 0 8px rgba(0,200,177,.35)':'none' }}/>
               <span style={{ fontSize:10,color:'rgba(235,235,245,0.35)',fontWeight:600 }}>{d.label}</span>
             </div>
           ))}
@@ -131,7 +131,7 @@ const RecordatoriosScreen = () => {
 
       {items.length===0&&(
         <div style={{ textAlign:'center',padding:'48px 0' }}>
-          <div style={{ width:64,height:64,borderRadius:18,background:'rgba(107,106,234,0.15)',border:'0.5px solid rgba(107,106,234,0.25)',display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 14px',color:'#7B7AEE' }}><Icon name="bell" size={28}/></div>
+          <div style={{ width:64,height:64,borderRadius:18,background:'rgba(0,200,177,0.15)',border:'0.5px solid rgba(0,200,177,0.25)',display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 14px',color:'#00C8B1' }}><Icon name="bell" size={28}/></div>
           <p style={{ fontWeight:600,color:'#FFF',fontSize:17,margin:0,letterSpacing:-0.3 }}>Sin recordatorios</p>
           <p style={{ color:'rgba(235,235,245,0.4)',fontSize:14,margin:'6px 0 0' }}>Tocá + para agregar uno</p>
         </div>
@@ -159,7 +159,7 @@ const FocusOverlay = ({ onClose }) => {
   const mm    = String(Math.floor(left/60)).padStart(2,'0');
   const ss    = String(left%60).padStart(2,'0');
   const R=108, circ=2*Math.PI*R, offset=circ*(1-prog);
-  const col   = mode==='work'?'#6B6AEA':'#30D158';
+  const col   = mode==='work'?'#00C8B1':'#30D158';
 
   React.useEffect(()=>{
     if(run){
@@ -187,7 +187,7 @@ const FocusOverlay = ({ onClose }) => {
       display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',
       padding:'24px 24px 40px',
       background:'rgba(0,0,0,0.96)',
-      backdropFilter:'blur(40px)',WebkitBackdropFilter:'blur(40px)',
+      WebkitBackdropFilter:'blur(40px)',
     }}>
       <div style={{ position:'absolute',width:300,height:300,borderRadius:'50%',background:`${col}18`,filter:'blur(80px)',pointerEvents:'none' }}/>
 
@@ -198,14 +198,14 @@ const FocusOverlay = ({ onClose }) => {
       {/* Mode toggle */}
       <div style={{ display:'flex',gap:0,...G.card,borderRadius:13,padding:4,marginBottom:28,zIndex:1 }}>
         {[['work','target','Trabajo'],['break','coffee','Descanso']].map(([v,ic,l])=>(
-          <button key={v} onClick={()=>!run&&sw(v)} style={{ display:'flex',alignItems:'center',gap:6,padding:'9px 18px',borderRadius:10,border:'none',cursor:'pointer',fontSize:14,fontWeight:600,background:mode===v?'rgba(255,255,255,0.12)':'transparent',color:mode===v?'#FFF':'rgba(235,235,245,0.4)',transition:'all .2s',letterSpacing:-0.1 }}><Icon name={ic} size={13}/> {l}</button>
+          <button key={v} onClick={()=>!run&&sw(v)} style={{ display:'flex',alignItems:'center',gap:6,padding:'9px 18px',borderRadius:10,border:'none',cursor:'pointer',fontSize:14,fontWeight:600,background:mode===v?'rgba(84,84,88,0.55)':'transparent',color:mode===v?'#FFF':'rgba(235,235,245,0.4)',transition:'all .2s',letterSpacing:-0.1 }}><Icon name={ic} size={13}/> {l}</button>
         ))}
       </div>
 
       {/* Ring timer */}
       <div style={{ position:'relative',width:268,height:268,marginBottom:24,zIndex:1 }}>
         <svg width="268" height="268" style={{ transform:'rotate(-90deg)',position:'absolute' }}>
-          <circle cx="134" cy="134" r={R} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="8"/>
+          <circle cx="134" cy="134" r={R} fill="none" stroke="rgba(84,84,88,0.35)" strokeWidth="8"/>
           <circle cx="134" cy="134" r={R} fill="none" stroke={col} strokeWidth="8"
             strokeDasharray={circ} strokeDashoffset={offset} strokeLinecap="round"
             style={{ transition:run?'stroke-dashoffset .8s linear':'none',filter:`drop-shadow(0 0 10px ${col}80)` }}/>
@@ -227,7 +227,7 @@ const FocusOverlay = ({ onClose }) => {
       {phase==='done' ? (
         <div style={{ display:'flex',gap:10,zIndex:1 }}>
           <button onClick={()=>sw('break')} style={{ display:'flex',alignItems:'center',gap:7,padding:'13px 22px',borderRadius:14,background:'linear-gradient(145deg,#34D158,#30D158)',color:'#FFF',border:'0.5px solid rgba(255,255,255,0.2)',fontWeight:600,cursor:'pointer',fontSize:15,boxShadow:'0 4px 16px rgba(48,209,88,.4)' }}><Icon name="coffee" size={16}/> Descansar</button>
-          <button onClick={()=>{ setMode('work'); setLeft(W); setPhase('ready'); }} style={{ display:'flex',alignItems:'center',gap:7,padding:'13px 22px',borderRadius:14,background:'linear-gradient(145deg,#7877F0,#5E5CE6)',color:'#FFF',border:'0.5px solid rgba(255,255,255,0.2)',fontWeight:600,cursor:'pointer',fontSize:15,boxShadow:'0 4px 16px rgba(94,92,230,.4)' }}><Icon name="reset" size={16}/> Nueva</button>
+          <button onClick={()=>{ setMode('work'); setLeft(W); setPhase('ready'); }} style={{ display:'flex',alignItems:'center',gap:7,padding:'13px 22px',borderRadius:14,background:'linear-gradient(145deg,#00D4BC,#00B5A0)',color:'#FFF',border:'0.5px solid rgba(255,255,255,0.2)',fontWeight:600,cursor:'pointer',fontSize:15,boxShadow:'0 4px 16px rgba(0,200,177,.4)' }}><Icon name="reset" size={16}/> Nueva</button>
         </div>
       ) : (
         <div style={{ display:'flex',gap:10,zIndex:1 }}>
@@ -298,7 +298,7 @@ const EnergyScreen = () => {
               <p style={{ margin:'0 0 4px',fontSize:12,fontWeight:600,color:'rgba(235,235,245,0.45)',textTransform:'uppercase',letterSpacing:0.5 }}>Hoy</p>
               <span style={{ fontSize:40,lineHeight:1 }}>{moodEmoji(avgEnergy)}</span>
             </div>
-            <button onClick={()=>setEdit(true)} style={{ background:'rgba(44,44,46,0.7)',border:'0.5px solid rgba(255,255,255,0.1)',borderRadius:10,padding:'8px 14px',color:'rgba(235,235,245,0.7)',cursor:'pointer',fontSize:13,fontWeight:500 }}>Editar</button>
+            <button onClick={()=>setEdit(true)} style={{ background:'#2C2C2E',border:'0.5px solid rgba(84,84,88,0.50)',borderRadius:10,padding:'8px 14px',color:'rgba(235,235,245,0.7)',cursor:'pointer',fontSize:13,fontWeight:500 }}>Editar</button>
           </div>
           <div style={{ display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:10,marginBottom:today.intencion?14:0 }}>
             {[['Energía',today.energia,'zap'],['Foco',today.foco,'target'],['Ánimo',today.animo,'face-smile']].map(([l,v,ic])=>(
@@ -324,9 +324,9 @@ const EnergyScreen = () => {
 
       {/* Edit form */}
       {showEdit && (
-        <C style={{ padding:16,marginBottom:14,border:'0.5px solid rgba(107,106,234,0.3)' }}>
+        <C style={{ padding:16,marginBottom:14,border:'0.5px solid rgba(0,200,177,0.3)' }}>
           <p style={{ margin:'0 0 16px',fontSize:16,fontWeight:700,color:'#FFF',letterSpacing:-0.3,display:'flex',alignItems:'center',gap:8 }}><Icon name="zap" size={16} color="#FFD60A"/> Check-in de energía</p>
-          {[['energia','Energía','zap','#FFD60A'],['foco','Foco','target','#6B6AEA'],['animo','Ánimo','face-smile','#30D158']].map(([k,l,ic,col])=>(
+          {[['energia','Energía','zap','#FFD60A'],['foco','Foco','target','#00C8B1'],['animo','Ánimo','face-smile','#30D158']].map(([k,l,ic,col])=>(
             <div key={k} style={{ marginBottom:14 }}>
               <div style={{ display:'flex',justifyContent:'space-between',marginBottom:6,alignItems:'center' }}>
                 <span style={{ fontSize:14,color:'rgba(235,235,245,0.75)',fontWeight:500,display:'flex',alignItems:'center',gap:6 }}><Icon name={ic} size={14} color={col}/> {l}</span>
@@ -336,10 +336,10 @@ const EnergyScreen = () => {
             </div>
           ))}
           <input value={form.intencion||''} onChange={e=>setForm(f=>({...f,intencion:e.target.value}))} placeholder="Intención del día…"
-            style={{ width:'100%',padding:'12px 14px',borderRadius:12,border:'0.5px solid rgba(255,255,255,0.08)',background:'rgba(44,44,46,0.7)',color:'#FFF',fontSize:15,marginBottom:14,fontFamily:'inherit' }}/>
+            style={{ width:'100%',padding:'12px 14px',borderRadius:12,border:'0.5px solid rgba(84,84,88,0.45)',background:'#2C2C2E',color:'#FFF',fontSize:15,marginBottom:14,fontFamily:'inherit' }}/>
           <div style={{ display:'flex',gap:8 }}>
-            <button onClick={save} style={{ flex:1,padding:12,borderRadius:12,background:'linear-gradient(145deg,#7877F0,#5E5CE6)',color:'#FFF',border:'none',fontWeight:600,cursor:'pointer',boxShadow:'0 4px 14px rgba(94,92,230,.35)' }}>Guardar</button>
-            <button onClick={()=>setEdit(false)} style={{ flex:1,padding:12,borderRadius:12,background:'rgba(44,44,46,0.7)',color:'rgba(235,235,245,0.55)',border:'0.5px solid rgba(255,255,255,0.08)',cursor:'pointer' }}>Cancelar</button>
+            <button onClick={save} style={{ flex:1,padding:12,borderRadius:12,background:'linear-gradient(145deg,#00D4BC,#00B5A0)',color:'#FFF',border:'none',fontWeight:600,cursor:'pointer',boxShadow:'0 4px 14px rgba(0,200,177,.35)' }}>Guardar</button>
+            <button onClick={()=>setEdit(false)} style={{ flex:1,padding:12,borderRadius:12,background:'#2C2C2E',color:'rgba(235,235,245,0.55)',border:'0.5px solid rgba(84,84,88,0.45)',cursor:'pointer' }}>Cancelar</button>
           </div>
         </C>
       )}
@@ -347,7 +347,7 @@ const EnergyScreen = () => {
       {/* Weekly chart */}
       <Hdr title="Esta semana"/>
       <C style={{ padding:'14px 16px',marginBottom:14 }}>
-        {[['Energía','energia','#FFD60A'],['Foco','foco','#6B6AEA'],['Ánimo','animo','#30D158']].map(([l,k,col])=>(
+        {[['Energía','energia','#FFD60A'],['Foco','foco','#00C8B1'],['Ánimo','animo','#30D158']].map(([l,k,col])=>(
           <div key={k} style={{ marginBottom:16 }}>
             <div style={{ display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:7 }}>
               <span style={{ fontSize:13,fontWeight:600,color:'rgba(235,235,245,0.6)' }}>{l}</span>
@@ -437,7 +437,7 @@ const ReplanScreen = ({ onNavigate }) => {
       <Title title="Replanear" sub="Reorganiza sin perder nada"/>
 
       {/* Explanation */}
-      <C style={{ padding:'13px 16px',marginBottom:14,background:'linear-gradient(135deg,rgba(255,159,10,0.1) 0%,rgba(28,28,30,0.78) 100%)',border:'0.5px solid rgba(255,159,10,0.22)' }}>
+      <C style={{ padding:'13px 16px',marginBottom:14,background:'linear-gradient(135deg,rgba(255,159,10,0.1) 0%,#1C1C1E 100%)',border:'0.5px solid rgba(255,159,10,0.22)' }}>
         <div style={{ display:'flex',gap:10,alignItems:'flex-start' }}>
           <Icon name="reset" size={16} color="#FF9F0A"/>
           <p style={{ margin:0,fontSize:14,color:'rgba(235,235,245,0.7)',lineHeight:1.5 }}>Mueve las tareas que no puedas hacer hoy a otro día. <strong style={{color:'#FFF'}}>LifeOS nunca borra nada</strong>, solo las reprograma.</p>
@@ -446,14 +446,14 @@ const ReplanScreen = ({ onNavigate }) => {
 
       {/* Auto-replan */}
       {tasks.length>0 && !plan && (
-        <button onClick={autoReplan} disabled={loading} style={{ width:'100%',padding:14,borderRadius:14,marginBottom:16,background:loading?'rgba(44,44,46,0.7)':'linear-gradient(145deg,#FF9F0A,#FF8C00)',color:loading?'rgba(235,235,245,0.4)':'#000',border:'0.5px solid rgba(255,255,255,0.12)',fontSize:16,fontWeight:700,cursor:loading?'default':'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:8,boxShadow:loading?'none':'0 6px 20px rgba(255,159,10,.35)' }}>
+        <button onClick={autoReplan} disabled={loading} style={{ width:'100%',padding:14,borderRadius:14,marginBottom:16,background:loading?'#2C2C2E':'linear-gradient(145deg,#FF9F0A,#FF8C00)',color:loading?'rgba(235,235,245,0.4)':'#000',border:'0.5px solid rgba(84,84,88,0.55)',fontSize:16,fontWeight:700,cursor:loading?'default':'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:8,boxShadow:loading?'none':'0 6px 20px rgba(255,159,10,.35)' }}>
           <Icon name="sparkle" size={16} weight={1.8} color={loading?'rgba(235,235,245,0.4)':'#000'}/> {loading?'Analizando…':'Replanear automáticamente'}
         </button>
       )}
 
       {/* Result */}
       {plan && (
-        <C style={{ padding:'13px 16px',marginBottom:14,background:'linear-gradient(135deg,rgba(48,209,88,0.1) 0%,rgba(28,28,30,0.78) 100%)',border:'0.5px solid rgba(48,209,88,0.3)' }}>
+        <C style={{ padding:'13px 16px',marginBottom:14,background:'linear-gradient(135deg,rgba(48,209,88,0.1) 0%,#1C1C1E 100%)',border:'0.5px solid rgba(48,209,88,0.3)' }}>
           <div style={{ display:'flex',gap:10,alignItems:'center' }}>
             <div style={{ color:'#30D158' }}><Icon name="check" size={18} weight={2.5}/></div>
             <div>
@@ -477,7 +477,7 @@ const ReplanScreen = ({ onNavigate }) => {
           <div style={{ display:'flex',flexDirection:'column',gap:8 }}>
             {tasks.map(task=>{
               const movedTo = moved[task.id];
-              const col = priColor[task.priority]||'#6B6AEA';
+              const col = priColor[task.priority]||'#00C8B1';
               return (
                 <C key={task.id} style={{ padding:'13px 16px',opacity:movedTo?0.55:1,borderLeft:`3px solid ${movedTo?'rgba(84,84,88,0.4)':col}` }}>
                   <div style={{ display:'flex',alignItems:'flex-start',gap:12,marginBottom:movedTo?0:10 }}>
@@ -492,8 +492,8 @@ const ReplanScreen = ({ onNavigate }) => {
                   </div>
                   {!movedTo && (
                     <div style={{ display:'flex',gap:6,paddingLeft:20 }}>
-                      <button onClick={()=>moveTask(task.id,tomorrow())} style={{ flex:1,padding:'8px 10px',borderRadius:10,background:'rgba(44,44,46,0.7)',border:'0.5px solid rgba(255,255,255,0.08)',color:'rgba(235,235,245,0.7)',cursor:'pointer',fontSize:12,fontWeight:500 }}>→ Mañana</button>
-                      <button onClick={()=>moveTask(task.id,nextWeek())} style={{ flex:1,padding:'8px 10px',borderRadius:10,background:'rgba(44,44,46,0.7)',border:'0.5px solid rgba(255,255,255,0.08)',color:'rgba(235,235,245,0.7)',cursor:'pointer',fontSize:12,fontWeight:500 }}>→ Próx. semana</button>
+                      <button onClick={()=>moveTask(task.id,tomorrow())} style={{ flex:1,padding:'8px 10px',borderRadius:10,background:'#2C2C2E',border:'0.5px solid rgba(84,84,88,0.45)',color:'rgba(235,235,245,0.7)',cursor:'pointer',fontSize:12,fontWeight:500 }}>→ Mañana</button>
+                      <button onClick={()=>moveTask(task.id,nextWeek())} style={{ flex:1,padding:'8px 10px',borderRadius:10,background:'#2C2C2E',border:'0.5px solid rgba(84,84,88,0.45)',color:'rgba(235,235,245,0.7)',cursor:'pointer',fontSize:12,fontWeight:500 }}>→ Próx. semana</button>
                       <button onClick={()=>{LOData.tasks.toggle(task.id);refresh();}} style={{ padding:'8px 12px',borderRadius:10,background:'rgba(48,209,88,0.14)',border:'0.5px solid rgba(48,209,88,0.3)',color:'#30D158',cursor:'pointer',fontSize:13,fontWeight:700 }}>✓</button>
                     </div>
                   )}

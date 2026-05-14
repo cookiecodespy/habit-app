@@ -8,7 +8,7 @@ const DocsScreen = () => {
       id:'intro',
       icon:'compass',
       title:'¿Qué es LifeOS?',
-      color:'#6B6AEA',
+      color:'#00C8B1',
       body:[
         { kind:'p', text:'LifeOS es un sistema personal para capturar lo que se te cruza, ordenarlo, y ejecutar lo importante sin que se te escape nada.' },
         { kind:'p', text:'La idea es simple: si tienes una idea, una tarea, un gasto o algo para recordar, lo metes en Captura. Después, en otro momento, decides qué hacer con cada cosa.' },
@@ -95,7 +95,7 @@ const DocsScreen = () => {
       id:'focus',
       icon:'target',
       title:'Focus (Pomodoro)',
-      color:'#6B6AEA',
+      color:'#00C8B1',
       body:[
         { kind:'p', text:'Bloques de trabajo profundo con un timer estilo pomodoro: 25 min de focus + 5 min de descanso (configurable).' },
         { kind:'p', text:'Tocás Iniciar y arranca. Antes puedes escribir en qué vas a trabajar. Cuando termina la sesión, se guarda en tu historial y suma minutos a tu día.' },
@@ -120,7 +120,7 @@ const DocsScreen = () => {
       color:'#BF5AF2',
       body:[
         { kind:'p', text:'Acá vives el "alto nivel" del sistema:' },
-        { kind:'item', icon:'target',  name:'Misión',   color:'#6B6AEA', desc:'Tu propósito personal. Una frase que te recuerda para qué estás haciendo todo esto.' },
+        { kind:'item', icon:'target',  name:'Misión',   color:'#00C8B1', desc:'Tu propósito personal. Una frase que te recuerda para qué estás haciendo todo esto.' },
         { kind:'item', icon:'chart',   name:'Balance',  color:'#BF5AF2', desc:'Radar de 6 áreas (Universidad, Trabajo, Proyectos, Salud, Personal, Finanzas). Cada una de 1 a 10.' },
         { kind:'item', icon:'sparkle', name:'Insights', color:'#FF9F0A', desc:'La app te dice tu mejor área, la que necesita atención y tu promedio.' },
         { kind:'item', icon:'graph',   name:'Progreso', color:'#30D158', desc:'Stats de la semana: tareas, focus, hábitos, puntos.' },
@@ -183,7 +183,7 @@ const DocsScreen = () => {
   const renderBody = (b, i) => {
     if(b.kind==='p')        return <p key={i} style={{ margin:'0 0 12px',fontSize:14,color:'rgba(235,235,245,0.72)',lineHeight:1.6,letterSpacing:-0.05 }}>{b.text}</p>;
     if(b.kind==='subtitle') return <p key={i} style={{ margin:'10px 0 8px',fontSize:11,fontWeight:700,color:'rgba(235,235,245,0.4)',textTransform:'uppercase',letterSpacing:0.7 }}>{b.text}</p>;
-    if(b.kind==='code')     return <div key={i} style={{ padding:'10px 12px',borderRadius:10,background:'rgba(0,0,0,0.4)',marginBottom:12,border:'0.5px solid rgba(255,255,255,0.06)' }}><code style={{ fontSize:13,color:'#7B7AEE',fontFamily:'ui-monospace,Menlo,monospace' }}>{b.text}</code></div>;
+    if(b.kind==='code')     return <div key={i} style={{ padding:'10px 12px',borderRadius:10,background:'rgba(0,0,0,0.4)',marginBottom:12,border:'0.5px solid rgba(84,84,88,0.35)' }}><code style={{ fontSize:13,color:'#00C8B1',fontFamily:'ui-monospace,Menlo,monospace' }}>{b.text}</code></div>;
     if(b.kind==='tip') return (
       <div key={i} style={{ display:'flex',gap:10,padding:'10px 12px',borderRadius:11,background:'rgba(255,159,10,0.07)',border:'0.5px solid rgba(255,159,10,0.18)',marginBottom:8 }}>
         <div style={{ color:'#FF9F0A',marginTop:1 }}><Icon name="lightbulb" size={14}/></div>
@@ -201,7 +201,7 @@ const DocsScreen = () => {
     );
     if(b.kind==='step') return (
       <div key={i} style={{ display:'flex',gap:12,alignItems:'flex-start',padding:'10px 0',borderBottom:'0.5px solid rgba(84,84,88,0.25)' }}>
-        <div style={{ width:28,height:28,borderRadius:'50%',background:'rgba(107,106,234,0.2)',border:'0.5px solid rgba(107,106,234,0.4)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,fontWeight:700,color:'#7B7AEE',flexShrink:0,marginTop:1,fontVariantNumeric:'tabular-nums' }}>{b.n}</div>
+        <div style={{ width:28,height:28,borderRadius:'50%',background:'rgba(0,200,177,0.2)',border:'0.5px solid rgba(0,200,177,0.4)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,fontWeight:700,color:'#00C8B1',flexShrink:0,marginTop:1,fontVariantNumeric:'tabular-nums' }}>{b.n}</div>
         <div style={{ flex:1,minWidth:0 }}>
           <p style={{ margin:'0 0 3px',fontSize:14,fontWeight:700,color:'#FFF',letterSpacing:-0.2 }}>{b.title}</p>
           <p style={{ margin:0,fontSize:13,color:'rgba(235,235,245,0.62)',lineHeight:1.55 }}>{b.text}</p>
@@ -210,7 +210,7 @@ const DocsScreen = () => {
     );
     if(b.kind==='tab') return (
       <div key={i} style={{ display:'flex',gap:12,alignItems:'flex-start',padding:'10px 0',borderBottom:'0.5px solid rgba(84,84,88,0.25)' }}>
-        <div style={{ width:34,height:34,borderRadius:10,background:'rgba(255,255,255,0.06)',border:'0.5px solid rgba(255,255,255,0.08)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,color:'#7B7AEE' }}><Icon name={b.icon} size={16}/></div>
+        <div style={{ width:34,height:34,borderRadius:10,background:'rgba(84,84,88,0.35)',border:'0.5px solid rgba(84,84,88,0.45)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,color:'#00C8B1' }}><Icon name={b.icon} size={16}/></div>
         <div style={{ flex:1,minWidth:0,paddingTop:2 }}>
           <p style={{ margin:'0 0 3px',fontSize:14,fontWeight:700,color:'#FFF',letterSpacing:-0.2 }}>{b.name}</p>
           <p style={{ margin:0,fontSize:13,color:'rgba(235,235,245,0.62)',lineHeight:1.5 }}>{b.text}</p>
@@ -220,7 +220,7 @@ const DocsScreen = () => {
     if(b.kind==='sync') return (
       <div key={i} style={{ padding:'10px 0',borderBottom:'0.5px solid rgba(84,84,88,0.25)' }}>
         <div style={{ display:'flex',alignItems:'center',gap:6,marginBottom:5,flexWrap:'wrap' }}>
-          <span style={{ fontSize:11.5,fontWeight:700,color:'#6B6AEA',background:'rgba(107,106,234,0.15)',padding:'2.5px 9px',borderRadius:7,letterSpacing:-0.1 }}>{b.from}</span>
+          <span style={{ fontSize:11.5,fontWeight:700,color:'#00C8B1',background:'rgba(0,200,177,0.15)',padding:'2.5px 9px',borderRadius:7,letterSpacing:-0.1 }}>{b.from}</span>
           <Icon name="arrow-right" size={11} color="rgba(235,235,245,0.4)" weight={2.5}/>
           <span style={{ fontSize:11.5,fontWeight:700,color:'#30D158',background:'rgba(48,209,88,0.15)',padding:'2.5px 9px',borderRadius:7,letterSpacing:-0.1 }}>{b.to}</span>
         </div>
@@ -235,9 +235,9 @@ const DocsScreen = () => {
       <Title title="Docs" sub="Cómo usar LifeOS"/>
 
       {/* Hero */}
-      <C style={{ padding:'18px',marginBottom:14,background:'linear-gradient(135deg,rgba(107,106,234,0.18) 0%,rgba(191,90,242,0.10) 60%,rgba(28,28,30,0.85) 100%)',border:'0.5px solid rgba(107,106,234,0.3)' }}>
+      <C style={{ padding:'18px',marginBottom:14,background:'linear-gradient(135deg,rgba(0,200,177,0.18) 0%,rgba(191,90,242,0.10) 60%,#1C1C1E 100%)',border:'0.5px solid rgba(0,200,177,0.3)' }}>
         <div style={{ display:'flex',alignItems:'center',gap:14,marginBottom:12 }}>
-          <div style={{ width:50,height:50,borderRadius:15,background:'linear-gradient(145deg,#7877F0,#BF5AF2)',display:'flex',alignItems:'center',justifyContent:'center',color:'#FFF',boxShadow:'0 6px 20px rgba(107,106,234,0.5),inset 0 1px 0 rgba(255,255,255,0.2)' }}>
+          <div style={{ width:50,height:50,borderRadius:15,background:'linear-gradient(145deg,#00D4BC,#0A84FF)',display:'flex',alignItems:'center',justifyContent:'center',color:'#FFF',boxShadow:'0 6px 20px rgba(0,200,177,0.5),inset 0 1px 0 rgba(255,255,255,0.2)' }}>
             <Icon name="target" size={26} weight={2}/>
           </div>
           <div>
@@ -254,7 +254,7 @@ const DocsScreen = () => {
         {SECTIONS.map(s=>{
           const open = openId===s.id;
           return (
-            <C key={s.id} style={{ overflow:'hidden',border:open?`0.5px solid ${s.color}40`:'0.5px solid rgba(255,255,255,0.08)' }}>
+            <C key={s.id} style={{ overflow:'hidden',border:open?`0.5px solid ${s.color}40`:'0.5px solid rgba(84,84,88,0.45)' }}>
               <button onClick={()=>setOpenId(open?null:s.id)} style={{ width:'100%',display:'flex',alignItems:'center',gap:14,padding:'13px 16px',background:open?`${s.color}0e`:'transparent',border:'none',cursor:'pointer',textAlign:'left',transition:'background .2s' }}>
                 <IconTile name={s.icon} color={s.color} size={38}/>
                 <p style={{ flex:1,margin:0,fontSize:15,fontWeight:600,color:'#FFF',letterSpacing:-0.2 }}>{s.title}</p>

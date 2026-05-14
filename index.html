@@ -12,12 +12,33 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <title>LifeOS</title>
 <style>
+  /* ── Design System ────────────────────────────────────────── */
+  :root{
+    --bg:       #000000;
+    --bg-1:     #1C1C1E;
+    --bg-2:     #2C2C2E;
+    --bg-3:     #3A3A3C;
+    --text:     #FFFFFF;
+    --text-2:   rgba(235,235,245,0.60);
+    --text-3:   rgba(235,235,245,0.30);
+    --sep:      rgba(84,84,88,0.45);
+    --accent:   #00C8B1;
+    --acc-dim:  rgba(0,200,177,0.18);
+    --acc-glow: rgba(0,200,177,0.35);
+    --red:      #FF453A;
+    --orange:   #FF9F0A;
+    --green:    #34C759;
+    --blue:     #0A84FF;
+    --purple:   #BF5AF2;
+    --yellow:   #FFD60A;
+  }
+
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-  html{height:100%;background:#000}
+  html{height:100%;background:var(--bg)}
   body{
     height:100%;
-    font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text','Helvetica Neue',sans-serif;
-    background:#000;color:#FFF;overflow:hidden;
+    font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','SF Pro Display','Helvetica Neue',sans-serif;
+    background:var(--bg);color:var(--text);overflow:hidden;
     -webkit-font-smoothing:antialiased;
     -moz-osx-font-smoothing:grayscale;
   }
@@ -25,174 +46,140 @@
   ::-webkit-scrollbar{display:none}
   input,select,textarea{font-family:inherit;outline:none;-webkit-appearance:none}
   input[type=date],input[type=time]{color-scheme:dark}
-  input[type=range]{-webkit-appearance:none;height:4px;border-radius:2px;background:rgba(84,84,88,0.5)}
+  input[type=range]{-webkit-appearance:none;height:4px;border-radius:2px;background:var(--bg-3)}
   input[type=range]::-webkit-slider-thumb{
     -webkit-appearance:none;width:24px;height:24px;border-radius:50%;
-    background:#FFF;box-shadow:0 2px 8px rgba(0,0,0,.5),0 0 0 0.5px rgba(255,255,255,0.3);cursor:pointer;
+    background:#FFF;box-shadow:0 2px 8px rgba(0,0,0,.6);cursor:pointer;
   }
   details summary{list-style:none}
   details summary::-webkit-details-marker{display:none}
 
-  @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-  @keyframes scaleIn{from{opacity:0;transform:scale(0.93)}to{opacity:1;transform:scale(1)}}
-  @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
-  @keyframes slideInRight{from{opacity:0;transform:translateX(22px)}to{opacity:1;transform:translateX(0)}}
-  .fade-up{animation:fadeUp .32s cubic-bezier(.34,1.2,.64,1) both}
-  .scale-in{animation:scaleIn .25s cubic-bezier(.34,1.2,.64,1) both}
-  .slide-in{animation:slideInRight .28s cubic-bezier(.34,1.2,.64,1) both}
-
-  /* ── Ambient Background ── */
-  body::before{
-    content:'';
-    position:fixed;inset:0;
-    background:
-      radial-gradient(ellipse at 15% 35%,rgba(94,92,230,0.22) 0%,transparent 52%),
-      radial-gradient(ellipse at 88% 8%,rgba(191,90,242,0.16) 0%,transparent 48%),
-      radial-gradient(ellipse at 60% 88%,rgba(10,132,255,0.12) 0%,transparent 50%),
-      radial-gradient(ellipse at 5% 90%,rgba(48,209,88,0.07) 0%,transparent 45%),
-      radial-gradient(ellipse at 95% 60%,rgba(255,159,10,0.06) 0%,transparent 40%);
-    pointer-events:none;z-index:0;
-  }
-  body::after{
-    content:'';
-    position:fixed;inset:0;
-    background:
-      radial-gradient(ellipse 200px 200px at 15% 35%,rgba(94,92,230,0.04) 0%,transparent 70%);
-    pointer-events:none;z-index:0;
-    animation:ambientDrift 18s ease-in-out infinite alternate;
-  }
-  @keyframes ambientDrift{
-    0%  { transform:translate(0,0) scale(1); }
-    50% { transform:translate(18px,-12px) scale(1.06); }
-    100%{ transform:translate(-10px,8px) scale(0.97); }
-  }
-  @keyframes pulse{
-    0%,100%{ opacity:1; transform:scale(1); }
-    50%    { opacity:0.5; transform:scale(0.7); }
-  }
+  /* ── Animations ── */
+  @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes scaleIn{from{opacity:0;transform:scale(0.95)}to{opacity:1;transform:scale(1)}}
+  @keyframes slideInRight{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:translateX(0)}}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.45;transform:scale(0.68)}}
+  @keyframes dotPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,69,58,0.5)}50%{box-shadow:0 0 0 4px rgba(255,69,58,0)}}
+  .fade-up{animation:fadeUp .28s cubic-bezier(.25,.8,.25,1) both}
+  .scale-in{animation:scaleIn .22s cubic-bezier(.25,.8,.25,1) both}
+  .slide-in{animation:slideInRight .26s cubic-bezier(.25,.8,.25,1) both}
 
   /* ── Shell ── */
   #shell{
     max-width:430px;margin:0 auto;height:100vh;
     display:flex;flex-direction:column;
     position:relative;overflow:hidden;
-    background:transparent;
-    z-index:1;
+    background:var(--bg);
   }
   @media(min-width:520px){
-    body{background:#0a0a0f}
+    body{background:#111}
     #shell{
-      box-shadow:
-        0 0 0 0.5px rgba(255,255,255,0.07),
-        0 30px 100px rgba(0,0,0,.95),
-        inset 0 0 0 0.5px rgba(255,255,255,0.04);
-      border-radius:0;
+      box-shadow:0 0 0 0.5px rgba(255,255,255,0.06),0 24px 80px rgba(0,0,0,.9);
     }
   }
 
   /* ── Screen ── */
   .screen{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain}
-  .screen-pad{padding:60px 16px 108px}
+  .screen-pad{padding:56px 16px 104px}
 
-  /* ── Glass card base ── */
+  /* ── Card base — solid, no blur ── */
   .glass{
-    background:rgba(26,26,28,0.82);
-    backdrop-filter:blur(48px) saturate(200%);
-    -webkit-backdrop-filter:blur(48px) saturate(200%);
-    border:0.5px solid rgba(255,255,255,0.09);
+    background:var(--bg-1);
+    border:0.5px solid var(--sep);
+    border-radius:16px;
   }
   .glass-bright{
-    background:rgba(42,42,44,0.78);
-    backdrop-filter:blur(48px) saturate(200%);
-    -webkit-backdrop-filter:blur(48px) saturate(200%);
-    border:0.5px solid rgba(255,255,255,0.12);
+    background:var(--bg-2);
+    border:0.5px solid rgba(84,84,88,0.55);
+    border-radius:16px;
   }
 
   /* ── Bottom nav ── */
   .nav{
     position:absolute;bottom:0;left:0;right:0;
-    height:83px;
-    background:rgba(12,12,16,0.92);
-    backdrop-filter:blur(60px) saturate(200%);
-    -webkit-backdrop-filter:blur(60px) saturate(200%);
-    border-top:0.5px solid rgba(255,255,255,0.08);
+    height:82px;
+    background:rgba(0,0,0,0.96);
+    border-top:0.5px solid var(--sep);
     display:flex;padding:0 4px;
-    padding-bottom:env(safe-area-inset-bottom,16px);
+    padding-bottom:env(safe-area-inset-bottom,14px);
     z-index:100;
   }
   .nav-btn{
     flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
     gap:4px;background:none;border:none;cursor:pointer;padding:8px 2px 0;position:relative;
-    transition:opacity .15s;
+    transition:opacity .12s;
   }
-  .nav-btn:active{ opacity:0.7; }
+  .nav-btn:active{opacity:0.55}
   .nav-icon-wrap{
-    width:28px;height:28px;display:flex;align-items:center;justify-content:center;
-    border-radius:9px;transition:all .25s cubic-bezier(.34,1.4,.64,1);
+    width:30px;height:30px;display:flex;align-items:center;justify-content:center;
+    border-radius:10px;transition:all .2s cubic-bezier(.34,1.4,.64,1);
   }
   .nav-btn.active .nav-icon-wrap{
-    background:rgba(107,106,234,0.22);
-    transform:scale(1.1) translateY(-1px);
+    background:var(--acc-dim);
+    transform:scale(1.08) translateY(-1px);
   }
-  .nav-icon{font-size:20px;line-height:1}
-  .nav-lbl{font-size:10px;font-weight:500;color:rgba(235,235,245,.32);letter-spacing:-.1px;transition:color .15s;line-height:1}
-  .nav-btn.active .nav-lbl{color:#7B7AEE;font-weight:700}
+  .nav-lbl{
+    font-size:10px;font-weight:500;
+    color:var(--text-3);
+    letter-spacing:-.1px;transition:color .15s;line-height:1;
+  }
+  .nav-btn.active .nav-lbl{color:var(--accent);font-weight:700}
   .nav-dot{
-    position:absolute;top:6px;right:calc(50% - 18px);
+    position:absolute;top:5px;right:calc(50% - 19px);
     width:8px;height:8px;border-radius:50%;
-    background:#FF453A;border:2px solid rgba(12,12,16,0.92);
-    animation:dotPulse 2s ease-in-out infinite;
-  }
-  @keyframes dotPulse{
-    0%,100%{ box-shadow:0 0 0 0 rgba(255,69,58,0.4); }
-    50%    { box-shadow:0 0 0 4px rgba(255,69,58,0); }
+    background:var(--red);border:2px solid #000;
+    animation:dotPulse 2.2s ease-in-out infinite;
   }
 
   /* ── FAB ── */
   .fab{
-    position:absolute;bottom:98px;right:16px;
-    width:52px;height:52px;
-    border-radius:16px;
-    background:linear-gradient(145deg,#7877F0,#6B6AEA,#5E5CE6);
-    border:0.5px solid rgba(255,255,255,0.22);
+    position:absolute;bottom:96px;right:16px;
+    width:50px;height:50px;border-radius:15px;
+    background:linear-gradient(145deg,#00D4BC,#00A896);
+    border:none;
     cursor:pointer;
-    font-size:24px;display:flex;align-items:center;justify-content:center;
-    box-shadow:
-      0 8px 28px rgba(94,92,230,.55),
-      0 2px 8px rgba(0,0,0,.7),
-      inset 0 1px 0 rgba(255,255,255,0.18),
-      inset 0 -1px 0 rgba(0,0,0,0.2);
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 6px 24px var(--acc-glow),0 2px 6px rgba(0,0,0,.6);
     z-index:50;
-    transition:transform .2s cubic-bezier(.34,1.56,.64,1),box-shadow .2s;
+    transition:transform .18s cubic-bezier(.34,1.56,.64,1),box-shadow .18s;
   }
-  .fab:hover{ transform:scale(1.06); box-shadow:0 10px 32px rgba(94,92,230,.65),0 2px 10px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,0.18); }
-  .fab:active{ transform:scale(.87); box-shadow:0 2px 12px rgba(94,92,230,.3); }
+  .fab:hover{transform:scale(1.07);box-shadow:0 10px 30px var(--acc-glow),0 2px 8px rgba(0,0,0,.5)}
+  .fab:active{transform:scale(.88);box-shadow:0 3px 12px rgba(0,200,177,.25)}
 
   /* ── Back button ── */
   .back-btn{
     display:inline-flex;align-items:center;gap:5px;
-    background:none;border:none;color:#6B6AEA;
+    background:none;border:none;color:var(--accent);
     font-size:16px;cursor:pointer;padding:8px 0;margin-bottom:4px;
     font-family:inherit;font-weight:500;
     -webkit-tap-highlight-color:transparent;
   }
-  .back-btn:active{opacity:0.7}
+  .back-btn:active{opacity:0.6}
+
+  /* ── Timeline card (Structured-style) ── */
+  .tl-block{
+    display:flex;align-items:flex-start;gap:0;
+    border-radius:12px;overflow:hidden;
+    margin-bottom:3px;
+    transition:opacity .15s;
+  }
+  .tl-block:active{opacity:.7}
 </style>
 
 <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
-<script src="lo-data.js?v=4"></script>
-<script src="lo-ai.js?v=4"></script>
+<script src="lo-data.js?v=5"></script>
+<script src="lo-ai.js?v=5"></script>
 </head>
 <body>
 <div id="root"></div>
-<script type="text/babel" src="lo-icons.jsx?v=4"></script>
-<script type="text/babel" src="lo-screens-1.jsx?v=4"></script>
-<script type="text/babel" src="lo-screens-2.jsx?v=4"></script>
-<script type="text/babel" src="lo-screens-3.jsx?v=4"></script>
-<script type="text/babel" src="lo-screens-4.jsx?v=4"></script>
-<script type="text/babel" src="lo-screens-docs.jsx?v=4"></script>
+<script type="text/babel" src="lo-icons.jsx?v=5"></script>
+<script type="text/babel" src="lo-screens-1.jsx?v=5"></script>
+<script type="text/babel" src="lo-screens-2.jsx?v=5"></script>
+<script type="text/babel" src="lo-screens-3.jsx?v=5"></script>
+<script type="text/babel" src="lo-screens-4.jsx?v=5"></script>
+<script type="text/babel" src="lo-screens-docs.jsx?v=5"></script>
 <script type="text/babel">
 
 /* ── ONBOARDING TOUR (multi-step, LifeOS-style) ─────────── */
@@ -221,7 +208,7 @@ const Onboarding = ({ onDone }) => {
         </button>
       ) : <div style={{ width:34 }}/>}
       <div style={{ flex:1,height:5,background:'rgba(255,255,255,0.1)',borderRadius:3,overflow:'hidden' }}>
-        <div style={{ height:'100%',width:`${((step+1)/TOTAL)*100}%`,background:'linear-gradient(90deg,#7877F0,#5E5CE6)',borderRadius:3,transition:'width .35s cubic-bezier(.4,0,.2,1)',boxShadow:'0 0 10px rgba(94,92,230,0.5)' }}/>
+        <div style={{ height:'100%',width:`${((step+1)/TOTAL)*100}%`,background:'linear-gradient(90deg,#00C8B1,#00B5A0)',borderRadius:3,transition:'width .35s cubic-bezier(.4,0,.2,1)',boxShadow:'0 0 10px rgba(0,200,177,0.5)' }}/>
       </div>
       {step<TOTAL-1 ? (
         <button onClick={finish} style={{ background:'none',border:'none',color:'rgba(235,235,245,0.55)',fontSize:15,fontWeight:500,cursor:'pointer',padding:0 }}>Saltar</button>
@@ -235,7 +222,7 @@ const Onboarding = ({ onDone }) => {
       background:'linear-gradient(160deg,#0a0a0f 0%,#0d0d18 100%)',position:'relative',overflow:'hidden',
     }}>
       {/* Ambient orbs */}
-      <div style={{ position:'absolute',top:'10%',right:'-10%',width:240,height:240,borderRadius:'50%',background:'rgba(94,92,230,0.18)',filter:'blur(80px)',pointerEvents:'none' }}/>
+      <div style={{ position:'absolute',top:'10%',right:'-10%',width:240,height:240,borderRadius:'50%',background:'rgba(0,200,177,0.18)',filter:'blur(80px)',pointerEvents:'none' }}/>
       <div style={{ position:'absolute',bottom:'25%',left:'-15%',width:220,height:220,borderRadius:'50%',background:'rgba(191,90,242,0.12)',filter:'blur(70px)',pointerEvents:'none' }}/>
       <div style={{ position:'relative',zIndex:1,display:'flex',flexDirection:'column',flex:1 }}>
         <Progress/>
@@ -247,11 +234,11 @@ const Onboarding = ({ onDone }) => {
   const NextBtn = ({ label='Continuar', disabled }) => (
     <button onClick={next} disabled={disabled} style={{
       marginTop:'auto',width:'100%',padding:17,borderRadius:18,
-      background:disabled?'rgba(44,44,46,0.7)':'linear-gradient(145deg,#7877F0,#5E5CE6)',
+      background:disabled?'rgba(44,44,46,0.7)':'linear-gradient(145deg,#00D4BC,#00B5A0)',
       color:disabled?'rgba(235,235,245,0.3)':'#FFF',
       border:disabled?'0.5px solid rgba(255,255,255,0.08)':'0.5px solid rgba(255,255,255,0.2)',
       fontSize:17,fontWeight:600,cursor:disabled?'default':'pointer',letterSpacing:-0.2,
-      boxShadow:disabled?'none':'0 8px 28px rgba(94,92,230,.45),inset 0 1px 0 rgba(255,255,255,0.18)',
+      boxShadow:disabled?'none':'0 8px 28px rgba(0,200,177,.45),inset 0 1px 0 rgba(255,255,255,0.18)',
       display:'flex',alignItems:'center',justifyContent:'center',gap:7,
     }}>
       {label}
@@ -264,14 +251,14 @@ const Onboarding = ({ onDone }) => {
     <Slide>
       <div style={{ flex:1,display:'flex',flexDirection:'column',justifyContent:'center',alignItems:'center',textAlign:'center' }}>
         <div style={{
-          width:104,height:104,borderRadius:30,background:'linear-gradient(145deg,#7877F0,#BF5AF2)',
+          width:104,height:104,borderRadius:30,background:'linear-gradient(145deg,#00D4BC,#0A84FF)',
           display:'flex',alignItems:'center',justifyContent:'center',marginBottom:32,color:'#FFF',
-          boxShadow:'0 16px 50px rgba(94,92,230,.55),0 4px 16px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,0.22)',
+          boxShadow:'0 16px 50px rgba(0,200,177,.55),0 4px 16px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,0.22)',
         }}>
           <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg>
         </div>
         <h1 style={{ fontSize:38,fontWeight:700,color:'#FFF',margin:'0 0 12px',letterSpacing:-0.8,lineHeight:1.05 }}>
-          Bienvenido a <span style={{ background:'linear-gradient(90deg,#7877F0,#BF5AF2)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',backgroundClip:'text' }}>LifeOS</span>
+          Bienvenido a <span style={{ background:'linear-gradient(90deg,#00C8B1,#0A84FF)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',backgroundClip:'text' }}>LifeOS</span>
         </h1>
         <p style={{ color:'rgba(235,235,245,.6)',fontSize:17,lineHeight:1.55,maxWidth:320,margin:0,letterSpacing:-0.1 }}>
           Tu sistema personal para capturar, ordenar y ejecutar lo que importa.
@@ -285,7 +272,7 @@ const Onboarding = ({ onDone }) => {
   if (step===1) return (
     <Slide>
       <h1 style={{ fontSize:34,fontWeight:700,color:'#FFF',margin:'0 0 8px',letterSpacing:-0.7,lineHeight:1.1 }}>
-        Una <span style={{ color:'#7B7AEE' }}>línea de tiempo</span> de tu día
+        Una <span style={{ color:'#00C8B1' }}>línea de tiempo</span> de tu día
       </h1>
       <p style={{ color:'rgba(235,235,245,.55)',fontSize:16,lineHeight:1.55,margin:'0 0 36px',letterSpacing:-0.1 }}>
         Eventos, tareas y recordatorios todos en un solo lugar, sincronizados automáticamente.
@@ -392,7 +379,7 @@ const Onboarding = ({ onDone }) => {
   return (
     <Slide>
       <h1 style={{ fontSize:34,fontWeight:700,color:'#FFF',margin:'0 0 8px',letterSpacing:-0.7,lineHeight:1.1 }}>
-        ¿Cómo te <span style={{ color:'#7B7AEE' }}>llamas</span>?
+        ¿Cómo te <span style={{ color:'#00C8B1' }}>llamas</span>?
       </h1>
       <p style={{ color:'rgba(235,235,245,.55)',fontSize:16,lineHeight:1.55,margin:'0 0 36px',letterSpacing:-0.1 }}>
         Para saludarte como corresponde cada vez que abras la app.
@@ -414,10 +401,10 @@ const Onboarding = ({ onDone }) => {
       <div style={{ flex:1 }}/>
       <button onClick={finish} style={{
         width:'100%',padding:17,borderRadius:18,
-        background:'linear-gradient(145deg,#7877F0,#5E5CE6)',
+        background:'linear-gradient(145deg,#00D4BC,#00B5A0)',
         color:'#FFF',border:'0.5px solid rgba(255,255,255,0.2)',
         fontSize:17,fontWeight:600,cursor:'pointer',letterSpacing:-0.2,
-        boxShadow:'0 8px 28px rgba(94,92,230,.45),inset 0 1px 0 rgba(255,255,255,0.18)',
+        boxShadow:'0 8px 28px rgba(0,200,177,.45),inset 0 1px 0 rgba(255,255,255,0.18)',
         display:'flex',alignItems:'center',justifyContent:'center',gap:7,
       }}>
         Empezar
@@ -505,14 +492,14 @@ const App = () => {
           {tab==='settings' && subScreen==='calendario' && <CalendarioScreen/>}
           {tab==='settings' && subScreen==='focus-hub'  && (
             <div style={{ display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',minHeight:'60vh',gap:18 }}>
-              <div style={{ width:88,height:88,borderRadius:26,background:'linear-gradient(145deg,#7877F0,#5E5CE6)',display:'flex',alignItems:'center',justifyContent:'center',color:'#FFF',boxShadow:'0 12px 36px rgba(94,92,230,0.5),inset 0 1px 0 rgba(255,255,255,0.2)' }}>
+              <div style={{ width:88,height:88,borderRadius:26,background:'linear-gradient(145deg,#00D4BC,#00B5A0)',display:'flex',alignItems:'center',justifyContent:'center',color:'#FFF',boxShadow:'0 12px 36px rgba(0,200,177,0.5),inset 0 1px 0 rgba(255,255,255,0.2)' }}>
                 <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg>
               </div>
               <div style={{ textAlign:'center' }}>
                 <p style={{ margin:'0 0 4px',fontSize:22,fontWeight:700,color:'#FFF',letterSpacing:-0.4 }}>Focus</p>
                 <p style={{ margin:0,fontSize:14,color:'rgba(235,235,245,0.45)' }}>Bloque de trabajo profundo</p>
               </div>
-              <button onClick={()=>setShowFocus(true)} style={{ display:'inline-flex',alignItems:'center',gap:8,padding:'14px 32px',borderRadius:16,background:'linear-gradient(145deg,#7877F0,#5E5CE6)',color:'#FFF',border:'0.5px solid rgba(255,255,255,0.2)',fontSize:16,fontWeight:600,cursor:'pointer',boxShadow:'0 6px 24px rgba(94,92,230,.4),inset 0 1px 0 rgba(255,255,255,0.2)' }}>
+              <button onClick={()=>setShowFocus(true)} style={{ display:'inline-flex',alignItems:'center',gap:8,padding:'14px 32px',borderRadius:16,background:'linear-gradient(145deg,#00D4BC,#00B5A0)',color:'#FFF',border:'0.5px solid rgba(255,255,255,0.2)',fontSize:16,fontWeight:600,cursor:'pointer',boxShadow:'0 6px 24px rgba(0,200,177,.4),inset 0 1px 0 rgba(255,255,255,0.2)' }}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20"/></svg> Iniciar Focus
               </button>
             </div>
@@ -532,7 +519,7 @@ const App = () => {
         {MAIN_TABS.map(t=>(
           <button key={t.id} className={`nav-btn${activeTab===t.id?' active':''}`} onClick={()=>onTabClick(t.id)}>
             {t.id==='inbox' && unproc>0 && <div className="nav-dot"/>}
-            <div className="nav-icon-wrap" style={{ color:activeTab===t.id?'#6B6AEA':'rgba(235,235,245,0.42)' }}>
+            <div className="nav-icon-wrap" style={{ color:activeTab===t.id?'#00C8B1':'rgba(235,235,245,0.42)' }}>
               {NAV_ICONS[t.id]}
             </div>
             <span className="nav-lbl">{t.label}</span>

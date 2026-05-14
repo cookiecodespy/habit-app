@@ -45,18 +45,18 @@ const HabitosScreen = () => {
       <Title title="Hábitos" sub="Constancia real" right={<PlusBtn onClick={()=>setShowAdd(!showAdd)}/>}/>
 
       {showAdd && (
-        <C style={{ padding:16,marginBottom:14,border:'0.5px solid rgba(107,106,234,0.3)' }}>
+        <C style={{ padding:16,marginBottom:14,border:'0.5px solid rgba(0,200,177,0.3)' }}>
           <p style={{ fontWeight:700,fontSize:16,color:'#FFF',marginBottom:14,letterSpacing:-0.3 }}>Nuevo hábito</p>
           <div style={{ display:'flex',gap:4,flexWrap:'wrap',marginBottom:14 }}>
             {ICONS.map(ic=>(
-              <button key={ic} onClick={()=>setForm(f=>({...f,icon:ic}))} style={{ width:38,height:38,borderRadius:11,border:form.icon===ic?'1.5px solid #6B6AEA':'0.5px solid rgba(255,255,255,0.07)',background:form.icon===ic?'rgba(107,106,234,0.25)':'rgba(44,44,46,0.7)',cursor:'pointer',fontSize:20,transition:'all .15s' }}>{ic}</button>
+              <button key={ic} onClick={()=>setForm(f=>({...f,icon:ic}))} style={{ width:38,height:38,borderRadius:11,border:form.icon===ic?'1.5px solid #00C8B1':'0.5px solid rgba(84,84,88,0.38)',background:form.icon===ic?'rgba(0,200,177,0.25)':'#2C2C2E',cursor:'pointer',fontSize:20,transition:'all .15s' }}>{ic}</button>
             ))}
           </div>
           <input value={form.name} onChange={e=>setForm(f=>({...f,name:e.target.value}))} onKeyDown={e=>e.key==='Enter'&&add()} placeholder="Nombre del hábito"
-            style={{ width:'100%',padding:'12px 14px',borderRadius:12,border:'0.5px solid rgba(255,255,255,0.08)',background:'rgba(44,44,46,0.7)',color:'#FFF',fontSize:15,marginBottom:14 }} autoFocus/>
+            style={{ width:'100%',padding:'12px 14px',borderRadius:12,border:'0.5px solid rgba(84,84,88,0.45)',background:'#2C2C2E',color:'#FFF',fontSize:15,marginBottom:14 }} autoFocus/>
           <div style={{ display:'flex',gap:8 }}>
-            <button onClick={add} style={{ flex:1,padding:12,borderRadius:12,background:'linear-gradient(145deg,#7877F0,#5E5CE6)',color:'#FFF',border:'none',fontWeight:600,cursor:'pointer',boxShadow:'0 4px 14px rgba(94,92,230,.35)' }}>Agregar</button>
-            <button onClick={()=>setShowAdd(false)} style={{ flex:1,padding:12,borderRadius:12,background:'rgba(44,44,46,0.7)',color:'rgba(235,235,245,0.55)',border:'0.5px solid rgba(255,255,255,0.08)',cursor:'pointer' }}>Cancelar</button>
+            <button onClick={add} style={{ flex:1,padding:12,borderRadius:12,background:'linear-gradient(145deg,#00D4BC,#00B5A0)',color:'#FFF',border:'none',fontWeight:600,cursor:'pointer',boxShadow:'0 4px 14px rgba(0,200,177,.35)' }}>Agregar</button>
+            <button onClick={()=>setShowAdd(false)} style={{ flex:1,padding:12,borderRadius:12,background:'#2C2C2E',color:'rgba(235,235,245,0.55)',border:'0.5px solid rgba(84,84,88,0.45)',cursor:'pointer' }}>Cancelar</button>
           </div>
         </C>
       )}
@@ -69,7 +69,7 @@ const HabitosScreen = () => {
             {weekDays.map((d,i)=>(
               <div key={i} style={{ textAlign:'center' }}>
                 <p style={{ margin:'0 0 2px',fontSize:10,fontWeight:600,color:'rgba(235,235,245,0.35)',textTransform:'uppercase' }}>{d.label}</p>
-                <p style={{ margin:0,fontSize:13,fontWeight:d.isToday?700:400,color:d.isToday?'#6B6AEA':'rgba(235,235,245,0.5)',fontVariantNumeric:'tabular-nums' }}>{d.day}</p>
+                <p style={{ margin:0,fontSize:13,fontWeight:d.isToday?700:400,color:d.isToday?'#00C8B1':'rgba(235,235,245,0.5)',fontVariantNumeric:'tabular-nums' }}>{d.day}</p>
               </div>
             ))}
             <div style={{ textAlign:'center' }}><p style={{ margin:0,fontSize:10,fontWeight:600,color:'rgba(235,235,245,0.35)',textTransform:'uppercase',paddingTop:2 }}>Racha</p></div>
@@ -78,24 +78,24 @@ const HabitosScreen = () => {
           {habits.map((h,hi)=>(
             <div key={h.id}>
               {editId===h.id ? (
-                <div style={{ padding:'14px 12px',background:'rgba(107,106,234,0.08)',borderTop:hi>0?'0.5px solid rgba(84,84,88,0.3)':'none' }}>
+                <div style={{ padding:'14px 12px',background:'rgba(0,200,177,0.08)',borderTop:hi>0?'0.5px solid rgba(84,84,88,0.3)':'none' }}>
                   <p style={{ margin:'0 0 10px',fontSize:13,fontWeight:600,color:'rgba(235,235,245,0.5)',textTransform:'uppercase',letterSpacing:0.5 }}>Editar hábito</p>
                   <div style={{ display:'flex',gap:4,flexWrap:'wrap',marginBottom:10 }}>
                     {ICONS.map(ic=>(
-                      <button key={ic} onClick={()=>setEditForm(f=>({...f,icon:ic}))} style={{ width:34,height:34,borderRadius:10,border:editForm.icon===ic?'1.5px solid #6B6AEA':'0.5px solid rgba(255,255,255,0.07)',background:editForm.icon===ic?'rgba(107,106,234,0.25)':'rgba(44,44,46,0.7)',cursor:'pointer',fontSize:18 }}>{ic}</button>
+                      <button key={ic} onClick={()=>setEditForm(f=>({...f,icon:ic}))} style={{ width:34,height:34,borderRadius:10,border:editForm.icon===ic?'1.5px solid #00C8B1':'0.5px solid rgba(84,84,88,0.38)',background:editForm.icon===ic?'rgba(0,200,177,0.25)':'#2C2C2E',cursor:'pointer',fontSize:18 }}>{ic}</button>
                     ))}
                   </div>
                   <input value={editForm.name} onChange={e=>setEditForm(f=>({...f,name:e.target.value}))} onKeyDown={e=>e.key==='Enter'&&saveEdit()}
-                    style={{ width:'100%',padding:'11px 13px',borderRadius:11,border:'0.5px solid rgba(255,255,255,0.1)',background:'rgba(44,44,46,0.85)',color:'#FFF',fontSize:15,marginBottom:10,fontFamily:'inherit' }} autoFocus/>
+                    style={{ width:'100%',padding:'11px 13px',borderRadius:11,border:'0.5px solid rgba(84,84,88,0.50)',background:'#2C2C2E',color:'#FFF',fontSize:15,marginBottom:10,fontFamily:'inherit' }} autoFocus/>
                   <div style={{ display:'flex',gap:8 }}>
-                    <button onClick={saveEdit} style={{ flex:1,padding:10,borderRadius:11,background:'linear-gradient(145deg,#7877F0,#5E5CE6)',color:'#FFF',border:'none',fontWeight:600,cursor:'pointer',fontSize:14 }}>Guardar</button>
-                    <button onClick={()=>setEditId(null)} style={{ flex:1,padding:10,borderRadius:11,background:'rgba(44,44,46,0.7)',color:'rgba(235,235,245,0.55)',border:'0.5px solid rgba(255,255,255,0.08)',cursor:'pointer',fontSize:14 }}>Cancelar</button>
+                    <button onClick={saveEdit} style={{ flex:1,padding:10,borderRadius:11,background:'linear-gradient(145deg,#00D4BC,#00B5A0)',color:'#FFF',border:'none',fontWeight:600,cursor:'pointer',fontSize:14 }}>Guardar</button>
+                    <button onClick={()=>setEditId(null)} style={{ flex:1,padding:10,borderRadius:11,background:'#2C2C2E',color:'rgba(235,235,245,0.55)',border:'0.5px solid rgba(84,84,88,0.45)',cursor:'pointer',fontSize:14 }}>Cancelar</button>
                     <button onClick={()=>del(h.id)} style={{ padding:'10px 14px',borderRadius:11,background:'rgba(255,69,58,0.15)',border:'0.5px solid rgba(255,69,58,0.3)',color:'#FF453A',cursor:'pointer',display:'flex',alignItems:'center' }}><Icon name="trash" size={14} weight={2}/></button>
                   </div>
                 </div>
               ) : (
                 <div style={{ display:'grid',gridTemplateColumns:'auto 1fr repeat(7,1fr) 44px',gap:4,padding:'10px 12px',alignItems:'center',position:'relative' }}>
-                  <div style={{ width:32,height:32,borderRadius:9,background:'rgba(107,106,234,0.15)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:18 }}>{h.icon}</div>
+                  <div style={{ width:32,height:32,borderRadius:9,background:'rgba(0,200,177,0.15)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:18 }}>{h.icon}</div>
                   <p onClick={()=>startEdit(h)} style={{ margin:0,fontSize:13,color:'rgba(235,235,245,0.8)',fontWeight:500,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',paddingLeft:4,cursor:'pointer',letterSpacing:-0.1 }} title="Toca para editar">{h.name}</p>
                   {weekDays.map((d,i)=>{
                     const isDone = h.completedDates&&h.completedDates.includes(d.ds);
@@ -104,7 +104,7 @@ const HabitosScreen = () => {
                       <div key={i} style={{ display:'flex',justifyContent:'center' }}>
                         <button onClick={()=>{ if(isT) toggle(h.id); }} style={{
                           width:28,height:28,borderRadius:8,cursor:isT?'pointer':'default',
-                          background:isDone?'#30D158':isT?'rgba(255,255,255,0.07)':'rgba(255,255,255,0.04)',
+                          background:isDone?'#30D158':isT?'rgba(84,84,88,0.38)':'rgba(255,255,255,0.04)',
                           display:'flex',alignItems:'center',justifyContent:'center',
                           border:isDone?'none':isT?'1px solid rgba(255,255,255,0.15)':'none',
                           boxShadow:isDone?'0 0 8px rgba(48,209,88,.35)':'none',
@@ -138,13 +138,13 @@ const HabitosScreen = () => {
             <p style={{ margin:0,fontSize:30,fontWeight:700,color:'#FFF',letterSpacing:-1,fontVariantNumeric:'tabular-nums' }}>{doneToday}<span style={{ fontSize:16,color:'rgba(235,235,245,0.4)',fontWeight:400 }}>/{habits.length}</span></p>
           </div>
         </div>
-        <div style={{ height:5,background:'rgba(44,44,46,0.7)',borderRadius:3,marginBottom:14 }}>
+        <div style={{ height:5,background:'#2C2C2E',borderRadius:3,marginBottom:14 }}>
           <div style={{ height:'100%',width:`${consistency}%`,background:'linear-gradient(90deg,#30D158,#34D160)',borderRadius:3,transition:'width .6s cubic-bezier(.4,0,.2,1)',boxShadow:'0 0 8px rgba(48,209,88,.4)' }}/>
         </div>
         <div style={{ display:'flex',gap:3,alignItems:'flex-end',height:46 }}>
           {weekBar.map((d,i)=>(
             <div key={i} style={{ flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:3 }}>
-              <div style={{ width:'100%',borderRadius:'4px 4px 0 0',background:d.isToday?'#6B6AEA':d.val>0?'#30D158':'rgba(44,44,46,0.6)',height:Math.max(3,d.val*40),transition:'height .3s ease',boxShadow:d.isToday?'0 0 8px rgba(107,106,234,.4)':d.val>0?'0 0 6px rgba(48,209,88,.25)':'none' }}/>
+              <div style={{ width:'100%',borderRadius:'4px 4px 0 0',background:d.isToday?'#00C8B1':d.val>0?'#30D158':'#2C2C2E',height:Math.max(3,d.val*40),transition:'height .3s ease',boxShadow:d.isToday?'0 0 8px rgba(0,200,177,.4)':d.val>0?'0 0 6px rgba(48,209,88,.25)':'none' }}/>
               <span style={{ fontSize:9,color:'rgba(235,235,245,0.35)',fontWeight:600 }}>{d.label}</span>
             </div>
           ))}
@@ -199,7 +199,7 @@ const VidaScreen = () => {
   return (
     <div style={{ paddingBottom:20 }}>
       <Title title="Vida" sub="Vista general" right={
-        <button onClick={()=>editRadar?saveRadar():setEditR(true)} style={{ display:'flex',alignItems:'center',gap:5,padding:'8px 14px',borderRadius:11,background:editRadar?'linear-gradient(145deg,#34D158,#30D158)':'rgba(44,44,46,0.7)',border:`0.5px solid ${editRadar?'rgba(48,209,88,0.4)':'rgba(255,255,255,0.1)'}`,color:'#FFF',fontSize:13,fontWeight:600,cursor:'pointer',boxShadow:editRadar?'0 4px 14px rgba(48,209,88,.3)':'none',letterSpacing:-0.1 }}>
+        <button onClick={()=>editRadar?saveRadar():setEditR(true)} style={{ display:'flex',alignItems:'center',gap:5,padding:'8px 14px',borderRadius:11,background:editRadar?'linear-gradient(145deg,#34D158,#30D158)':'#2C2C2E',border:`0.5px solid ${editRadar?'rgba(48,209,88,0.4)':'rgba(84,84,88,0.50)'}`,color:'#FFF',fontSize:13,fontWeight:600,cursor:'pointer',boxShadow:editRadar?'0 4px 14px rgba(48,209,88,.3)':'none',letterSpacing:-0.1 }}>
           {editRadar?<><Icon name="check" size={13} weight={2.5}/> Guardar</>:<><Icon name="pencil" size={12}/> Editar</>}
         </button>
       }/>
@@ -209,10 +209,10 @@ const VidaScreen = () => {
         {editMision ? (
           <div>
             <textarea value={misionDraft} onChange={e=>setMD(e.target.value)} rows={3}
-              style={{ width:'100%',padding:'11px 13px',borderRadius:12,border:'0.5px solid rgba(255,255,255,0.08)',background:'rgba(44,44,46,0.7)',color:'#FFF',fontSize:15,fontFamily:'inherit',lineHeight:1.5,resize:'none',marginBottom:12 }}/>
+              style={{ width:'100%',padding:'11px 13px',borderRadius:12,border:'0.5px solid rgba(84,84,88,0.45)',background:'#2C2C2E',color:'#FFF',fontSize:15,fontFamily:'inherit',lineHeight:1.5,resize:'none',marginBottom:12 }}/>
             <div style={{ display:'flex',gap:8 }}>
-              <button onClick={saveMision} style={{ flex:1,padding:11,borderRadius:12,background:'linear-gradient(145deg,#7877F0,#5E5CE6)',color:'#FFF',border:'none',fontWeight:600,cursor:'pointer' }}>Guardar</button>
-              <button onClick={()=>setEditM(false)} style={{ flex:1,padding:11,borderRadius:12,background:'rgba(44,44,46,0.7)',color:'rgba(235,235,245,0.55)',border:'0.5px solid rgba(255,255,255,0.08)',cursor:'pointer' }}>Cancelar</button>
+              <button onClick={saveMision} style={{ flex:1,padding:11,borderRadius:12,background:'linear-gradient(145deg,#00D4BC,#00B5A0)',color:'#FFF',border:'none',fontWeight:600,cursor:'pointer' }}>Guardar</button>
+              <button onClick={()=>setEditM(false)} style={{ flex:1,padding:11,borderRadius:12,background:'#2C2C2E',color:'rgba(235,235,245,0.55)',border:'0.5px solid rgba(84,84,88,0.45)',cursor:'pointer' }}>Cancelar</button>
             </div>
           </div>
         ) : (
@@ -232,8 +232,8 @@ const VidaScreen = () => {
           <svg width={size} height={size}>
             {[2,4,6,8,10].map(v=>(<polygon key={v} points={gridPts((v/10)*maxR)} fill="none" stroke="rgba(84,84,88,0.3)" strokeWidth="1"/>))}
             {AREAS.map((_,i)=>{ const angle=(i*2*Math.PI/n)-Math.PI/2; return <line key={i} x1={cx} y1={cy} x2={cx+maxR*Math.cos(angle)} y2={cy+maxR*Math.sin(angle)} stroke="rgba(84,84,88,0.3)" strokeWidth="1"/>; })}
-            <polygon points={polyPts} fill="rgba(107,106,234,0.18)" stroke="#6B6AEA" strokeWidth="2"/>
-            {pts.map((p,i)=><circle key={i} cx={p.x} cy={p.y} r="5" fill="#6B6AEA" style={{ filter:'drop-shadow(0 0 4px rgba(107,106,234,.6))' }}/>)}
+            <polygon points={polyPts} fill="rgba(0,200,177,0.15)" stroke="#00C8B1" strokeWidth="2"/>
+            {pts.map((p,i)=><circle key={i} cx={p.x} cy={p.y} r="5" fill="#00C8B1" style={{ filter:'drop-shadow(0 0 4px rgba(0,200,177,.6))' }}/>)}
             {labelPts.map((p,i)=>(
               <g key={i}>
                 <text x={p.x} y={p.y-6} textAnchor="middle" fontSize="9" fontWeight="700" fill={areaColor[p.a]||'rgba(235,235,245,0.5)'} fontFamily="-apple-system,sans-serif">{p.a}</text>
@@ -246,7 +246,7 @@ const VidaScreen = () => {
         <div style={{ display:'flex',overflowX:'auto',padding:'0 12px 14px',gap:10 }}>
           {AREAS.map(a=>(
             <div key={a} style={{ flexShrink:0,textAlign:'center',minWidth:54 }}>
-              <p style={{ margin:'0 0 2px',fontSize:20,fontWeight:700,color:areaColor[a]||'#6B6AEA',fontVariantNumeric:'tabular-nums',letterSpacing:-0.5 }}>{radar[a]}</p>
+              <p style={{ margin:'0 0 2px',fontSize:20,fontWeight:700,color:areaColor[a]||'#00C8B1',fontVariantNumeric:'tabular-nums',letterSpacing:-0.5 }}>{radar[a]}</p>
               <p style={{ margin:0,fontSize:10,color:'rgba(235,235,245,0.4)',fontWeight:600 }}>{a}</p>
             </div>
           ))}
@@ -273,7 +273,7 @@ const VidaScreen = () => {
         {[
           { icon:'check',  text:`Mejor área: ${highest} (${radar[highest]}/10)`,           color:'#30D158' },
           { icon:'flag',   text:`${lowest} necesita más atención (${radar[lowest]}/10)`,    color:'#FF9F0A' },
-          { icon:'chart',  text:`Promedio de vida: ${avg}/10 — ${avg>=7?'buen balance':'hay espacio'}`, color:'#6B6AEA' },
+          { icon:'chart',  text:`Promedio de vida: ${avg}/10 — ${avg>=7?'buen balance':'hay espacio'}`, color:'#00C8B1' },
         ].map((ins,i)=>(
           <Row key={i} last={i===2}
             left={<IconTile name={ins.icon} color={ins.color} size={32}/>}
@@ -286,7 +286,7 @@ const VidaScreen = () => {
       <div style={{ display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:14 }}>
         {[
           { v:completedT, l:'Tareas cerradas', c:'#30D158', icon:'check' },
-          { v:`${Math.round(focusTot/60*10)/10}h`, l:'Foco esta semana', c:'#6B6AEA', icon:'target' },
+          { v:`${Math.round(focusTot/60*10)/10}h`, l:'Foco esta semana', c:'#00C8B1', icon:'target' },
           { v:`${habitRate}%`, l:'Hábitos hoy', c:'#BF5AF2', icon:'leaf' },
           { v:score, l:'Puntos ganados', c:'#FF9F0A', icon:'star' },
         ].map(s=>(
@@ -312,22 +312,22 @@ const WeeklyReview = () => {
   return (
     <C>
       <div style={{ padding:'14px 16px 0',display:'flex',justifyContent:'space-between',alignItems:'center' }}>
-        <p style={{ margin:0,fontSize:16,fontWeight:600,color:'#FFF',letterSpacing:-0.2,display:'flex',alignItems:'center',gap:7 }}><Icon name="note" size={15} color="#7B7AEE"/> Review semanal</p>
+        <p style={{ margin:0,fontSize:16,fontWeight:600,color:'#FFF',letterSpacing:-0.2,display:'flex',alignItems:'center',gap:7 }}><Icon name="note" size={15} color="#00C8B1"/> Review semanal</p>
         {saved&&<span style={{ fontSize:12,color:'#30D158',fontWeight:600,display:'inline-flex',alignItems:'center',gap:3 }}><Icon name="check" size={11} weight={3}/> Guardado</span>}
       </div>
       {[
         { k:'logros', l:'¿Qué lograste?',   p:'Tareas, hábitos, progresos…',          icon:'trophy', c:'#FF9F0A' },
         { k:'caido',  l:'¿Qué se cayó?',     p:'Sin culpa. Solo observar.',           icon:'flag',   c:'#FF453A' },
-        { k:'ajuste', l:'¿Qué ajustás?',     p:'1 cambio concreto para la próxima.',  icon:'sliders',c:'#6B6AEA' },
+        { k:'ajuste', l:'¿Qué ajustás?',     p:'1 cambio concreto para la próxima.',  icon:'sliders',c:'#00C8B1' },
       ].map(q=>(
         <div key={q.k} style={{ padding:'13px 16px',borderTop:'0.5px solid rgba(84,84,88,0.32)' }}>
           <p style={{ margin:'0 0 7px',fontSize:14,fontWeight:600,color:'rgba(235,235,245,0.65)',display:'flex',alignItems:'center',gap:6 }}><Icon name={q.icon} size={13} color={q.c}/> {q.l}</p>
           <textarea value={form[q.k]} onChange={e=>{ setForm(f=>({...f,[q.k]:e.target.value})); setSaved(false); }} placeholder={q.p} rows={2}
-            style={{ width:'100%',padding:'11px 13px',borderRadius:12,border:'0.5px solid rgba(255,255,255,0.07)',background:'rgba(44,44,46,0.7)',color:'#FFF',fontSize:14,resize:'none',fontFamily:'inherit',lineHeight:1.5 }}/>
+            style={{ width:'100%',padding:'11px 13px',borderRadius:12,border:'0.5px solid rgba(84,84,88,0.38)',background:'#2C2C2E',color:'#FFF',fontSize:14,resize:'none',fontFamily:'inherit',lineHeight:1.5 }}/>
         </div>
       ))}
       <div style={{ padding:'12px 16px 16px' }}>
-        <button onClick={save} style={{ width:'100%',padding:12,borderRadius:12,background:'linear-gradient(145deg,#7877F0,#5E5CE6)',color:'#FFF',border:'none',fontWeight:600,cursor:'pointer',boxShadow:'0 4px 14px rgba(94,92,230,.35)' }}>Guardar review</button>
+        <button onClick={save} style={{ width:'100%',padding:12,borderRadius:12,background:'linear-gradient(145deg,#00D4BC,#00B5A0)',color:'#FFF',border:'none',fontWeight:600,cursor:'pointer',boxShadow:'0 4px 14px rgba(0,200,177,.35)' }}>Guardar review</button>
       </div>
     </C>
   );
@@ -386,18 +386,18 @@ const GastosScreen = () => {
 
   const saveBudget = () => { LOData.gastos.saveBudget({ monthly: parseFloat(budget)||50000 }); setShowBudget(false); };
 
-  const inputStyle = { width:'100%',padding:'12px 14px',borderRadius:12,border:'0.5px solid rgba(255,255,255,0.08)',background:'rgba(44,44,46,0.7)',color:'#FFF',fontSize:15,fontFamily:'inherit' };
+  const inputStyle = { width:'100%',padding:'12px 14px',borderRadius:12,border:'0.5px solid rgba(84,84,88,0.45)',background:'#2C2C2E',color:'#FFF',fontSize:15,fontFamily:'inherit' };
   const budgetColor = pctUsed>=90?'#FF453A':pctUsed>=70?'#FF9F0A':'#30D158';
 
   return (
     <div style={{ paddingBottom:20 }}>
       <Title title="Gastos" sub="Control financiero" right={<PlusBtn color="#30D158" onClick={()=>setShowAdd(!showAdd)}/>}/>
 
-      <C style={{ padding:'16px',marginBottom:12,background:'linear-gradient(135deg,rgba(48,209,88,0.1) 0%,rgba(28,28,30,0.78) 100%)',border:'0.5px solid rgba(48,209,88,0.18)' }}>
+      <C style={{ padding:'16px',marginBottom:12,background:'linear-gradient(135deg,rgba(48,209,88,0.1) 0%,#1C1C1E 100%)',border:'0.5px solid rgba(48,209,88,0.18)' }}>
         <div style={{ display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:14 }}>
-          <button onClick={()=>changeMonth(-1)} style={{ background:'rgba(44,44,46,0.7)',border:'0.5px solid rgba(255,255,255,0.07)',borderRadius:9,width:30,height:30,cursor:'pointer',color:'#FFF',display:'flex',alignItems:'center',justifyContent:'center' }}><Icon name="chevron-l" size={13} weight={2.5}/></button>
+          <button onClick={()=>changeMonth(-1)} style={{ background:'#2C2C2E',border:'0.5px solid rgba(84,84,88,0.38)',borderRadius:9,width:30,height:30,cursor:'pointer',color:'#FFF',display:'flex',alignItems:'center',justifyContent:'center' }}><Icon name="chevron-l" size={13} weight={2.5}/></button>
           <span style={{ fontWeight:700,fontSize:16,color:'#FFF',letterSpacing:-0.2 }}>{monthLabel()}</span>
-          <button onClick={()=>changeMonth(1)} style={{ background:'rgba(44,44,46,0.7)',border:'0.5px solid rgba(255,255,255,0.07)',borderRadius:9,width:30,height:30,cursor:'pointer',color:'#FFF',display:'flex',alignItems:'center',justifyContent:'center' }}><Icon name="chevron-r" size={13} weight={2.5}/></button>
+          <button onClick={()=>changeMonth(1)} style={{ background:'#2C2C2E',border:'0.5px solid rgba(84,84,88,0.38)',borderRadius:9,width:30,height:30,cursor:'pointer',color:'#FFF',display:'flex',alignItems:'center',justifyContent:'center' }}><Icon name="chevron-r" size={13} weight={2.5}/></button>
         </div>
         <div style={{ display:'flex',justifyContent:'space-between',alignItems:'flex-end',marginBottom:10 }}>
           <div>
@@ -412,7 +412,7 @@ const GastosScreen = () => {
             </button>
           </div>
         </div>
-        <div style={{ height:6,background:'rgba(255,255,255,0.08)',borderRadius:3,overflow:'hidden',marginBottom:6 }}>
+        <div style={{ height:6,background:'rgba(84,84,88,0.45)',borderRadius:3,overflow:'hidden',marginBottom:6 }}>
           <div style={{ height:'100%',width:`${pctUsed}%`,background:`linear-gradient(90deg,${budgetColor},${budgetColor}cc)`,borderRadius:3,transition:'width .6s cubic-bezier(.4,0,.2,1)',boxShadow:`0 0 8px ${budgetColor}50` }}/>
         </div>
         <div style={{ display:'flex',justifyContent:'space-between' }}>
@@ -423,7 +423,7 @@ const GastosScreen = () => {
           <div style={{ marginTop:12,display:'flex',gap:8 }}>
             <input type="number" value={budget} onChange={e=>setBudget(e.target.value)} placeholder="Presupuesto mensual"
               style={{ ...inputStyle,flex:1,fontSize:14,padding:'10px 12px' }}/>
-            <button onClick={saveBudget} style={{ padding:'10px 16px',borderRadius:12,background:'linear-gradient(145deg,#7877F0,#5E5CE6)',color:'#FFF',border:'none',fontWeight:600,cursor:'pointer',fontSize:14 }}>OK</button>
+            <button onClick={saveBudget} style={{ padding:'10px 16px',borderRadius:12,background:'linear-gradient(145deg,#00D4BC,#00B5A0)',color:'#FFF',border:'none',fontWeight:600,cursor:'pointer',fontSize:14 }}>OK</button>
           </div>
         )}
       </C>
@@ -434,7 +434,7 @@ const GastosScreen = () => {
           <div style={{ display:'flex',flexDirection:'column',gap:10 }}>
             {topCats.map(({ c, amt })=>{
               const pct = monthTotal>0 ? Math.round((amt/monthTotal)*100) : 0;
-              const col = COLORS[c]||'#6B6AEA';
+              const col = COLORS[c]||'#00C8B1';
               return (
                 <div key={c}>
                   <div style={{ display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:4 }}>
@@ -447,7 +447,7 @@ const GastosScreen = () => {
                       <span style={{ fontSize:14,fontWeight:700,color:col,fontVariantNumeric:'tabular-nums' }}>{fmt(amt)}</span>
                     </div>
                   </div>
-                  <div style={{ height:4,background:'rgba(255,255,255,0.07)',borderRadius:2,overflow:'hidden' }}>
+                  <div style={{ height:4,background:'rgba(84,84,88,0.38)',borderRadius:2,overflow:'hidden' }}>
                     <div style={{ height:'100%',width:`${pct}%`,background:col,borderRadius:2,transition:'width .5s ease',boxShadow:`0 0 6px ${col}60` }}/>
                   </div>
                 </div>
@@ -467,9 +467,9 @@ const GastosScreen = () => {
           </div>
           <div style={{ display:'flex',gap:6,overflowX:'auto',marginBottom:10,paddingBottom:2 }}>
             {CATS.map(c=>{
-              const col = COLORS[c]||'#6B6AEA';
+              const col = COLORS[c]||'#00C8B1';
               return (
-                <button key={c} onClick={()=>setForm(f=>({...f,category:c}))} style={{ flexShrink:0,padding:'7px 11px',borderRadius:18,border:form.category===c?`0.5px solid ${col}66`:'0.5px solid transparent',cursor:'pointer',background:form.category===c?`${col}28`:'rgba(44,44,46,0.7)',color:form.category===c?col:'rgba(235,235,245,0.5)',fontSize:12,fontWeight:600,display:'flex',alignItems:'center',gap:5 }}><Icon name={catIcon[c]||'wallet'} size={12}/> {c}</button>
+                <button key={c} onClick={()=>setForm(f=>({...f,category:c}))} style={{ flexShrink:0,padding:'7px 11px',borderRadius:18,border:form.category===c?`0.5px solid ${col}66`:'0.5px solid transparent',cursor:'pointer',background:form.category===c?`${col}28`:'#2C2C2E',color:form.category===c?col:'rgba(235,235,245,0.5)',fontSize:12,fontWeight:600,display:'flex',alignItems:'center',gap:5 }}><Icon name={catIcon[c]||'wallet'} size={12}/> {c}</button>
               );
             })}
           </div>
@@ -479,7 +479,7 @@ const GastosScreen = () => {
             style={{ ...inputStyle,marginBottom:14,fontSize:14 }}/>
           <div style={{ display:'flex',gap:8 }}>
             <button onClick={add} style={{ flex:1,padding:13,borderRadius:12,background:'linear-gradient(145deg,#34D158,#30D158)',color:'#FFF',border:'none',fontWeight:600,cursor:'pointer',fontSize:15,boxShadow:'0 4px 14px rgba(48,209,88,.3)' }}>Guardar</button>
-            <button onClick={()=>setShowAdd(false)} style={{ flex:1,padding:13,borderRadius:12,background:'rgba(44,44,46,0.7)',color:'rgba(235,235,245,0.55)',border:'0.5px solid rgba(255,255,255,0.08)',cursor:'pointer' }}>Cancelar</button>
+            <button onClick={()=>setShowAdd(false)} style={{ flex:1,padding:13,borderRadius:12,background:'#2C2C2E',color:'rgba(235,235,245,0.55)',border:'0.5px solid rgba(84,84,88,0.45)',cursor:'pointer' }}>Cancelar</button>
           </div>
         </C>
       )}
@@ -493,7 +493,7 @@ const GastosScreen = () => {
       ) : (
         <C>
           {monthItems.map((g,i)=>{
-            const col = COLORS[g.category]||'#6B6AEA';
+            const col = COLORS[g.category]||'#00C8B1';
             return (
               <div key={g.id} style={{ display:'flex',alignItems:'center',gap:12,padding:'12px 16px',position:'relative' }}>
                 <IconTile name={catIcon[g.category]||'wallet'} color={col} size={38}/>
@@ -529,7 +529,7 @@ const AISettingsScreen = () => {
     setStatus(result);
   };
 
-  const inputStyle = { width:'100%',padding:'12px 14px',borderRadius:12,border:'0.5px solid rgba(255,255,255,0.08)',background:'rgba(44,44,46,0.7)',color:'#FFF',fontSize:15,fontFamily:'inherit' };
+  const inputStyle = { width:'100%',padding:'12px 14px',borderRadius:12,border:'0.5px solid rgba(84,84,88,0.45)',background:'#2C2C2E',color:'#FFF',fontSize:15,fontFamily:'inherit' };
 
   return (
     <div style={{ paddingBottom:20 }}>
@@ -544,7 +544,7 @@ const AISettingsScreen = () => {
               <p style={{ margin:0,fontSize:13,color:'rgba(235,235,245,0.4)' }}>Clasifica capturas y genera insights</p>
             </div>
           </div>
-          <div onClick={()=>setCfg(c=>({...c,enabled:!c.enabled}))} style={{ width:48,height:28,borderRadius:15,background:cfg.enabled?'#30D158':'rgba(84,84,88,0.5)',cursor:'pointer',position:'relative',transition:'background .25s',flexShrink:0,border:'0.5px solid rgba(255,255,255,0.08)' }}>
+          <div onClick={()=>setCfg(c=>({...c,enabled:!c.enabled}))} style={{ width:48,height:28,borderRadius:15,background:cfg.enabled?'#30D158':'rgba(84,84,88,0.5)',cursor:'pointer',position:'relative',transition:'background .25s',flexShrink:0,border:'0.5px solid rgba(84,84,88,0.45)' }}>
             <div style={{ width:24,height:24,borderRadius:12,background:'#FFF',position:'absolute',top:1.5,left:cfg.enabled?22:1.5,transition:'left .25s cubic-bezier(.34,1.4,.64,1)',boxShadow:'0 2px 6px rgba(0,0,0,.35)' }}/>
           </div>
         </div>
@@ -563,10 +563,10 @@ const AISettingsScreen = () => {
           <input value={cfg.model} onChange={e=>setCfg(c=>({...c,model:e.target.value}))} placeholder="gemma3:4b" style={{ ...inputStyle,marginBottom:14 }} disabled={!cfg.enabled}/>
         )}
         <div style={{ display:'flex',gap:8 }}>
-          <button onClick={test} disabled={!cfg.enabled||status==='testing'} style={{ flex:1,padding:12,borderRadius:12,background:'rgba(44,44,46,0.7)',border:'0.5px solid rgba(255,255,255,0.1)',color:'#FFF',fontSize:14,fontWeight:600,cursor:cfg.enabled?'pointer':'default',display:'flex',alignItems:'center',justifyContent:'center',gap:6 }}>
+          <button onClick={test} disabled={!cfg.enabled||status==='testing'} style={{ flex:1,padding:12,borderRadius:12,background:'#2C2C2E',border:'0.5px solid rgba(84,84,88,0.50)',color:'#FFF',fontSize:14,fontWeight:600,cursor:cfg.enabled?'pointer':'default',display:'flex',alignItems:'center',justifyContent:'center',gap:6 }}>
             <Icon name="wifi" size={13}/> {status==='testing'?'Probando…':'Probar conexión'}
           </button>
-          <button onClick={save} style={{ flex:1,padding:12,borderRadius:12,background:'linear-gradient(145deg,#7877F0,#5E5CE6)',color:'#FFF',border:'none',fontSize:14,fontWeight:600,cursor:'pointer',boxShadow:'0 4px 14px rgba(94,92,230,.35)',display:'flex',alignItems:'center',justifyContent:'center',gap:6 }}>
+          <button onClick={save} style={{ flex:1,padding:12,borderRadius:12,background:'linear-gradient(145deg,#00D4BC,#00B5A0)',color:'#FFF',border:'none',fontSize:14,fontWeight:600,cursor:'pointer',boxShadow:'0 4px 14px rgba(0,200,177,.35)',display:'flex',alignItems:'center',justifyContent:'center',gap:6 }}>
             {status?.saved?<><Icon name="check" size={13} weight={2.5}/> Guardado</>:'Guardar'}
           </button>
         </div>
@@ -588,7 +588,7 @@ const AISettingsScreen = () => {
         )}
       </C>
 
-      <C style={{ padding:'14px 16px',marginBottom:12,background:'linear-gradient(135deg,rgba(191,90,242,0.08) 0%,rgba(28,28,30,0.78) 100%)' }}>
+      <C style={{ padding:'14px 16px',marginBottom:12,background:'linear-gradient(135deg,rgba(191,90,242,0.08) 0%,#1C1C1E 100%)' }}>
         <p style={{ margin:'0 0 12px',fontSize:15,fontWeight:600,color:'#FFF',letterSpacing:-0.2,display:'flex',alignItems:'center',gap:7 }}><Icon name="note" size={14} color="#BF5AF2"/> Cómo configurar Ollama</p>
         {[
           { n:'1', text:'Instalá Ollama desde ollama.com' },
@@ -613,7 +613,7 @@ const AISettingsScreen = () => {
         {[
           { icon:'tag',     t:'Auto-clasifica capturas', s:'Detecta si es tarea, recordatorio, idea, gasto…', c:'#BF5AF2' },
           { icon:'sparkle', t:'Insight diario',          s:'Análisis de tu día en la pantalla Hoy',          c:'#FF9F0A' },
-          { icon:'target',  t:'Sugiere prioridades',     s:'Evalúa urgencia de tus tareas automáticamente',  c:'#6B6AEA' },
+          { icon:'target',  t:'Sugiere prioridades',     s:'Evalúa urgencia de tus tareas automáticamente',  c:'#00C8B1' },
         ].map((f,i)=>(
           <Row key={i} last={i===2}
             left={<IconTile name={f.icon} color={f.c} size={34}/>}
@@ -640,22 +640,22 @@ const AIScreen = ({ onNavigate }) => {
     { id:'dia', icon:'sun',       text:'Planear mi día de hoy',    color:'#FFD60A' },
     { id:'sem', icon:'calendar',  text:'Organizar esta semana',    color:'#0A84FF' },
     { id:'rep', icon:'reset',     text:'Replanear tareas de hoy',  color:'#FF9F0A' },
-    { id:'pri', icon:'target',    text:'Priorizar mis pendientes', color:'#6B6AEA' },
+    { id:'pri', icon:'target',    text:'Priorizar mis pendientes', color:'#00C8B1' },
     { id:'rut', icon:'flame',     text:'Crear rutina matutina',    color:'#FF453A' },
     { id:'rev', icon:'star',      text:'Revisión semanal',         color:'#BF5AF2' },
   ];
 
   const MOCK = {
     dia:[
-      {time:'07:00',title:'Revisión del plan',dur:'15 min',col:'#6B6AEA'},
+      {time:'07:00',title:'Revisión del plan',dur:'15 min',col:'#00C8B1'},
       {time:'08:00',title:'Bloque de trabajo profundo',dur:'2 h',col:'#0A84FF'},
       {time:'10:00',title:'Responder mensajes',dur:'30 min',col:'#FF9F0A'},
       {time:'14:00',title:'Tareas urgentes pendientes',dur:'1 h',col:'#FF453A'},
-      {time:'16:00',title:'Focus — proyecto principal',dur:'1.5 h',col:'#6B6AEA'},
+      {time:'16:00',title:'Focus — proyecto principal',dur:'1.5 h',col:'#00C8B1'},
       {time:'18:00',title:'Cierre y planificación mañana',dur:'15 min',col:'#30D158'},
     ],
     sem:[
-      {time:'',title:'Lunes — Planificación semanal',dur:'Mañana',col:'#6B6AEA'},
+      {time:'',title:'Lunes — Planificación semanal',dur:'Mañana',col:'#00C8B1'},
       {time:'',title:'Martes/Miércoles — Deep work',dur:'Todo el día',col:'#0A84FF'},
       {time:'',title:'Jueves — Reuniones y colaboración',dur:'Tarde',col:'#FF9F0A'},
       {time:'',title:'Viernes — Revisión y cierre',dur:'Mañana',col:'#30D158'},
@@ -663,7 +663,7 @@ const AIScreen = ({ onNavigate }) => {
     rep:[
       {time:'',title:'Revisar tareas sin completar',dur:'10 min',col:'#FF453A'},
       {time:'',title:'Mover no urgentes a mañana',dur:'5 min',col:'#FF9F0A'},
-      {time:'',title:'Elegir 3 tareas para hoy',dur:'5 min',col:'#6B6AEA'},
+      {time:'',title:'Elegir 3 tareas para hoy',dur:'5 min',col:'#00C8B1'},
     ],
     pri:[
       {time:'',title:'🔴 Urgente: Entregar informe',dur:'Hoy',col:'#FF453A'},
@@ -673,17 +673,17 @@ const AIScreen = ({ onNavigate }) => {
     rut:[
       {time:'06:00',title:'Agua + movimiento (10 min)',dur:'10 min',col:'#30D158'},
       {time:'06:15',title:'Journaling o meditación',dur:'15 min',col:'#BF5AF2'},
-      {time:'06:30',title:'Revisar el plan del día',dur:'10 min',col:'#6B6AEA'},
+      {time:'06:30',title:'Revisar el plan del día',dur:'10 min',col:'#00C8B1'},
       {time:'07:00',title:'Bloque de trabajo sin distracciones',dur:'2 h',col:'#0A84FF'},
     ],
     rev:[
       {time:'',title:'¿Qué salió bien esta semana?',dur:'Revisar',col:'#30D158'},
       {time:'',title:'¿Qué quedó pendiente?',dur:'Revisar',col:'#FF9F0A'},
       {time:'',title:'¿Qué aprendiste?',dur:'Revisar',col:'#BF5AF2'},
-      {time:'',title:'Plan de la próxima semana',dur:'Definir',col:'#6B6AEA'},
+      {time:'',title:'Plan de la próxima semana',dur:'Definir',col:'#00C8B1'},
     ],
     custom:[
-      {time:'',title:'Bloque de planificación',dur:'30 min',col:'#6B6AEA'},
+      {time:'',title:'Bloque de planificación',dur:'30 min',col:'#00C8B1'},
       {time:'',title:'Tareas más importantes del día',dur:'2 h',col:'#0A84FF'},
       {time:'',title:'Revisión y ajuste',dur:'15 min',col:'#30D158'},
     ],
@@ -719,7 +719,7 @@ const AIScreen = ({ onNavigate }) => {
     <div style={{ paddingBottom:20 }}>
       {/* Header */}
       <div style={{ display:'flex',alignItems:'center',gap:12,marginBottom:22 }}>
-        <div style={{ width:44,height:44,borderRadius:13,background:'linear-gradient(145deg,#BF5AF2,#7877F0)',display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 6px 20px rgba(191,90,242,0.4),inset 0 1px 0 rgba(255,255,255,0.2)' }}>
+        <div style={{ width:44,height:44,borderRadius:13,background:'linear-gradient(145deg,#00C8B1,#0A84FF)',display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 6px 20px rgba(191,90,242,0.4),inset 0 1px 0 rgba(255,255,255,0.2)' }}>
           <Icon name="sparkle" size={20} color="#FFF" weight={1.8}/>
         </div>
         <div>
@@ -734,9 +734,9 @@ const AIScreen = ({ onNavigate }) => {
           <C style={{ padding:'14px 16px',marginBottom:14,border:'0.5px solid rgba(191,90,242,0.2)' }}>
             <p style={{ margin:'0 0 8px',fontSize:12,fontWeight:600,color:'rgba(235,235,245,0.45)',textTransform:'uppercase',letterSpacing:0.5 }}>¿Qué necesitas planear?</p>
             <textarea value={input} onChange={e=>setInput(e.target.value)} placeholder="Escribe lo que necesitas organizar, planear o priorizar…" rows={3}
-              style={{ width:'100%',padding:'11px 13px',borderRadius:12,border:'0.5px solid rgba(255,255,255,0.08)',background:'rgba(44,44,46,0.7)',color:'#FFF',fontSize:15,resize:'none',fontFamily:'inherit',lineHeight:1.5,letterSpacing:-0.1 }}/>
+              style={{ width:'100%',padding:'11px 13px',borderRadius:12,border:'0.5px solid rgba(84,84,88,0.45)',background:'#2C2C2E',color:'#FFF',fontSize:15,resize:'none',fontFamily:'inherit',lineHeight:1.5,letterSpacing:-0.1 }}/>
             {input.trim() && (
-              <button onClick={()=>generatePlan('custom',input)} style={{ width:'100%',marginTop:10,padding:12,borderRadius:12,background:'linear-gradient(145deg,#BF5AF2,#7877F0)',color:'#FFF',border:'0.5px solid rgba(255,255,255,0.2)',fontSize:15,fontWeight:600,cursor:'pointer',boxShadow:'0 5px 18px rgba(191,90,242,.38)',display:'flex',alignItems:'center',justifyContent:'center',gap:8 }}>
+              <button onClick={()=>generatePlan('custom',input)} style={{ width:'100%',marginTop:10,padding:12,borderRadius:12,background:'linear-gradient(145deg,#00C8B1,#0A84FF)',color:'#FFF',border:'0.5px solid rgba(255,255,255,0.2)',fontSize:15,fontWeight:600,cursor:'pointer',boxShadow:'0 5px 18px rgba(191,90,242,.38)',display:'flex',alignItems:'center',justifyContent:'center',gap:8 }}>
                 <Icon name="sparkle" size={15} weight={1.8}/> Generar plan
               </button>
             )}
@@ -747,7 +747,7 @@ const AIScreen = ({ onNavigate }) => {
           <div style={{ display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:14 }}>
             {PROMPTS.map(p=>(
               <div key={p.id} onClick={()=>generatePlan(p.id)}
-                style={{ display:'flex',alignItems:'center',gap:10,padding:'13px 14px',...G.card,background:`linear-gradient(130deg,${p.color}14 0%,rgba(28,28,30,0.85) 60%)`,border:`0.5px solid ${p.color}22`,cursor:'pointer',transition:'transform .18s cubic-bezier(.34,1.4,.64,1)' }}
+                style={{ display:'flex',alignItems:'center',gap:10,padding:'13px 14px',...G.card,background:`linear-gradient(130deg,${p.color}14 0%,#1C1C1E 60%)`,border:`0.5px solid ${p.color}22`,cursor:'pointer',transition:'transform .18s cubic-bezier(.34,1.4,.64,1)' }}
                 onMouseDown={e=>e.currentTarget.style.transform='scale(0.96)'}
                 onMouseUp={e=>e.currentTarget.style.transform='scale(1)'}
                 onMouseLeave={e=>e.currentTarget.style.transform='scale(1)'}
@@ -763,7 +763,7 @@ const AIScreen = ({ onNavigate }) => {
 
           {/* AI status */}
           {!aiEnabled && (
-            <C style={{ padding:'12px 16px',border:'0.5px solid rgba(100,210,255,0.22)',background:'linear-gradient(135deg,rgba(100,210,255,0.08) 0%,rgba(28,28,30,0.78) 100%)' }}>
+            <C style={{ padding:'12px 16px',border:'0.5px solid rgba(100,210,255,0.22)',background:'linear-gradient(135deg,rgba(100,210,255,0.08) 0%,#1C1C1E 100%)' }}>
               <div style={{ display:'flex',gap:10,alignItems:'flex-start' }}>
                 <Icon name="cpu" size={15} color="#64D2FF"/>
                 <div>
@@ -782,7 +782,7 @@ const AIScreen = ({ onNavigate }) => {
       {/* Loading */}
       {loading && (
         <div style={{ display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'64px 0',gap:20 }}>
-          <div style={{ width:76,height:76,borderRadius:22,background:'linear-gradient(145deg,#BF5AF2,#7877F0)',display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 14px 38px rgba(191,90,242,0.45),inset 0 1px 0 rgba(255,255,255,0.2)',animation:'pulse 1.3s ease-in-out infinite' }}>
+          <div style={{ width:76,height:76,borderRadius:22,background:'linear-gradient(145deg,#00C8B1,#0A84FF)',display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 14px 38px rgba(191,90,242,0.45),inset 0 1px 0 rgba(255,255,255,0.2)',animation:'pulse 1.3s ease-in-out infinite' }}>
             <Icon name="sparkle" size={34} color="#FFF" weight={1.8}/>
           </div>
           <div style={{ textAlign:'center' }}>
@@ -800,11 +800,11 @@ const AIScreen = ({ onNavigate }) => {
               <p style={{ margin:'0 0 2px',fontSize:19,fontWeight:700,color:'#FFF',letterSpacing:-0.5 }}>Plan generado</p>
               <p style={{ margin:0,fontSize:13,color:'rgba(235,235,245,0.45)' }}>{plan.items.length} bloques · {plan.text}</p>
             </div>
-            <button onClick={()=>setPlan(null)} style={{ background:'rgba(44,44,46,0.7)',border:'0.5px solid rgba(255,255,255,0.08)',borderRadius:10,padding:'8px 14px',color:'rgba(235,235,245,0.7)',cursor:'pointer',fontSize:13,fontWeight:500 }}>Nuevo</button>
+            <button onClick={()=>setPlan(null)} style={{ background:'#2C2C2E',border:'0.5px solid rgba(84,84,88,0.45)',borderRadius:10,padding:'8px 14px',color:'rgba(235,235,245,0.7)',cursor:'pointer',fontSize:13,fontWeight:500 }}>Nuevo</button>
           </div>
           <div style={{ display:'flex',flexDirection:'column',gap:8,marginBottom:16 }}>
             {plan.items.map((item,i)=>(
-              <div key={i} style={{ display:'flex',alignItems:'center',gap:12,padding:'13px 16px',...G.card,background:`linear-gradient(130deg,${item.col}12 0%,rgba(28,28,30,0.85) 70%)`,borderLeft:`3px solid ${item.col}` }}>
+              <div key={i} style={{ display:'flex',alignItems:'center',gap:12,padding:'13px 16px',...G.card,background:`linear-gradient(130deg,${item.col}12 0%,#1C1C1E 70%)`,borderLeft:`3px solid ${item.col}` }}>
                 {item.time&&<span style={{ fontSize:12,fontWeight:700,color:item.col,fontVariantNumeric:'tabular-nums',flexShrink:0,minWidth:42 }}>{item.time}</span>}
                 <div style={{ flex:1,minWidth:0 }}>
                   <p style={{ margin:0,fontSize:15,fontWeight:600,color:'#FFF',letterSpacing:-0.2 }}>{item.title}</p>
@@ -815,10 +815,10 @@ const AIScreen = ({ onNavigate }) => {
             ))}
           </div>
           <div style={{ display:'flex',gap:10 }}>
-            <button onClick={addToTimeline} style={{ flex:1,padding:14,borderRadius:14,background:'linear-gradient(145deg,#7877F0,#5E5CE6)',color:'#FFF',border:'0.5px solid rgba(255,255,255,0.2)',fontSize:15,fontWeight:600,cursor:'pointer',boxShadow:'0 6px 20px rgba(94,92,230,.4)',display:'flex',alignItems:'center',justifyContent:'center',gap:8 }}>
+            <button onClick={addToTimeline} style={{ flex:1,padding:14,borderRadius:14,background:'linear-gradient(145deg,#00D4BC,#00B5A0)',color:'#FFF',border:'0.5px solid rgba(255,255,255,0.2)',fontSize:15,fontWeight:600,cursor:'pointer',boxShadow:'0 6px 20px rgba(0,200,177,.4)',display:'flex',alignItems:'center',justifyContent:'center',gap:8 }}>
               <Icon name="calendar" size={15}/> Agregar al Timeline
             </button>
-            <button onClick={()=>setPlan(null)} style={{ padding:14,borderRadius:14,background:'rgba(44,44,46,0.7)',color:'rgba(235,235,245,0.7)',border:'0.5px solid rgba(255,255,255,0.08)',fontSize:15,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center' }}>
+            <button onClick={()=>setPlan(null)} style={{ padding:14,borderRadius:14,background:'#2C2C2E',color:'rgba(235,235,245,0.7)',border:'0.5px solid rgba(84,84,88,0.45)',fontSize:15,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center' }}>
               <Icon name="close" size={16}/>
             </button>
           </div>
@@ -865,21 +865,21 @@ const SettingsScreen = ({ onNavigate }) => {
       <Title title="Configuración" sub="LifeOS · Tu sistema personal"/>
 
       {/* Profile */}
-      <C style={{ padding:'15px 16px',marginBottom:20,background:'linear-gradient(130deg,rgba(107,106,234,0.14) 0%,rgba(28,28,30,0.85) 70%)' }}>
+      <C style={{ padding:'15px 16px',marginBottom:20,background:'linear-gradient(130deg,rgba(0,200,177,0.14) 0%,#1C1C1E 70%)' }}>
         <div style={{ display:'flex',alignItems:'center',gap:14 }}>
-          <div style={{ width:54,height:54,borderRadius:16,background:'linear-gradient(145deg,#7877F0,#BF5AF2)',display:'flex',alignItems:'center',justifyContent:'center',color:'#FFF',fontSize:24,fontWeight:700,flexShrink:0,boxShadow:'0 6px 20px rgba(94,92,230,.4),inset 0 1px 0 rgba(255,255,255,0.2)' }}>
+          <div style={{ width:54,height:54,borderRadius:16,background:'linear-gradient(145deg,#00D4BC,#0A84FF)',display:'flex',alignItems:'center',justifyContent:'center',color:'#FFF',fontSize:24,fontWeight:700,flexShrink:0,boxShadow:'0 6px 20px rgba(0,200,177,.4),inset 0 1px 0 rgba(255,255,255,0.2)' }}>
             {name.charAt(0).toUpperCase()}
           </div>
           <div style={{ flex:1,minWidth:0 }}>
             <p style={{ margin:0,fontSize:18,fontWeight:700,color:'#FFF',letterSpacing:-0.5 }}>{name}</p>
             <p style={{ margin:'2px 0 0',fontSize:13,color:'rgba(235,235,245,0.45)' }}>{points} puntos · LifeOS Free</p>
           </div>
-          <Tag label="Free" color="#6B6AEA"/>
+          <Tag label="Free" color="#00C8B1"/>
         </div>
       </C>
 
       {/* Pro banner */}
-      <div style={{ marginBottom:20,padding:'16px 20px',borderRadius:18,background:'linear-gradient(135deg,#7877F0 0%,#BF5AF2 100%)',border:'0.5px solid rgba(255,255,255,0.2)',boxShadow:'0 8px 28px rgba(94,92,230,.35),inset 0 1px 0 rgba(255,255,255,0.18)' }}>
+      <div style={{ marginBottom:20,padding:'16px 20px',borderRadius:18,background:'linear-gradient(135deg,#00D4BC 0%,#0A84FF 100%)',border:'0.5px solid rgba(255,255,255,0.2)',boxShadow:'0 8px 28px rgba(0,200,177,.35),inset 0 1px 0 rgba(255,255,255,0.18)' }}>
         <div style={{ display:'flex',justifyContent:'space-between',alignItems:'center' }}>
           <div>
             <p style={{ margin:'0 0 4px',fontSize:17,fontWeight:700,color:'#FFF',letterSpacing:-0.4 }}>LifeOS Pro</p>
@@ -900,7 +900,7 @@ const SettingsScreen = ({ onNavigate }) => {
       <Sec title="Funciones">
         <SRow icon="leaf"    color="#30D158" title="Hábitos"       sub="Constancia real"              onClick={()=>onNavigate('habitos')}/>
         <SRow icon="bell"    color="#FF9F0A" title="Recordatorios" sub="No olvides nada"              onClick={()=>onNavigate('recordar')}/>
-        <SRow icon="target"  color="#6B6AEA" title="Focus"         sub="Trabajo profundo · Pomodoro"  onClick={()=>onNavigate('focus-hub')}/>
+        <SRow icon="target"  color="#00C8B1" title="Focus"         sub="Trabajo profundo · Pomodoro"  onClick={()=>onNavigate('focus-hub')}/>
         <SRow icon="zap"     color="#FFD60A" title="Monitor de Energía" sub="Estado diario de energía y ánimo" onClick={()=>onNavigate('energia')}/>
         <SRow icon="reset"   color="#FF9F0A" title="Replanear"     sub="Reorganiza tareas del día"    onClick={()=>onNavigate('replan')} last/>
       </Sec>
@@ -934,7 +934,7 @@ const SettingsScreen = ({ onNavigate }) => {
 
       {/* Support */}
       <Sec title="Soporte">
-        <SRow icon="book"    color="#7B7AEE" title="Documentación" sub="Cómo usar LifeOS"              onClick={()=>onNavigate('docs')} last/>
+        <SRow icon="book"    color="#00C8B1" title="Documentación" sub="Cómo usar LifeOS"              onClick={()=>onNavigate('docs')} last/>
       </Sec>
 
       {/* Footer */}
