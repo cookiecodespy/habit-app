@@ -716,13 +716,12 @@ function CreateScreen({ theme, onBack, onSave }) {
         </div>
       </div>
 
-      {/* ─── BODY — clean sections ─── */}
-      <div style={{ paddingBottom: 120 }}>
+      {/* ─── BODY — centered, carded form ─── */}
+      <div style={{ maxWidth: 720, margin: '0 auto', width: '100%', padding: '12px 14px 130px', display: 'flex', flexDirection: 'column', gap: 12 }}>
 
         {/* ── Fecha — 14-day horizontal strip ── */}
-        <div style={{ padding: '18px 0 16px', borderBottom: `0.5px solid ${theme.border}` }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 20px', marginBottom: 12 }}>
-            <SectionTitle theme={theme} accent={c.to}>¿Para cuándo?</SectionTitle>
+        <div style={loCardStyle(theme)}>
+          <CardHead theme={theme} icon="calendar" accent={pickedColor} title="Fecha" help="¿Para cuándo es esta tarea?" trailing={
             <button onClick={() => { setShowCal(v => !v); const [y, m] = selectedDate.split('-').map(Number); setCalCursor({ y, m: m - 1 }); }}
               className="lo-press" style={{
                 display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', fontFamily: 'inherit',
@@ -734,8 +733,8 @@ function CreateScreen({ theme, onBack, onSave }) {
               <UIIcon name="calendar" size={13} color={showCal ? '#fff' : theme.accent}/>
               {fmtDateLabel(selectedDate)}
             </button>
-          </div>
-          <div style={{ display: 'flex', gap: 6, overflowX: 'auto', padding: '4px 20px 6px', WebkitOverflowScrolling: 'touch' }}>
+          }/>
+          <div style={{ display: 'flex', gap: 6, overflowX: 'auto', padding: '4px 0 6px', WebkitOverflowScrolling: 'touch' }}>
             {dateStrip.map(({ off, dow, day, mon, dateStr }) => {
               const active = selectedDate === dateStr;
               return (
@@ -758,7 +757,7 @@ function CreateScreen({ theme, onBack, onSave }) {
           </div>
 
           {showCal && (
-            <div className="lo-fade" style={{ padding: '16px 20px 4px' }}>
+            <div className="lo-fade" style={{ padding: '14px 0 4px' }}>
               <div style={{
                 background: theme.surface, border: `0.5px solid ${theme.border}`,
                 borderRadius: 20, padding: '14px 14px 10px',
@@ -817,14 +816,13 @@ function CreateScreen({ theme, onBack, onSave }) {
         </div>
 
         {/* ── Horario ── */}
-        <div style={{ padding: '18px 20px 18px', borderBottom: `0.5px solid ${theme.border}` }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-            <SectionTitle theme={theme} accent={c.to}>Horario</SectionTitle>
+        <div style={loCardStyle(theme)}>
+          <CardHead theme={theme} icon="clock" accent={pickedColor} title="Horario" help="¿A qué hora?" trailing={
             <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
               <span style={{ fontSize: 12.5, color: theme.text2, fontWeight: 500 }}>Todo el día</span>
               <Toggle on={allDayOn} onChange={() => setAllDay(v => !v)} theme={theme}/>
             </label>
-          </div>
+          }/>
           {allDayOn ? (
             <div style={{ fontSize: 12.5, color: theme.text3, padding: '2px 2px 4px' }}>Sin hora — aparecerá en la fila “Todo el día”.</div>
           ) : (<>
@@ -901,11 +899,10 @@ function CreateScreen({ theme, onBack, onSave }) {
         </div>
 
         {/* ── Color ── */}
-        <div style={{ padding: '18px 20px 18px', borderBottom: `0.5px solid ${theme.border}` }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-            <SectionTitle theme={theme} accent={c.to}>Color</SectionTitle>
+        <div style={loCardStyle(theme)}>
+          <CardHead theme={theme} icon="sparkle" accent={pickedColor} title="Color" help="El color de tu tarea" trailing={
             <span style={{ fontSize: 12.5, color: c.from, fontWeight: 700 }}>{COLOR_LABELS[pickedColor]}</span>
-          </div>
+          }/>
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', paddingBottom: 6, alignItems: 'center', rowGap: 14 }}>
             {colors.map(col => {
               const cc = LIFE_PALETTE[col];
@@ -931,8 +928,8 @@ function CreateScreen({ theme, onBack, onSave }) {
         </div>
 
         {/* ── Icono ── */}
-        <div style={{ padding: '18px 20px 18px', borderBottom: `0.5px solid ${theme.border}` }}>
-          <SectionTitle theme={theme} accent={c.to} style={{ marginBottom: 14 }}>Icono</SectionTitle>
+        <div style={loCardStyle(theme)}>
+          <CardHead theme={theme} icon="grip" accent={pickedColor} title="Icono" help="Elige uno que la represente"/>
           <div style={{ display: 'flex', gap: 7, marginBottom: 14, overflowX: 'auto', paddingBottom: 2 }}>
             {ICON_CATEGORIES.map(cat => (
               <button key={cat.id} onClick={() => setIconCat(cat.id)} className="lo-press" style={{
@@ -967,8 +964,8 @@ function CreateScreen({ theme, onBack, onSave }) {
         </div>
 
         {/* ── Prioridad ── */}
-        <div style={{ padding: '18px 20px 18px', borderBottom: `0.5px solid ${theme.border}` }}>
-          <div style={{ fontSize: 10.5, fontWeight: 700, color: theme.text3, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 12 }}>Prioridad</div>
+        <div style={loCardStyle(theme)}>
+          <CardHead theme={theme} icon="flag" accent="amber" title="Prioridad" help="¿Qué tan importante es?"/>
           <div style={{ display: 'flex', gap: 10 }}>
             {PRIORITIES.map(p => {
               const active = priority === p.id;
@@ -991,16 +988,15 @@ function CreateScreen({ theme, onBack, onSave }) {
         </div>
 
         {/* ── Tema (Agenda filter) ── */}
-        <div style={{ padding: '18px 20px 18px', borderBottom: `0.5px solid ${theme.border}` }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 11 }}>
-            <SectionTitle theme={theme} accent={c.to}>Tema</SectionTitle>
-            {category && !catTouched && <span style={{ fontSize: 10.5, color: c.to, fontWeight: 700 }}>✦ sugerido</span>}
-          </div>
+        <div style={loCardStyle(theme)}>
+          <CardHead theme={theme} icon="target" accent={pickedColor} title="Tema" help="Clasifícala para tu Agenda" trailing={
+            category && !catTouched ? <span style={{ fontSize: 10.5, color: c.to, fontWeight: 700 }}>✦ sugerido</span> : null
+          }/>
           <CategoryPicker theme={theme} value={category} onChange={(v) => { setCatTouched(true); setCategory(v); }}/>
         </div>
 
         {/* ── Opciones ── */}
-        <div style={{ borderBottom: `0.5px solid ${theme.border}` }}>
+        <div style={{ ...loCardStyle(theme), padding: '6px 6px' }}>
           <OptionRow theme={theme} icon="bell" tint="coral" label="Recordatorio"
             on={reminderOn} onToggle={() => setReminder(!reminderOn)}
             sub={reminderOn ? '10 min antes' : 'Apagado'} />
@@ -1013,7 +1009,7 @@ function CreateScreen({ theme, onBack, onSave }) {
         </div>
 
         {/* ── Checklist (collapsible) ── */}
-        <div style={{ padding: '0 20px' }}>
+        <div style={{ ...loCardStyle(theme), padding: '2px 14px' }}>
           <button onClick={() => setShowChecklist(!showChecklist)} className="lo-press" style={{
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             width: '100%', background: 'transparent', border: 'none', cursor: 'pointer',
@@ -1072,6 +1068,19 @@ function CreateScreen({ theme, onBack, onSave }) {
               </button>
             </div>
           )}
+        </div>
+
+        {/* ── Consejo ── */}
+        <div style={{
+          display: 'flex', alignItems: 'flex-start', gap: 11, padding: '13px 15px', borderRadius: 16,
+          background: `linear-gradient(135deg, ${c.from}1c, ${theme.surface} 70%)`,
+          border: `0.5px solid ${c.to}33`,
+        }}>
+          <UIIcon name="sparkle" size={16} color={c.to}/>
+          <div style={{ fontSize: 12.5, color: theme.text2, lineHeight: 1.45 }}>
+            <span style={{ fontWeight: 700, color: theme.text }}>Consejo · </span>
+            mantén el nombre claro y específico; tu yo del futuro lo agradecerá.
+          </div>
         </div>
       </div>
 
@@ -1149,6 +1158,33 @@ function Card({ theme, children, style }) {
       ...style,
     }}>{children}</div>
   );
+}
+
+// Card header: icon badge + title + helper line. The senior-grade "labeled card" pattern.
+function CardHead({ theme, icon, accent, title, help, trailing }) {
+  const cc = accent ? (LIFE_PALETTE[accent] || null) : null;
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
+      <div style={{
+        width: 40, height: 40, borderRadius: 13, flexShrink: 0,
+        background: cc ? `linear-gradient(145deg, ${cc.from}, ${cc.to})` : theme.surfaceHi,
+        border: cc ? 'none' : `1px solid ${theme.border}`,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        boxShadow: cc ? `0 5px 14px ${cc.to}40` : 'none',
+      }}>
+        <UIIcon name={icon} size={18} color={cc ? '#fff' : theme.text2} strokeWidth={2}/>
+      </div>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontSize: 14.5, fontWeight: 700, color: theme.text, letterSpacing: -0.2 }}>{title}</div>
+        {help && <div style={{ fontSize: 11.5, color: theme.text3, marginTop: 1 }}>{help}</div>}
+      </div>
+      {trailing}
+    </div>
+  );
+}
+// Card surface shared by the Create form sections.
+function loCardStyle(theme) {
+  return { padding: 16, background: theme.surface, border: `0.5px solid ${theme.border}`, borderRadius: 20 };
 }
 
 // Section header with a small colour tick — the recurring "intention" motif.
