@@ -4,11 +4,13 @@
 // FOCUS MODE — fullscreen current task with countdown + breathing
 // Triggered from Detail screen "Iniciar enfoque"
 // ──────────────────────────────────────────────────────────────
-function FocusMode({ theme, task, onClose }) {
-  const c = LIFE_PALETTE[task.color];
-  const totalSec = minutesBetween(task.start, task.end) * 60;
+function FocusMode({ theme, task, onClose, onComplete }) {
+  const c = LIFE_PALETTE[task.color] || LIFE_PALETTE.coral;
+  // Guard against 0/NaN when a task has no real duration (start===end).
+  const totalSec = Math.max(60, (minutesBetween(task.start, task.end) || 25) * 60);
   const [remaining, setRemaining] = React.useState(totalSec);
   const [paused, setPaused] = React.useState(false);
+  const firedRef = React.useRef(false);
 
   React.useEffect(() => {
     if (paused) return;
@@ -16,9 +18,18 @@ function FocusMode({ theme, task, onClose }) {
     return () => clearInterval(id);
   }, [paused]);
 
+  // Timer reaching zero is a real event: celebrate it once.
+  React.useEffect(() => {
+    if (remaining === 0 && !firedRef.current) {
+      firedRef.current = true;
+      if (window.toast) window.toast('Tiempo cumplido ✨ Toca ✓ para completar', { tone: 'success', icon: 'check' });
+    }
+  }, [remaining]);
+
+  const finish = () => { if (onComplete) onComplete(); else onClose(); };
   const mm = Math.floor(remaining / 60);
   const ss = remaining % 60;
-  const pct = 1 - remaining / totalSec;
+  const pct = totalSec > 0 ? 1 - remaining / totalSec : 1;
 
   return (
     <div data-screen-label="Focus Mode" className="lo-fade" style={{
@@ -81,7 +92,7 @@ function FocusMode({ theme, task, onClose }) {
             <div className="lo-breath" style={{ filter: `drop-shadow(0 12px 32px ${c.to}66)` }}>
               <LifeIcon name={task.icon} color={task.color} size={72} shape="squircle"/>
             </div>
-            <div style={{ fontSize: 52, fontWeight: 700, color: theme.text, letterSpacing: -2, fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
+            <div className="lo-display" style={{ fontSize: 56, fontWeight: 600, color: theme.text, letterSpacing: -2, fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
               {String(mm).padStart(2,'0')}<span style={{ opacity: 0.5 }}>:</span>{String(ss).padStart(2,'0')}
             </div>
             <div style={{ fontSize: 12, color: theme.text3, fontWeight: 500 }}>
@@ -95,11 +106,8 @@ function FocusMode({ theme, task, onClose }) {
         </div>
       </div>
 
-      {/* Controls */}
-      <div style={{ padding: '24px 24px 40px', display: 'flex', gap: 12, justifyContent: 'center' }}>
-        <button className="lo-press" style={focusBtn(theme)}>
-          <UIIcon name="bell" size={18} color={theme.text}/>
-        </button>
+      {/* Controls — pause/resume + complete (✓ completes the task, B4) */}
+      <div style={{ padding: '24px 24px 40px', display: 'flex', gap: 16, justifyContent: 'center', alignItems: 'center' }}>
         <button onClick={() => setPaused(!paused)} className="lo-press" style={{
           ...focusBtn(theme),
           width: 72, height: 72,
@@ -111,8 +119,14 @@ function FocusMode({ theme, task, onClose }) {
             ? <UIIcon name="play" size={28} color="#fff"/>
             : <UIIcon name="pause" size={28} color="#fff" strokeWidth={2.4}/>}
         </button>
-        <button onClick={onClose} className="lo-press" style={focusBtn(theme)}>
-          <UIIcon name="check" size={20} color={theme.text} strokeWidth={2.4}/>
+        <button onClick={finish} className="lo-press" style={{
+          ...focusBtn(theme),
+          width: 72, height: 72,
+          background: remaining === 0 ? `linear-gradient(135deg, ${LIFE_PALETTE.mint.from}, ${LIFE_PALETTE.mint.to})` : 'rgba(255,255,255,0.08)',
+          border: remaining === 0 ? 'none' : '0.5px solid rgba(255,255,255,0.12)',
+          boxShadow: remaining === 0 ? `0 12px 32px ${LIFE_PALETTE.mint.to}66` : 'none',
+        }}>
+          <UIIcon name="check" size={26} color="#fff" strokeWidth={2.6}/>
         </button>
       </div>
     </div>
@@ -134,9 +148,10 @@ function focusBtn(theme) {
 function QuickAddMenu({ theme, onClose, onSelect }) {
   const items = [
     { id: 'task',    label: 'Nueva tarea',     icon: 'plus',     color: 'coral'    },
+    { id: 'habit',   label: 'Nuevo hábito',    icon: 'flame',    color: 'amber'    },
     { id: 'routine', label: 'Nueva rutina',    icon: 'repeat',   color: 'lavender' },
     { id: 'inbox',   label: 'Inbox rápido',    icon: 'inbox',    color: 'mint'     },
-    { id: 'voice',   label: 'Dictar tarea',    icon: 'sparkle',  color: 'sky'      },
+    { id: 'voice',   label: 'Dictar con IA',   icon: 'sparkle',  color: 'sky'      },
   ];
   return (
     <div className="lo-fade" onClick={onClose} style={{
@@ -274,18 +289,41 @@ const ROUTINES = [
   },
 ];
 
+// Human "N tareas · 2h 30m" summary computed from a routine's steps.
+function routineSub(tasks) {
+  const total = (tasks || []).reduce((s, t) => s + (Number(t.dur) || 0), 0);
+  const h = Math.floor(total / 60), m = total % 60;
+  const dur = h ? `${h}h${m ? ` ${m}m` : ''}` : `${m}m`;
+  return `${tasks.length} ${tasks.length === 1 ? 'tarea' : 'tareas'} · ${dur}`;
+}
+
+const ROUTINE_ICONS = ['sparkle', 'sun', 'moon', 'coffee', 'briefcase', 'book', 'yoga', 'meal', 'clock', 'heart', 'dumbbell', 'walk', 'pencil', 'music'];
+const ROUTINE_COLORS = ['coral', 'amber', 'rose', 'mint', 'sky', 'lavender', 'lime', 'teal', 'plum', 'sun', 'ember', 'slate'];
+const STEP_ICONS = ['sparkle', 'coffee', 'book', 'briefcase', 'yoga', 'meal', 'walk', 'shower', 'meditate', 'moon', 'pencil', 'music', 'dumbbell', 'heart', 'pill', 'clock'];
+
 function RoutinesScreen({ theme, onBack, onApply }) {
   const [picked, setPicked] = React.useState(null);
-  const r = picked && ROUTINES.find(x => x.id === picked);
+  const [editing, setEditing] = React.useState(null); // routine object | 'new' | null
+  const [version, setVersion] = React.useState(0);
 
-  if (r) return <RoutineDetail theme={theme} routine={r} onBack={() => setPicked(null)} onApply={onApply}/>;
+  // Custom routines persist in the store; defaults are read-only.
+  const custom = React.useMemo(() => LOStore.customRoutines().map(r => ({ ...r, custom: true, sub: routineSub(r.tasks) })), [version]);
+  const all = [...custom, ...ROUTINES];
+  const r = picked && all.find(x => x.id === picked);
+
+  if (editing) return (
+    <RoutineEditor theme={theme}
+      initial={editing === 'new' ? null : editing}
+      onCancel={() => setEditing(null)}
+      onSaved={() => { setEditing(null); setVersion(v => v + 1); }}
+      onDeleted={() => { setEditing(null); setPicked(null); setVersion(v => v + 1); }}/>
+  );
+  if (r) return <RoutineDetail theme={theme} routine={r} onBack={() => setPicked(null)}
+    onApply={onApply} onEdit={r.custom ? () => setEditing(r) : null}/>;
 
   return (
     <div data-screen-label="Routines" className="lo-fade">
-      <ScreenTopBar theme={theme} title="Rutinas" onBack={onBack}
-        trailing={<button className="lo-press" style={{ width: 36, height: 36, borderRadius: 18, background: theme.surface, border: `0.5px solid ${theme.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-          <UIIcon name="plus" size={18} color={theme.text2}/>
-        </button>}/>
+      <ScreenTopBar theme={theme} title="Rutinas" onBack={onBack}/>
       <div style={{ padding: '0 16px 24px' }}>
         <div className="lo-fade" style={{ padding: '0 4px 14px' }}>
           <div style={{ fontSize: 12.5, color: theme.text3, fontWeight: 500 }}>Bloques reutilizables</div>
@@ -297,53 +335,195 @@ function RoutinesScreen({ theme, onBack, onApply }) {
           </p>
         </div>
 
+        {/* Create custom routine */}
+        <button onClick={() => setEditing('new')} className="lo-press lo-lift" style={{
+          width: '100%', marginBottom: 12, padding: '13px 16px', borderRadius: 16,
+          background: `linear-gradient(135deg, ${theme.accent}1f, ${theme.surface} 80%)`,
+          border: `1px dashed ${theme.accent}66`, cursor: 'pointer', color: theme.text,
+          display: 'flex', alignItems: 'center', gap: 12, fontFamily: 'inherit', textAlign: 'left',
+        }}>
+          <div style={{ width: 38, height: 38, borderRadius: 12, background: `linear-gradient(135deg, ${theme.accent}, ${theme.accent}cc)`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <UIIcon name="plus" size={20} color="#fff" strokeWidth={2.4}/>
+          </div>
+          <div>
+            <div style={{ fontSize: 15, fontWeight: 700, letterSpacing: -0.2 }}>Crear rutina</div>
+            <div style={{ fontSize: 12, color: theme.text2, marginTop: 1 }}>Arma tu propio pack de tareas</div>
+          </div>
+        </button>
+
+        {custom.length > 0 && <SectionLabel theme={theme} text="Mis rutinas"/>}
         <div className="lo-stagger" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {ROUTINES.map((r, i) => {
-            const c = LIFE_PALETTE[r.color];
+          {all.map((r, i) => {
+            const c = LIFE_PALETTE[r.color] || LIFE_PALETTE.coral;
+            if (i === custom.length && custom.length > 0) {
+              return <React.Fragment key="__sep"><SectionLabel theme={theme} text="Plantillas"/>{routineCard(r, i, c)}</React.Fragment>;
+            }
+            return routineCard(r, i, c);
+          })}
+        </div>
+      </div>
+    </div>
+  );
+
+  function routineCard(r, i, c) {
+    return (
+      <button key={r.id} onClick={() => setPicked(r.id)} className="lo-press lo-lift" style={{
+        '--i': i,
+        background: `linear-gradient(135deg, ${c.from}22 0%, ${theme.surface} 70%)`,
+        border: `0.5px solid ${c.to}33`,
+        borderRadius: 20, padding: 14,
+        display: 'flex', alignItems: 'center', gap: 14,
+        cursor: 'pointer', color: theme.text, textAlign: 'left',
+        fontFamily: 'inherit',
+      }}>
+        <LifeIcon name={r.icon} color={r.color} size={50} shape="squircle"/>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: 16, fontWeight: 600, letterSpacing: -0.2, display: 'flex', alignItems: 'center', gap: 7 }}>
+            {r.name}
+            {r.custom && <span style={{ fontSize: 9.5, fontWeight: 700, color: theme.accent, background: `${theme.accent}22`, padding: '2px 6px', borderRadius: 6, letterSpacing: 0.3 }}>MÍA</span>}
+          </div>
+          <div style={{ fontSize: 12, color: theme.text2, marginTop: 2 }}>{r.sub}</div>
+          <div style={{ display: 'flex', gap: 4, marginTop: 8 }}>
+            {r.tasks.slice(0, 5).map((t, k) => (
+              <LifeIcon key={k} name={t.icon} color={t.color || r.color} size={22} shape="rounded"/>
+            ))}
+          </div>
+        </div>
+        <UIIcon name="chevronR" size={14} color={theme.text3}/>
+      </button>
+    );
+  }
+}
+
+function SectionLabel({ theme, text }) {
+  return <div style={{ fontSize: 10.5, fontWeight: 700, color: theme.text3, letterSpacing: 1.2, textTransform: 'uppercase', margin: '6px 4px 8px' }}>{text}</div>;
+}
+
+// Create / edit a custom routine: name, look, and an ordered list of steps.
+function RoutineEditor({ theme, initial, onCancel, onSaved, onDeleted }) {
+  const editing = !!(initial && initial.id);
+  const [name, setName] = React.useState(initial?.name || '');
+  const [icon, setIcon] = React.useState(initial?.icon || 'sparkle');
+  const [color, setColor] = React.useState(initial?.color || 'coral');
+  const [tasks, setTasks] = React.useState(() =>
+    (initial?.tasks?.length ? initial.tasks.map(t => ({ ...t })) : [{ icon: 'sparkle', color: initial?.color || 'coral', label: '', dur: 30 }]));
+  const c = LIFE_PALETTE[color] || LIFE_PALETTE.coral;
+
+  const setStep = (i, patch) => setTasks(ts => ts.map((t, k) => k === i ? { ...t, ...patch } : t));
+  const cycleStepIcon = (i) => setStep(i, { icon: STEP_ICONS[(STEP_ICONS.indexOf(tasks[i].icon) + 1 + STEP_ICONS.length) % STEP_ICONS.length] });
+  const addStep = () => setTasks(ts => [...ts, { icon: 'sparkle', color, label: '', dur: 30 }]);
+  const removeStep = (i) => setTasks(ts => ts.length > 1 ? ts.filter((_, k) => k !== i) : ts);
+
+  const valid = name.trim() && tasks.some(t => t.label.trim());
+  const save = () => {
+    if (!valid) return;
+    const clean = tasks.map(t => ({ ...t, color: t.color || color, label: t.label.trim() })).filter(t => t.label);
+    const payload = { name: name.trim(), icon, color, tasks: clean };
+    if (editing) LOStore.updateRoutine(initial.id, payload); else LOStore.addRoutine(payload);
+    onSaved();
+  };
+  const del = () => {
+    if (typeof window !== 'undefined' && !window.confirm('¿Borrar esta rutina?')) return;
+    LOStore.removeRoutine(initial.id); onDeleted();
+  };
+
+  const fieldLabel = { fontSize: 10.5, fontWeight: 700, color: theme.text3, letterSpacing: 1, textTransform: 'uppercase', margin: '18px 0 9px' };
+
+  return (
+    <div data-screen-label="Routine Editor" className="lo-fade">
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px 6px', height: 44 }}>
+        <button onClick={onCancel} className="lo-press" style={{ background: 'transparent', border: 'none', color: theme.text2, fontSize: 15, cursor: 'pointer', fontFamily: 'inherit' }}>Cancelar</button>
+        <span style={{ fontSize: 16, fontWeight: 600, color: theme.text }}>{editing ? 'Editar rutina' : 'Nueva rutina'}</span>
+        <button onClick={save} disabled={!valid} className="lo-press" style={{ background: 'transparent', border: 'none', color: valid ? theme.accent : theme.text3, fontSize: 15, fontWeight: 700, cursor: valid ? 'pointer' : 'default', fontFamily: 'inherit' }}>Guardar</button>
+      </div>
+
+      <div style={{ padding: '0 16px 28px' }}>
+        {/* Name */}
+        <input value={name} onChange={e => setName(e.target.value)} placeholder="Nombre de la rutina" autoFocus style={{
+          width: '100%', background: theme.surface, border: `1px solid ${theme.border}`, borderRadius: 14,
+          padding: '14px 16px', fontSize: 17, fontWeight: 600, color: theme.text, fontFamily: 'inherit', outline: 'none', marginTop: 6,
+        }}/>
+
+        {/* Icon picker */}
+        <div style={fieldLabel}>Ícono</div>
+        <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4 }}>
+          {ROUTINE_ICONS.map(ic => {
+            const active = icon === ic;
             return (
-              <button key={r.id} onClick={() => setPicked(r.id)} className="lo-press lo-lift" style={{
-                '--i': i,
-                background: `linear-gradient(135deg, ${c.from}22 0%, ${theme.surface} 70%)`,
-                border: `0.5px solid ${c.to}33`,
-                borderRadius: 20, padding: 14,
-                display: 'flex', alignItems: 'center', gap: 14,
-                cursor: 'pointer', color: theme.text, textAlign: 'left',
-                fontFamily: 'inherit',
+              <button key={ic} onClick={() => setIcon(ic)} className="lo-press" style={{
+                flexShrink: 0, padding: 5, borderRadius: 13, cursor: 'pointer',
+                background: active ? `${c.to}22` : 'transparent',
+                border: `1.5px solid ${active ? c.to : theme.border}`,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
-                <LifeIcon name={r.icon} color={r.color} size={50} shape="squircle"/>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 16, fontWeight: 600, letterSpacing: -0.2 }}>{r.name}</div>
-                  <div style={{ fontSize: 12, color: theme.text2, marginTop: 2 }}>{r.sub}</div>
-                  {/* Mini preview */}
-                  <div style={{ display: 'flex', gap: 4, marginTop: 8 }}>
-                    {r.tasks.slice(0, 5).map((t, k) => (
-                      <LifeIcon key={k} name={t.icon} color={t.color} size={22} shape="rounded"/>
-                    ))}
-                  </div>
-                </div>
-                <UIIcon name="chevronR" size={14} color={theme.text3}/>
+                <LifeIcon name={ic} color={color} size={32} shape="rounded"/>
               </button>
             );
           })}
         </div>
 
-        {/* Create new */}
-        <button className="lo-press" style={{
-          marginTop: 12, width: '100%',
-          background: 'transparent', border: `1px dashed ${theme.border}`,
-          borderRadius: 18, padding: 14,
-          color: theme.text2, fontSize: 13.5, fontWeight: 500,
-          cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-          fontFamily: 'inherit',
-        }}>
-          <UIIcon name="plus" size={16} color={theme.text2}/> Crear rutina nueva
-        </button>
+        {/* Color picker */}
+        <div style={fieldLabel}>Color</div>
+        <div style={{ display: 'flex', gap: 9, flexWrap: 'wrap' }}>
+          {ROUTINE_COLORS.map(col => {
+            const cc = LIFE_PALETTE[col];
+            return (
+              <button key={col} onClick={() => setColor(col)} className="lo-press" style={{
+                width: 30, height: 30, borderRadius: 15, cursor: 'pointer',
+                background: `linear-gradient(135deg, ${cc.from}, ${cc.to})`,
+                border: color === col ? `2.5px solid ${theme.text}` : `2.5px solid transparent`,
+                boxShadow: color === col ? `0 2px 8px ${cc.to}66` : 'none',
+              }}/>
+            );
+          })}
+        </div>
+
+        {/* Steps */}
+        <div style={fieldLabel}>Pasos · {routineSub(tasks)}</div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {tasks.map((t, i) => (
+            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, background: theme.surface, border: `1px solid ${theme.border}`, borderRadius: 14, padding: '8px 10px' }}>
+              <button onClick={() => cycleStepIcon(i)} className="lo-press" title="Cambiar ícono" style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 0, flexShrink: 0 }}>
+                <LifeIcon name={t.icon} color={color} size={36} shape="rounded"/>
+              </button>
+              <input value={t.label} onChange={e => setStep(i, { label: e.target.value })} placeholder={`Paso ${i + 1}`} style={{
+                flex: 1, minWidth: 0, background: 'transparent', border: 'none', outline: 'none',
+                fontSize: 14.5, color: theme.text, fontFamily: 'inherit',
+              }}/>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
+                <button onClick={() => setStep(i, { dur: Math.max(5, (t.dur || 30) - 5) })} className="lo-press" style={stepBtn(theme)}>−</button>
+                <span style={{ fontSize: 12, fontWeight: 600, color: theme.text2, minWidth: 34, textAlign: 'center', fontVariantNumeric: 'tabular-nums' }}>{t.dur}m</span>
+                <button onClick={() => setStep(i, { dur: Math.min(240, (t.dur || 30) + 5) })} className="lo-press" style={stepBtn(theme)}>+</button>
+              </div>
+              <button onClick={() => removeStep(i)} className="lo-press" style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: theme.text3, flexShrink: 0, padding: '4px 2px' }}>
+                <UIIcon name="x" size={15} color={theme.text3}/>
+              </button>
+            </div>
+          ))}
+        </div>
+        <button onClick={addStep} className="lo-press" style={{
+          width: '100%', marginTop: 10, padding: '11px', borderRadius: 13, cursor: 'pointer',
+          background: 'transparent', border: `1px dashed ${theme.border}`, color: theme.accent,
+          fontSize: 13.5, fontWeight: 600, fontFamily: 'inherit',
+        }}>+ Añadir paso</button>
+
+        {editing && (
+          <button onClick={del} className="lo-press" style={{
+            width: '100%', marginTop: 22, padding: '13px', borderRadius: 13, cursor: 'pointer',
+            background: 'transparent', border: `1px solid ${LIFE_PALETTE.coral.to}55`, color: LIFE_PALETTE.coral.to,
+            fontSize: 14, fontWeight: 600, fontFamily: 'inherit',
+          }}>Borrar rutina</button>
+        )}
       </div>
     </div>
   );
 }
 
-function RoutineDetail({ theme, routine, onBack, onApply }) {
+function stepBtn(theme) {
+  return { width: 26, height: 26, borderRadius: 8, background: theme.surfaceHi || theme.bg2 || theme.border, border: `1px solid ${theme.border}`, color: theme.text2, fontSize: 16, lineHeight: 1, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center' };
+}
+
+function RoutineDetail({ theme, routine, onBack, onApply, onEdit }) {
   const c = LIFE_PALETTE[routine.color];
   return (
     <div data-screen-label="Routine Detail" className="lo-fade">
@@ -357,9 +537,11 @@ function RoutineDetail({ theme, routine, onBack, onApply }) {
           <button onClick={onBack} className="lo-press" style={glassBtn}>
             <UIIcon name="chevronL" size={18} color="#fff" strokeWidth={2.2}/>
           </button>
-          <button className="lo-press" style={glassBtn}>
-            <UIIcon name="pencil" size={16} color="#fff" strokeWidth={2}/>
-          </button>
+          {onEdit ? (
+            <button onClick={onEdit} className="lo-press" style={glassBtn}>
+              <UIIcon name="pencil" size={17} color="#fff" strokeWidth={2.2}/>
+            </button>
+          ) : <div style={{ width: 36 }}/>}
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: 8, position: 'relative', zIndex: 2 }}>
           <div className="lo-scale-in" style={{ filter: `drop-shadow(0 12px 24px ${c.to}77)` }}>
@@ -415,10 +597,10 @@ function SearchOverlay({ theme, onClose, onPickTask }) {
   const inputRef = React.useRef(null);
   React.useEffect(() => { setTimeout(() => inputRef.current?.focus(), 50); }, []);
 
-  const all = TODAY_TASKS.filter(t => t.kind !== 'break');
+  const all = LOStore.allTasks().filter(t => t.kind !== 'break');
   const matches = q.trim()
-    ? all.filter(t => (t.title + ' ' + (t.subtitle || '')).toLowerCase().includes(q.toLowerCase()))
-    : all.slice(0, 5);
+    ? all.filter(t => (t.title + ' ' + (t.note || t.subtitle || '')).toLowerCase().includes(q.toLowerCase()))
+    : all.slice().sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)).slice(0, 6);
 
   return (
     <div className="lo-fade" style={{
@@ -512,51 +694,336 @@ function EmptyState({ theme, icon = 'sparkle', title, body, ctaLabel, onCta }) {
 }
 
 // ──────────────────────────────────────────────────────────────
-// DEADLINE CARD — countdown to next exam / important date
-// Only seeded for first-week users
+// HABITS — daily streak tracker, surfaced on the Today screen.
+// This is the soul of the app: build habits, keep the streak alive.
 // ──────────────────────────────────────────────────────────────
-function DeadlineCard({ theme }) {
-  const showSeed = typeof isWithinFirstWeekFromStorage !== 'function' || isWithinFirstWeekFromStorage();
-  if (!showSeed) return null;
-  const deadlines = [
-    { title: 'Examen de Cálculo II', subtitle: 'Universidad de Chile · 14:00', days: 3, color: 'coral', icon: 'pencil' },
-    { title: 'Entrega proyecto Diseño', subtitle: 'Sala 502', days: 7, color: 'plum', icon: 'briefcase' },
-  ];
+function HabitsStrip({ theme, onAdd, onEdit }) {
+  const habits = useHabits();
+  const today = loDateStr();
+  const list = habits.all;
+  // Long-press a habit card → edit/delete sheet; a normal tap toggles today.
+  const timerRef = React.useRef(null);
+  const longRef = React.useRef(false);
+  const startPress = (h) => { longRef.current = false; timerRef.current = setTimeout(() => { longRef.current = true; if (onEdit) onEdit(h); }, 480); };
+  const endPress = () => clearTimeout(timerRef.current);
+  const onTapHabit = (h) => { if (longRef.current) { longRef.current = false; return; } habits.toggleToday(h.id); };
+
+  if (list.length === 0) {
+    return (
+      <div style={{ padding: '4px 16px 8px' }}>
+        <button onClick={onAdd} className="lo-press" style={{
+          width: '100%', display: 'flex', alignItems: 'center', gap: 12, padding: '13px 14px',
+          background: `linear-gradient(135deg, ${LIFE_PALETTE.coral.from}1A, ${theme.surface} 70%)`,
+          border: `1px dashed ${theme.accent}66`, borderRadius: 18, cursor: 'pointer',
+          color: theme.text, fontFamily: 'inherit', textAlign: 'left',
+        }}>
+          <div style={{ width: 38, height: 38, borderRadius: 12, background: theme.accent + '22', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <UIIcon name="flame" size={20} color={theme.accent} strokeWidth={2}/>
+          </div>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 14, fontWeight: 600, letterSpacing: -0.1 }}>Crea tu primer hábito</div>
+            <div style={{ fontSize: 12, color: theme.text2, marginTop: 1 }}>Construye rachas día a día</div>
+          </div>
+          <UIIcon name="plus" size={18} color={theme.accent} strokeWidth={2.4}/>
+        </button>
+      </div>
+    );
+  }
+
   return (
-    <div style={{ padding: '0 20px 12px', display: 'flex', gap: 10, overflowX: 'auto' }}>
-      {deadlines.map((d, i) => {
-        const c = LIFE_PALETTE[d.color];
-        return (
-          <button key={i} className="lo-press lo-lift" style={{
-            flex: '0 0 auto', minWidth: 200, maxWidth: 240,
-            background: `linear-gradient(135deg, ${c.from}22, ${c.to}11)`,
-            border: `0.5px solid ${c.to}55`,
-            borderRadius: 16, padding: '12px 14px',
-            display: 'flex', alignItems: 'center', gap: 12,
-            cursor: 'pointer', color: theme.text, fontFamily: 'inherit', textAlign: 'left',
-          }}>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center',
-              padding: '6px 10px', borderRadius: 10,
-              background: `linear-gradient(135deg, ${c.from}, ${c.to})`,
-              minWidth: 44,
-              boxShadow: `0 4px 12px ${c.to}55`,
+    <div style={{ padding: '2px 0 8px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '4px 24px 8px' }}>
+        <span style={{ fontSize: 10, fontWeight: 700, color: theme.text3, letterSpacing: 1.4, textTransform: 'uppercase' }}>Hábitos</span>
+        <div style={{ flex: 1, height: 0.5, background: theme.border }}/>
+        <button onClick={onAdd} className="lo-press" style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: theme.accent, display: 'flex', padding: 0 }}>
+          <UIIcon name="plus" size={16} color={theme.accent} strokeWidth={2.4}/>
+        </button>
+      </div>
+      <div style={{ display: 'flex', gap: 10, overflowX: 'auto', padding: '2px 16px 4px', scrollbarWidth: 'none' }}>
+        {list.map(h => {
+          const c = LIFE_PALETTE[h.color] || LIFE_PALETTE.coral;
+          const doneToday = !!(h.log || {})[today];
+          const streak = habits.streak(h);
+          return (
+            <button key={h.id} onClick={() => onTapHabit(h)}
+              onPointerDown={() => startPress(h)} onPointerUp={endPress} onPointerLeave={endPress}
+              className="lo-press" style={{
+              flexShrink: 0, width: 96, padding: '12px 10px', borderRadius: 18, cursor: 'pointer',
+              fontFamily: 'inherit', textAlign: 'center',
+              background: doneToday ? `linear-gradient(160deg, ${c.from}, ${c.to})` : theme.surface,
+              border: `0.5px solid ${doneToday ? c.to : theme.border}`,
+              boxShadow: doneToday ? `0 6px 20px ${c.to}44` : '0 2px 8px rgba(0,0,0,0.12)',
+              transition: 'all .2s var(--ease-smooth)',
+              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
             }}>
-              <span style={{ fontSize: 18, fontWeight: 700, color: '#fff', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>{d.days}</span>
-              <span style={{ fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.85)', letterSpacing: 0.4, marginTop: 2 }}>{d.days === 1 ? 'DÍA' : 'DÍAS'}</span>
+              <div style={{ opacity: doneToday ? 1 : 0.92 }}>
+                <LifeIcon name={h.icon} color={doneToday ? h.color : h.color} size={36} shape="squircle"/>
+              </div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: doneToday ? '#fff' : theme.text, letterSpacing: -0.1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%' }}>{h.title}</div>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 3, fontSize: 11, fontWeight: 700,
+                color: doneToday ? 'rgba(255,255,255,0.92)' : (streak > 0 ? theme.accent : theme.text3) }}>
+                <UIIcon name="flame" size={11} color={doneToday ? '#fff' : (streak > 0 ? theme.accent : theme.text3)} strokeWidth={2}/>
+                {streak}
+              </div>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+const HABIT_ICONS = ['fire', 'meditate', 'yoga', 'book', 'walk', 'shower', 'coffee', 'pencil', 'moon', 'pill', 'meal', 'sparkle'];
+const HABIT_COLORS = ['coral', 'amber', 'mint', 'sky', 'lavender', 'rose', 'lime', 'teal'];
+const HABIT_CADENCES = [
+  { id: 'daily',    label: 'Diario' },
+  { id: 'weekdays', label: 'Entre semana' },
+  { id: 'custom',   label: 'Días específicos' },
+];
+const DOW_LABELS = ['D', 'L', 'M', 'X', 'J', 'V', 'S']; // index 0=Sun
+
+// Consistency grid (GitHub-style) for a single habit — the feature Structured
+// doesn't have. 18 weeks back, one column per week, one cell per day.
+function HabitHeatmap({ theme, habit }) {
+  const WEEKS = 18;
+  const c = LIFE_PALETTE[habit.color] || LIFE_PALETTE.coral;
+  const today = new Date();
+  const todayDow = (today.getDay() + 6) % 7; // Mon=0
+  const start = new Date(today);
+  start.setDate(today.getDate() - todayDow - (WEEKS - 1) * 7);
+  const log = habit.log || {};
+  const cols = [];
+  for (let w = 0; w < WEEKS; w++) {
+    const col = [];
+    for (let r = 0; r < 7; r++) {
+      const d = new Date(start); d.setDate(start.getDate() + w * 7 + r);
+      const ds = loDateStr(d);
+      col.push({ ds, done: !!log[ds], future: d > today, scheduled: window.LOStore ? loHabitScheduledOn(habit, ds) : true });
+    }
+    cols.push(col);
+  }
+  return (
+    <div style={{ display: 'flex', gap: 3, overflowX: 'auto', paddingBottom: 2, scrollbarWidth: 'none' }}>
+      {cols.map((col, wi) => (
+        <div key={wi} style={{ display: 'flex', flexDirection: 'column', gap: 3, flexShrink: 0 }}>
+          {col.map((cell, ri) => (
+            <div key={ri} title={cell.ds} style={{
+              width: 12, height: 12, borderRadius: 3,
+              background: cell.future ? 'transparent'
+                : cell.done ? `linear-gradient(135deg, ${c.from}, ${c.to})`
+                : cell.scheduled ? theme.rail : 'transparent',
+              border: cell.future ? `1px dashed ${theme.border}` : (cell.scheduled || cell.done ? 'none' : `1px solid ${theme.rail}`),
+              boxShadow: cell.done ? `0 1px 4px ${c.to}55` : 'none',
+            }}/>
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function HabitStatPill({ theme, label, value, accent }) {
+  return (
+    <div style={{ flex: 1, background: theme.surface, border: `0.5px solid ${theme.border}`, borderRadius: 14, padding: '10px 8px', textAlign: 'center' }}>
+      <div className="lo-display" style={{ fontSize: 20, fontWeight: 600, color: accent || theme.text, letterSpacing: -0.4, fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>{value}</div>
+      <div style={{ fontSize: 9.5, color: theme.text3, fontWeight: 600, letterSpacing: 0.4, textTransform: 'uppercase', marginTop: 4 }}>{label}</div>
+    </div>
+  );
+}
+
+function HabitCreateSheet({ theme, onClose, habit = null }) {
+  const habits = useHabits();
+  const editing = !!habit;
+  const [name, setName] = React.useState(habit?.title || '');
+  const [icon, setIcon] = React.useState(habit?.icon || 'fire');
+  const [color, setColor] = React.useState(habit?.color || 'coral');
+  const [cadence, setCadence] = React.useState(habit?.cadence || 'daily');
+  const [days, setDays] = React.useState(habit?.days || [1, 3, 5]);
+  const c = LIFE_PALETTE[color];
+
+  const toggleDay = (d) => setDays(prev => prev.includes(d) ? prev.filter(x => x !== d) : [...prev, d].sort());
+
+  const save = () => {
+    if (!name.trim()) return;
+    const payload = { title: name.trim(), icon, color, cadence, days: cadence === 'custom' ? days : null };
+    if (editing) {
+      habits.update(habit.id, payload);
+      toast('Hábito actualizado', { tone: 'success', icon: 'check' });
+    } else {
+      habits.add(payload);
+      toast(`Hábito "${name.trim()}" creado`, { tone: 'success', icon: 'check' });
+    }
+    onClose();
+  };
+
+  const del = () => {
+    if (typeof window !== 'undefined' && !window.confirm(`¿Borrar el hábito "${habit.title}"? Se pierde su racha.`)) return;
+    habits.remove(habit.id);
+    toast('Hábito eliminado', { icon: 'trash' });
+    onClose();
+  };
+
+  return (
+    <div data-screen-label="New Habit">
+      <div style={{
+        background: `linear-gradient(165deg, ${c.from} 0%, ${c.to} 55%, ${theme.bg} 100%)`,
+        padding: '0 16px 26px', position: 'relative', overflow: 'hidden',
+      }}>
+        <div style={{ position: 'absolute', top: -90, right: -50, width: 240, height: 240, borderRadius: '50%', background: `radial-gradient(circle, ${c.from}55, transparent 70%)` }}/>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: 54, position: 'relative', zIndex: 2 }}>
+          <button onClick={onClose} className="lo-press" style={glassBtn}><UIIcon name="x" size={16} color="#fff" strokeWidth={2.5}/></button>
+          <span style={{ fontSize: 12.5, fontWeight: 700, color: 'rgba(255,255,255,0.9)', letterSpacing: 0.6, textTransform: 'uppercase' }}>{editing ? 'Editar hábito' : 'Nuevo hábito'}</span>
+          {editing
+            ? <button onClick={del} className="lo-press" style={glassBtn}><UIIcon name="trash" size={16} color="#fff" strokeWidth={2}/></button>
+            : <div style={{ width: 36 }}/>}
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: 6, position: 'relative', zIndex: 2 }}>
+          <div className="lo-scale-in" style={{ filter: `drop-shadow(0 12px 26px ${c.to}AA)` }}>
+            <LifeIcon name={icon} color={color} size={80} shape="squircle"/>
+          </div>
+          <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Nombre del hábito" autoFocus
+            onKeyDown={(e) => { if (e.key === 'Enter') save(); }}
+            style={{ marginTop: 16, width: '100%', background: 'transparent', border: 'none', outline: 'none',
+              textAlign: 'center', fontSize: 24, fontWeight: 700, color: '#fff', letterSpacing: -0.5,
+              fontFamily: 'inherit', caretColor: 'rgba(255,255,255,0.8)' }}/>
+        </div>
+      </div>
+
+      <div style={{ padding: '16px 16px 28px' }}>
+        {editing && (
+          <div className="lo-fade" style={{ marginBottom: 6 }}>
+            <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+              <HabitStatPill theme={theme} label="Racha" value={habits.streak(habit)} accent={c.to}/>
+              <HabitStatPill theme={theme} label="Mejor" value={loHabitBestStreak(habit)}/>
+              <HabitStatPill theme={theme} label="30 días" value={loHabitRate(habit, 30) + '%'}/>
             </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 13, fontWeight: 600, color: theme.text, letterSpacing: -0.1,
-                whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{d.title}</div>
-              <div style={{ fontSize: 11, color: theme.text2, marginTop: 2,
-                whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{d.subtitle}</div>
+            <SectionLabel theme={theme}>Consistencia</SectionLabel>
+            <div style={{ background: theme.surface, border: `0.5px solid ${theme.border}`, borderRadius: 16, padding: 14 }}>
+              <HabitHeatmap theme={theme} habit={habit}/>
             </div>
-          </button>
-        );
-      })}
+          </div>
+        )}
+        <SectionLabel theme={theme}>Ícono</SectionLabel>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 8 }}>
+          {HABIT_ICONS.map(ic => (
+            <button key={ic} onClick={() => setIcon(ic)} className="lo-press" style={{
+              aspectRatio: '1', borderRadius: 14, cursor: 'pointer',
+              background: icon === ic ? theme.accentSoft : theme.surface,
+              border: `1.5px solid ${icon === ic ? theme.accent : theme.border}`,
+              display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0,
+            }}><LifeIcon name={ic} color={color} size={28} shape="rounded"/></button>
+          ))}
+        </div>
+
+        <SectionLabel theme={theme}>Color</SectionLabel>
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+          {HABIT_COLORS.map(col => {
+            const cc = LIFE_PALETTE[col];
+            return (
+              <button key={col} onClick={() => setColor(col)} className="lo-press" style={{
+                width: 36, height: 36, borderRadius: 18, cursor: 'pointer', padding: 0, border: 'none',
+                background: `linear-gradient(135deg, ${cc.from}, ${cc.to})`,
+                boxShadow: color === col ? `0 0 0 2px ${theme.bg}, 0 0 0 4px ${cc.to}` : 'none',
+              }}/>
+            );
+          })}
+        </div>
+
+        <SectionLabel theme={theme}>Frecuencia</SectionLabel>
+        <div style={{ display: 'flex', gap: 8 }}>
+          {HABIT_CADENCES.map(cd => {
+            const active = cadence === cd.id;
+            return (
+              <button key={cd.id} onClick={() => setCadence(cd.id)} className="lo-press" style={{
+                flex: 1, padding: '10px 6px', borderRadius: 13, cursor: 'pointer', fontFamily: 'inherit',
+                background: active ? theme.accentSoft : theme.surface,
+                border: `1.5px solid ${active ? theme.accent : theme.border}`,
+                color: active ? theme.accent : theme.text2, fontSize: 12.5, fontWeight: active ? 700 : 500,
+              }}>{cd.label}</button>
+            );
+          })}
+        </div>
+        {cadence === 'custom' && (
+          <div className="lo-fade" style={{ display: 'flex', gap: 6, marginTop: 10, justifyContent: 'space-between' }}>
+            {[1, 2, 3, 4, 5, 6, 0].map(d => {
+              const active = days.includes(d);
+              return (
+                <button key={d} onClick={() => toggleDay(d)} className="lo-press" style={{
+                  flex: 1, aspectRatio: '1', borderRadius: '50%', cursor: 'pointer', fontFamily: 'inherit',
+                  background: active ? `linear-gradient(135deg, ${c.from}, ${c.to})` : theme.surface,
+                  border: `1.5px solid ${active ? 'transparent' : theme.border}`,
+                  color: active ? '#fff' : theme.text2, fontSize: 13, fontWeight: 700,
+                }}>{DOW_LABELS[d]}</button>
+              );
+            })}
+          </div>
+        )}
+
+        <button onClick={save} disabled={!name.trim()} className="lo-press" style={{
+          marginTop: 24, width: '100%', height: 54, borderRadius: 18, border: 'none',
+          background: name.trim() ? `linear-gradient(135deg, ${c.from}, ${c.to})` : theme.rail,
+          color: name.trim() ? '#fff' : theme.text3, fontSize: 16, fontWeight: 700,
+          cursor: name.trim() ? 'pointer' : 'default', fontFamily: 'inherit',
+          boxShadow: name.trim() ? `0 8px 28px ${c.to}66` : 'none',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+        }}>
+          <UIIcon name="fire" size={18} color={name.trim() ? '#fff' : theme.text3} strokeWidth={2.2}/>
+          {editing ? 'Guardar cambios' : 'Empezar a construir el hábito'}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ──────────────────────────────────────────────────────────────
+// DEADLINE CARD — surfaces upcoming hard due dates with a countdown
+// ──────────────────────────────────────────────────────────────
+function DeadlineCard({ theme, onOpenTask }) {
+  const items = (typeof LOStore !== 'undefined') ? LOStore.upcomingDeadlines(3) : [];
+  if (!items.length) return null;
+
+  const daysLeft = (ds) => {
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    const [y, m, d] = ds.split('-').map(Number);
+    return Math.round((new Date(y, m - 1, d) - today) / 86400000);
+  };
+  const countLabel = (n) => n <= 0 ? 'Vence hoy' : n === 1 ? 'Mañana' : `${n} días`;
+  const niceDate = (ds) => { const [y, m, d] = ds.split('-').map(Number); return new Date(y, m - 1, d).toLocaleDateString('es-CL', { weekday: 'short', day: 'numeric', month: 'short' }); };
+
+  return (
+    <div style={{ padding: '4px 16px 14px' }}>
+      <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase', color: theme.text3, margin: '0 2px 8px' }}>Fechas límite</div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        {items.map((t) => {
+          const n = daysLeft(t.deadline);
+          const urgent = n <= 1;
+          const c = LIFE_PALETTE[t.color] || LIFE_PALETTE.coral;
+          return (
+            <button key={t.id} onClick={() => onOpenTask && onOpenTask(t)} className="lo-press lo-lift" style={{
+              display: 'flex', alignItems: 'center', gap: 12, width: '100%', textAlign: 'left',
+              padding: '11px 13px', borderRadius: 16, cursor: 'pointer',
+              background: theme.surface, border: `0.5px solid ${urgent ? `${c.to}66` : theme.border}`,
+            }}>
+              <LifeIcon name={t.icon} color={t.color} size={36} shape="rounded"/>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 14.5, fontWeight: 600, color: theme.text, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{t.title}</div>
+                <div style={{ fontSize: 12, color: theme.text3, textTransform: 'capitalize' }}>{niceDate(t.deadline)}</div>
+              </div>
+              <div className="lo-display" style={{
+                fontSize: 12.5, fontWeight: 700, padding: '5px 11px', borderRadius: 10,
+                color: urgent ? '#fff' : c.to,
+                background: urgent ? `linear-gradient(135deg, ${c.from}, ${c.to})` : `${c.to}1f`,
+                whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums',
+              }}>{countLabel(n)}</div>
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }
 
 Object.assign(window, {
   FocusMode, QuickAddMenu, RoutinesScreen, SearchOverlay, EmptyState, DeadlineCard, ROUTINES,
+  HabitsStrip, HabitCreateSheet, HabitHeatmap, HabitStatPill,
 });

@@ -71,8 +71,8 @@ function TimelineTopBar({ theme, userName, onOpen }) {
           whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
           {greeting}, {userName || 'amigo'}
         </div>
-        <h1 style={{ margin: '2px 0 0', fontSize: 30, fontWeight: 700, color: theme.text, letterSpacing: -0.7 }}>
-          {dayName} <span style={{ color: theme.accent, fontWeight: 400 }}>{dayNum}</span>
+        <h1 className="lo-display" style={{ margin: '2px 0 0', fontSize: 32, fontWeight: 600, color: theme.text, letterSpacing: -0.5 }}>
+          {dayName} <span style={{ color: theme.accent }}>{dayNum}</span>
         </h1>
       </div>
       <div style={{ display: 'flex', gap: 6, alignItems: 'center', color: theme.text2, paddingTop: 4, flexShrink: 0 }}>
@@ -93,99 +93,150 @@ function TimelineTopBar({ theme, userName, onOpen }) {
 // ──────────────────────────────────────────────────────────────
 // Below-the-fold header content — progress + week selector (scrolls)
 // ──────────────────────────────────────────────────────────────
-// Build real current week (Mon–Sun containing today)
+// Build real current week (Mon–Sun containing today), includes ISO dateStr for task filtering
 function buildCurrentWeek() {
   const today = new Date();
   const todayD = today.getDate();
-  const dow = today.getDay(); // 0=Sun,1=Mon..6=Sat
+  const dow = today.getDay();
   const monday = new Date(today);
   monday.setDate(today.getDate() - ((dow + 6) % 7));
   const SHORT = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
   return Array.from({ length: 7 }, (_, i) => {
     const d = new Date(monday);
     d.setDate(monday.getDate() + i);
-    return { d: d.getDate(), label: SHORT[d.getDay()], today: d.getDate() === todayD && d.getMonth() === today.getMonth() && d.getFullYear() === today.getFullYear(), dots: [] };
+    const dateStr = loDateStr(d);
+    return {
+      d: d.getDate(), label: SHORT[d.getDay()], dateStr,
+      today: d.getDate() === todayD && d.getMonth() === today.getMonth() && d.getFullYear() === today.getFullYear(),
+      dots: [],
+    };
   });
 }
 
 function TimelineHeaderBody({ theme, userTasks }) {
-  const seedTasks = (typeof getTodayTasks === 'function' ? getTodayTasks() : TODAY_TASKS_RAW).filter(t => t.kind !== 'break');
-  const extra = (userTasks || []).filter(t => t.kind !== 'break');
-  const tasks = [...seedTasks, ...extra];
+  const todayStr = loDateStr();
+  const tasks = (LOStore.tasksForDate(todayStr) || []).filter(t => t.kind !== 'break');
   const done = tasks.filter(t => t.status === 'done').length;
   const total = tasks.length;
   const pct = total > 0 ? Math.round((done / total) * 100) : 0;
   const next = tasks.find(t => t.status === 'todo' || t.status === 'doing');
 
   const week = buildCurrentWeek();
+  const weekWithDots = week.map(day => ({
+    ...day,
+    dots: (userTasks || []).filter(t => t.targetDate === day.dateStr).slice(0, 4).map(t => t.color),
+    count: (userTasks || []).filter(t => t.targetDate === day.dateStr).length,
+  }));
+
+  const r = 30, C = 2 * Math.PI * r;
 
   return (
-    <div style={{ padding: '0 20px 14px' }}>
-      {/* Progress card */}
+    <div style={{ padding: '0 16px 16px' }}>
+      {/* Premium progress card */}
       <div className="lo-slide-in" style={{
-        padding: '12px 14px',
-        background: theme.surface, borderRadius: 16,
-        border: `0.5px solid ${theme.border}`,
-        display: 'flex', alignItems: 'center', gap: 12,
+        borderRadius: 24, position: 'relative', overflow: 'hidden',
+        background: total > 0
+          ? `linear-gradient(145deg, ${theme.accent}1C 0%, ${theme.accentSoft} 100%)`
+          : theme.surface,
+        border: `0.5px solid ${total > 0 ? theme.accent + '55' : theme.border}`,
+        padding: '16px',
+        boxShadow: total > 0
+          ? `0 8px 32px ${theme.accent}18, inset 0 1px 0 rgba(255,255,255,0.06)`
+          : `0 2px 8px rgba(0,0,0,0.14)`,
       }}>
-        <div style={{ position: 'relative', width: 40, height: 40 }}>
-          <svg width="40" height="40" viewBox="0 0 40 40">
-            <circle cx="20" cy="20" r="16" stroke={theme.rail} strokeWidth="3" fill="none"/>
-            {total > 0 && (
-              <circle cx="20" cy="20" r="16" stroke={theme.accent} strokeWidth="3" fill="none"
-                strokeDasharray={2 * Math.PI * 16} strokeDashoffset={(2 * Math.PI * 16) * (1 - pct/100)}
-                strokeLinecap="round" transform="rotate(-90 20 20)"
-                style={{ transition: 'stroke-dashoffset .6s var(--ease-out-quart)' }}/>
+        {total > 0 && (
+          <div style={{
+            position: 'absolute', top: -50, right: -30, width: 180, height: 180, borderRadius: '50%',
+            background: `radial-gradient(circle, ${theme.accent}1E 0%, transparent 65%)`,
+            pointerEvents: 'none',
+          }}/>
+        )}
+        <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 16 }}>
+          {/* Big progress ring */}
+          <div style={{ position: 'relative', width: 68, height: 68, flexShrink: 0 }}>
+            <svg width="68" height="68" viewBox="0 0 68 68">
+              <circle cx="34" cy="34" r={r} stroke={theme.rail} strokeWidth="5" fill="none"/>
+              {total > 0 && (
+                <circle cx="34" cy="34" r={r} stroke={theme.accent} strokeWidth="5" fill="none"
+                  strokeDasharray={C} strokeDashoffset={C * (1 - pct / 100)}
+                  strokeLinecap="round" transform="rotate(-90 34 34)"
+                  style={{ transition: 'stroke-dashoffset .8s var(--ease-out-quart)' }}/>
+              )}
+            </svg>
+            <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+              {total > 0 ? (
+                <>
+                  <span style={{ fontSize: 17, fontWeight: 800, color: theme.text, lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>{pct}</span>
+                  <span style={{ fontSize: 9, color: theme.text3, fontWeight: 700, marginTop: 1 }}>%</span>
+                </>
+              ) : (
+                <UIIcon name="sparkle" size={22} color={theme.text3} strokeWidth={1.5}/>
+              )}
+            </div>
+          </div>
+
+          {/* Text side */}
+          <div style={{ flex: 1, minWidth: 0 }}>
+            {total > 0 ? (
+              <>
+                <div className="lo-display" style={{ fontSize: 24, fontWeight: 600, color: theme.text, letterSpacing: -0.5, lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
+                  {done} <span style={{ fontSize: 14, color: theme.text2, fontWeight: 500, fontFamily: 'var(--font-ui)' }}>de {total} {total === 1 ? 'tarea' : 'tareas'}</span>
+                </div>
+                <div style={{ marginTop: 8, height: 3, background: theme.rail, borderRadius: 2, overflow: 'hidden' }}>
+                  <div style={{
+                    width: `${pct}%`, height: '100%',
+                    background: `linear-gradient(90deg, ${theme.accent}AA, ${theme.accent})`,
+                    borderRadius: 2, transition: 'width .8s var(--ease-out-quart)',
+                  }}/>
+                </div>
+                {next ? (
+                  <div style={{ marginTop: 7, display: 'flex', alignItems: 'center', gap: 5 }}>
+                    <span style={{ fontSize: 9, padding: '2px 7px', borderRadius: 999, background: theme.accent + '22', color: theme.accent, fontWeight: 700, letterSpacing: 0.4, flexShrink: 0 }}>SIGUE</span>
+                    <span style={{ fontSize: 12, color: theme.text2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{next.title}</span>
+                  </div>
+                ) : done === total && total > 0 ? (
+                  <div style={{ marginTop: 7, fontSize: 12, color: theme.accent, fontWeight: 600 }}>¡Todo listo para hoy!</div>
+                ) : null}
+              </>
+            ) : (
+              <>
+                <div style={{ fontSize: 18, fontWeight: 700, color: theme.text, letterSpacing: -0.3 }}>Tu día empieza aquí</div>
+                <div style={{ fontSize: 12.5, color: theme.text2, marginTop: 4, lineHeight: 1.4 }}>
+                  Toca <span style={{ fontWeight: 700, color: theme.accent }}>+</span> para añadir tu primera tarea de hoy.
+                </div>
+              </>
             )}
-          </svg>
-          <span style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: total > 0 ? 11 : 13, fontWeight: 700,
-            color: total > 0 ? theme.text : theme.text3,
-            fontVariantNumeric: 'tabular-nums' }}>
-            {total > 0 ? pct : '·'}
-          </span>
+          </div>
         </div>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          {total > 0 ? (
-            <>
-              <div style={{ fontSize: 14, fontWeight: 600, color: theme.text, letterSpacing: -0.1 }}>
-                {done} de {total} {total === 1 ? 'tarea hecha' : 'tareas hechas'}
-              </div>
-              <div style={{ fontSize: 11.5, color: theme.text2, marginTop: 1 }}>
-                {next ? `Siguiente: ${next.title}` : '¡Todo listo por hoy! 🎉'}
-              </div>
-            </>
-          ) : (
-            <>
-              <div style={{ fontSize: 14, fontWeight: 600, color: theme.text, letterSpacing: -0.1 }}>
-                Tu día empieza vacío
-              </div>
-              <div style={{ fontSize: 11.5, color: theme.text2, marginTop: 1 }}>
-                Toca + para agendar tu primera tarea.
-              </div>
-            </>
-          )}
-        </div>
-        <UIIcon name="chevronR" size={14} color={theme.text3}/>
       </div>
 
-      {/* Real week selector */}
+      {/* Week strip with per-day task dots */}
       <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 14 }}>
-        {week.map((day) => (
+        {weekWithDots.map((day) => (
           <button key={day.d + day.label} className="lo-press" style={{
             background: 'transparent', border: 'none', cursor: 'pointer',
-            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, width: 38, padding: 0,
+            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, width: 40, padding: 0,
           }}>
-            <span style={{ fontSize: 11, color: day.today ? theme.accent : theme.text3, fontWeight: 600, letterSpacing: 0.3 }}>{day.label}</span>
+            <span style={{ fontSize: 10, color: day.today ? theme.accent : theme.text3, fontWeight: 600, letterSpacing: 0.3 }}>{day.label}</span>
             <div style={{
               width: 34, height: 34, borderRadius: 17,
               background: day.today ? theme.accent : 'transparent',
               color: day.today ? '#fff' : theme.text,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 15, fontWeight: day.today ? 700 : 500,
-              boxShadow: day.today ? `0 4px 12px ${theme.accent}55` : 'none',
-              transition: 'all .25s var(--ease-out-back)',
+              fontSize: 14.5, fontWeight: day.today ? 700 : 500,
+              boxShadow: day.today ? `0 4px 14px ${theme.accent}66` : 'none',
+              border: day.count > 0 && !day.today ? `1.5px solid ${theme.border}` : 'none',
+              transition: 'all .2s var(--ease-out-back)',
             }}>{day.d}</div>
+            <div style={{ display: 'flex', gap: 2, height: 5 }}>
+              {day.dots.slice(0, 3).map((color, k) => (
+                <div key={k} style={{
+                  width: 4, height: 4, borderRadius: 2,
+                  background: day.today ? 'rgba(255,255,255,0.7)' : (LIFE_PALETTE[color] || LIFE_PALETTE.coral).to,
+                }}/>
+              ))}
+              {day.dots.length === 0 && <div style={{ width: 4, height: 4 }}/>}
+            </div>
           </button>
         ))}
       </div>
@@ -216,29 +267,8 @@ function btn(theme) {
 // Quick Actions row — favorite tasks one tap to schedule
 // ──────────────────────────────────────────────────────────────
 function QuickActionsRow({ theme, onAdd }) {
-  const showSeed = typeof isWithinFirstWeekFromStorage !== 'function' || isWithinFirstWeekFromStorage();
   return (
     <div style={{ display: 'flex', gap: 10, padding: '0 20px 16px', overflowX: 'auto' }}>
-      {showSeed && QUICK_ACTIONS.map((q) => (
-        <button key={q.id} className="lo-press lo-lift" style={{
-          flex: '0 0 auto', width: 80, height: 96,
-          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8,
-          padding: '10px 6px',
-          background: theme.surface, borderRadius: 20,
-          border: `0.5px solid ${theme.border}`,
-          cursor: 'pointer', color: theme.text, fontFamily: 'inherit',
-        }}>
-          <LifeIcon name={q.icon} color={q.color} size={38} shape="rounded" />
-          <span style={{
-            fontSize: 11, fontWeight: 500, color: theme.text2,
-            textAlign: 'center', lineHeight: 1.2,
-            display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
-            overflow: 'hidden',
-          }}>
-            {q.label}
-          </span>
-        </button>
-      ))}
       <button onClick={onAdd} className="lo-press" style={{
         flex: '0 0 auto', width: 80, height: 96,
         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8,
@@ -251,7 +281,7 @@ function QuickActionsRow({ theme, onAdd }) {
           <UIIcon name="plus" size={18} color={theme.text3} strokeWidth={2}/>
         </div>
         <span style={{ fontSize: 11, fontWeight: 500, lineHeight: 1.2 }}>
-          {showSeed ? 'Añadir' : 'Crear acceso'}
+          Crear acceso
         </span>
       </button>
     </div>
@@ -296,17 +326,22 @@ function StatusRing({ task, theme }) {
 // ──────────────────────────────────────────────────────────────
 // VARIANT 1: Classic — pill-rail timeline (the main one)
 // ──────────────────────────────────────────────────────────────
-function TimelineClassic({ theme, dense, blockShape, currentTime = '07:55', onOpenTask, onAdd, userTasks }) {
+function TimelineClassic({ theme, dense, blockShape, currentTime = '07:55', onOpenTask, onAdd, onToggle, userTasks }) {
   const d = dense ? DENSITY.compact : DENSITY.comfy;
-  const seed = (typeof getTodayTasks === 'function' ? getTodayTasks() : TODAY_TASKS_RAW);
-  const tasks = [...seed, ...(userTasks || [])].sort((a, b) => (a.start || '').localeCompare(b.start || ''));
+  // Pull today's concrete tasks straight from the store so recurring
+  // templates expand into occurrences and completions stay in sync.
+  const todayStr = loDateStr();
+  const all = (LOStore.tasksForDate(todayStr) || []);
+  // All-day tasks have no time slot — they ride a pill row above the timeline.
+  const allDayTasks = all.filter(t => t.allDay);
+  const tasks = all.filter(t => !t.allDay);
 
   // Compute remaining minutes for active task
   const [nowH, nowM] = currentTime.split(':').map(Number);
   const nowMins = nowH * 60 + nowM;
 
-  // Empty state — no tasks for today
-  if (tasks.length === 0) {
+  // Empty state — nothing scheduled today (timed or all-day)
+  if (tasks.length === 0 && allDayTasks.length === 0) {
     return (
       <div style={{ paddingTop: 12, paddingBottom: 40 }}>
         <EmptyState theme={theme}
@@ -336,6 +371,28 @@ function TimelineClassic({ theme, dense, blockShape, currentTime = '07:55', onOp
   let rowIdx = 0;
   return (
     <div className="lo-stagger" style={{ paddingBottom: 120 }}>
+      {allDayTasks.length > 0 && (
+        <div style={{ '--i': rowIdx++, padding: '4px 16px 8px' }}>
+          <div style={{ fontSize: 10, fontWeight: 700, color: theme.text3, letterSpacing: 1.4, textTransform: 'uppercase', margin: '0 8px 8px' }}>Todo el día</div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+            {allDayTasks.map((t) => {
+              const c = LIFE_PALETTE[t.color] || LIFE_PALETTE.coral;
+              const isDone = t.status === 'done';
+              return (
+                <div key={t.id} role="button" tabIndex={0} onClick={() => onOpenTask && onOpenTask(t)} className="lo-press" style={{
+                  display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer',
+                  padding: '8px 13px 8px 9px', borderRadius: 13, opacity: isDone ? 0.5 : 1,
+                  background: `linear-gradient(135deg, ${c.from}26, ${c.to}1a)`,
+                  border: `0.5px solid ${c.to}3a`,
+                }}>
+                  <LifeIcon name={t.icon} color={t.color} size={26} shape={blockShape === 'pill' ? 'pill' : 'rounded'}/>
+                  <span style={{ fontSize: 13.5, fontWeight: 600, color: theme.text, textDecoration: isDone ? 'line-through' : 'none' }}>{t.title}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
       {groups.map((sec) => {
         const sectionHeader = (
           <div key={sec.id + '-h'} style={{ '--i': rowIdx++, padding: '10px 24px 8px', display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -346,81 +403,88 @@ function TimelineClassic({ theme, dense, blockShape, currentTime = '07:55', onOp
         );
         const rows = sec.items.map((t, i) => {
           if (t.kind === 'break') return <BreakRow key={t.id} task={t} theme={theme} dense={dense} />;
-          const isLast = i === sec.items.length - 1;
           const isActive = t.status === 'doing';
           const isDone = t.status === 'done';
-          const radius = blockShape === 'pill' ? 999 : blockShape === 'squircle' ? 26 : 22;
           const c = LIFE_PALETTE[t.color];
           const [eh, em] = t.end.split(':').map(Number);
           const remaining = isActive ? Math.max(0, (eh * 60 + em) - nowMins) : 0;
+          // Compact time string: "9:30a" instead of "9:30 AM"
+          const shortTime = (hhmm) => fmt12(hhmm).replace(' AM','a').replace(' PM','p');
           return (
-            <div key={t.id} style={{ '--i': rowIdx++, display: 'flex', gap: 12, padding: '0 16px', marginBottom: d.rowGap, opacity: isDone ? 0.5 : 1 }}>
-              <div style={{ width: 54, flexShrink: 0, paddingTop: 8, textAlign: 'right' }}>
-                <div style={{ fontSize: d.timeSize, color: isActive ? theme.accent : theme.text3, fontVariantNumeric: 'tabular-nums', fontWeight: isActive ? 700 : 500, letterSpacing: -0.2 }}>
-                  {fmt12(t.start)}
-                </div>
-                <div style={{ fontSize: d.timeSize - 1, color: theme.text3, opacity: 0.55, fontVariantNumeric: 'tabular-nums', marginTop: 2 }}>
-                  {fmt12(t.end)}
+            <div key={t.id} style={{ '--i': rowIdx++, display: 'flex', gap: 8, padding: '0 16px', marginBottom: d.rowGap + 6, opacity: isDone ? 0.5 : 1 }}>
+              {/* Slim time column */}
+              <div style={{ width: 38, flexShrink: 0, paddingTop: 16, textAlign: 'right' }}>
+                <div style={{ fontSize: 10.5, color: isActive ? theme.accent : theme.text3, fontVariantNumeric: 'tabular-nums', fontWeight: isActive ? 700 : 500, letterSpacing: -0.2, lineHeight: 1.2 }}>
+                  {shortTime(t.start)}
                 </div>
               </div>
-              <div style={{ position: 'relative', width: d.iconSize + 12, flexShrink: 0, display: 'flex', justifyContent: 'center' }}>
-                <div style={{
-                  position: 'absolute', top: 0, bottom: isLast ? 12 : -d.rowGap, left: '50%',
-                  transform: 'translateX(-50%)',
-                  width: d.iconSize + 8, borderRadius: radius,
-                  background: isActive ? `linear-gradient(180deg, ${c.from}40 0%, ${c.to}20 100%)` : theme.surface,
-                  border: `0.5px solid ${isActive ? c.to + '88' : theme.border}`,
-                  boxShadow: isActive ? `0 0 0 4px ${c.to}11, 0 8px 24px ${c.to}22` : 'none',
-                }}/>
-                <div style={{ position: 'relative', paddingTop: 4 }}>
-                  <LifeIcon name={t.icon} color={t.color} size={d.iconSize} shape={blockShape === 'pill' ? 'pill' : 'rounded'} />
-                </div>
-              </div>
-              <button onClick={() => onOpenTask && onOpenTask(t)} className="lo-press" style={{
-                flex: 1, minWidth: 0,
-                background: 'transparent', border: 'none', cursor: 'pointer',
-                textAlign: 'left', padding: `${d.cardPad - 2}px 4px ${d.cardPad - 2}px 4px`,
-                color: theme.text, fontFamily: 'inherit',
+              {/* Full-width card with colored left accent bar (div so the
+                  status ring can be its own button — no nested buttons) */}
+              <div role="button" tabIndex={0} onClick={() => onOpenTask && onOpenTask(t)} className="lo-press" style={{
+                flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 12,
+                padding: '12px 12px 12px 14px',
+                background: isActive
+                  ? `linear-gradient(135deg, ${c.from}1E 0%, ${c.to}0F 100%)`
+                  : theme.surface,
+                borderRadius: 20,
+                border: `0.5px solid ${isActive ? c.to + '66' : theme.border}`,
+                borderLeft: `3.5px solid ${isActive ? c.to : c.to + 'AA'}`,
+                cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit', color: theme.text,
+                boxShadow: isActive
+                  ? `0 6px 24px ${c.to}28, inset 0 1px 0 rgba(255,255,255,0.06)`
+                  : `0 2px 10px rgba(0,0,0,0.14), inset 0 1px 0 rgba(255,255,255,0.04)`,
+                transition: 'all .2s var(--ease-smooth)',
               }}>
-                {isActive ? (
-                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, marginBottom: 3, paddingLeft: 4 }}>
-                    <span className="lo-pulse" style={{
-                      width: 6, height: 6, borderRadius: 3, background: theme.accent, flexShrink: 0,
-                      '--pulse-c': theme.accent + '99', '--pulse-c-end': theme.accent + '00',
-                    }}/>
-                    <span style={{ fontSize: d.subSize, color: theme.accent, fontWeight: 700, letterSpacing: 0.2 }}>
-                      {remaining}m restantes
-                    </span>
-                  </div>
-                ) : (
-                  <div style={{ fontSize: d.subSize, color: theme.text2, fontVariantNumeric: 'tabular-nums', marginBottom: 2 }}>
-                    {fmt12(t.start)}–{fmt12(t.end)} <span style={{ opacity: 0.55 }}>({minutesBetween(t.start, t.end)} min)</span>
-                  </div>
-                )}
-                <div style={{ fontSize: d.titleSize, fontWeight: 600, letterSpacing: -0.2, textDecoration: isDone ? 'line-through' : 'none', textDecorationColor: theme.text3 }}>
-                  {t.title}
-                </div>
-                {t.subtitle && !isDone && (
-                  <div style={{ fontSize: d.subSize, color: theme.text2, marginTop: 3 }}>{t.subtitle}</div>
-                )}
-                {t.subtasks && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 6 }}>
-                    <span style={{ fontSize: 10.5, color: theme.text3, fontWeight: 500, fontVariantNumeric: 'tabular-nums' }}>
-                      {t.subtasks.done}/{t.subtasks.total}
-                    </span>
-                    <div style={{ height: 3, flex: 1, maxWidth: 90, background: theme.rail, borderRadius: 2, overflow: 'hidden' }}>
-                      <div style={{ width: `${(t.subtasks.done/t.subtasks.total)*100}%`, height: '100%', background: c.to }}/>
+                <LifeIcon name={t.icon} color={t.color} size={d.iconSize} shape={blockShape === 'pill' ? 'pill' : 'rounded'} />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  {isActive ? (
+                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, marginBottom: 2 }}>
+                      <span className="lo-pulse" style={{
+                        width: 5, height: 5, borderRadius: 3, background: theme.accent, flexShrink: 0,
+                        '--pulse-c': theme.accent + '99', '--pulse-c-end': theme.accent + '00',
+                      }}/>
+                      <span style={{ fontSize: 10.5, color: theme.accent, fontWeight: 700, letterSpacing: 0.3 }}>
+                        {remaining}m restantes
+                      </span>
                     </div>
+                  ) : (
+                    <div style={{ fontSize: 10.5, color: theme.text3, fontVariantNumeric: 'tabular-nums', marginBottom: 2 }}>
+                      {minutesBetween(t.start, t.end)} min
+                    </div>
+                  )}
+                  <div style={{ fontSize: d.titleSize, fontWeight: 600, letterSpacing: -0.2, color: theme.text, textDecorationLine: isDone ? 'line-through' : 'none', textDecorationColor: theme.text3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {t.title}
                   </div>
-                )}
-                {t.alarm && !isDone && (
-                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, marginTop: 6, fontSize: 10.5, color: theme.text3 }}>
-                    <UIIcon name="bell" size={11} color={theme.text3} strokeWidth={1.8}/> Recordatorio
-                  </div>
-                )}
-              </button>
-              <div style={{ paddingTop: 10, flexShrink: 0 }}>
-                <StatusRing task={t} theme={theme}/>
+                  {t.subtitle && !isDone && (
+                    <div style={{ fontSize: d.subSize, color: theme.text2, marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.subtitle}</div>
+                  )}
+                  {(() => {
+                    const prog = loSubProgress(t);
+                    if (!prog) return null;
+                    return (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 5 }}>
+                        <div style={{ height: 3, flex: 1, maxWidth: 80, background: theme.rail, borderRadius: 2, overflow: 'hidden' }}>
+                          <div style={{ width: `${(prog.done / prog.total) * 100}%`, height: '100%', background: c.to }}/>
+                        </div>
+                        <span style={{ fontSize: 10, color: theme.text3, fontVariantNumeric: 'tabular-nums' }}>
+                          {prog.done}/{prog.total}
+                        </span>
+                      </div>
+                    );
+                  })()}
+                  {t.alarm && !isDone && (
+                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, marginTop: 4, fontSize: 10, color: theme.text3 }}>
+                      <UIIcon name="bell" size={10} color={theme.text3} strokeWidth={1.8}/> Recordatorio
+                    </div>
+                  )}
+                </div>
+                <button onClick={(e) => { e.stopPropagation(); onToggle && onToggle(t.id); }} className="lo-press"
+                  title={isDone ? 'Reabrir' : 'Completar'} style={{
+                    background: 'transparent', border: 'none', padding: 4, margin: -4, cursor: 'pointer', flexShrink: 0,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>
+                  <StatusRing task={t} theme={theme}/>
+                </button>
               </div>
             </div>
           );
@@ -484,7 +548,7 @@ function TimelineCards({ theme, dense, blockShape }) {
               <div style={{ fontSize: 11.5, color: theme.text3, fontVariantNumeric: 'tabular-nums', fontWeight: 500 }}>
                 {fmt12(t.start)} · {minutesBetween(t.start, t.end)} min
               </div>
-              <div style={{ fontSize: 16, fontWeight: 600, color: theme.text, marginTop: 2, letterSpacing: -0.2, textDecoration: t.status === 'done' ? 'line-through' : 'none' }}>
+              <div style={{ fontSize: 16, fontWeight: 600, color: theme.text, marginTop: 2, letterSpacing: -0.2, textDecorationLine: t.status === 'done' ? 'line-through' : 'none' }}>
                 {t.title}
               </div>
               {t.subtitle && <div style={{ fontSize: 12, color: theme.text2, marginTop: 2 }}>{t.subtitle}</div>}
@@ -580,7 +644,7 @@ function TimelineMinimal({ theme }) {
               <div style={{ fontSize: 10.5, letterSpacing: 0.4, color: theme.text3, fontWeight: 600, textTransform: 'uppercase' }}>
                 {fmt12(t.start)} — {fmt12(t.end)}
               </div>
-              <div style={{ fontSize: 17, fontWeight: 600, color: theme.text, letterSpacing: -0.3, marginTop: 2, textDecoration: t.status === 'done' ? 'line-through' : 'none' }}>
+              <div style={{ fontSize: 17, fontWeight: 600, color: theme.text, letterSpacing: -0.3, marginTop: 2, textDecorationLine: t.status === 'done' ? 'line-through' : 'none' }}>
                 {t.title}
               </div>
               {t.subtitle && <div style={{ fontSize: 12.5, color: theme.text2, marginTop: 2 }}>{t.subtitle}</div>}

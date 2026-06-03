@@ -1,9 +1,26 @@
 .DS_Store
 Thumbs.db
 
+# dev tooling (local syntax-check + headless smoke tests)
+node_modules
+package.json
+package-lock.json
+package.dev.json
+check.js
+smoke.js
+flow.js
+
 # wrangler files
 .wrangler
 .dev.vars*
 !.dev.vars.example
 .env*
 !.env.example
+
+# stale backups (local snapshots, not source of truth)
+.backup-*/
+.openclaw-backup*/
+.openclaw-polish-backup*/
+
+# test artifacts (regression screenshots)
+shot-*.png

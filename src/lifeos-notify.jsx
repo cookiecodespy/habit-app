@@ -82,9 +82,9 @@ function sendNotif(title, body, options = {}) {
   } catch { return null; }
 }
 
-// Useful: schedule a heartbeat that checks if any task starts soon and notifies.
-// In a real app this would be a service worker. For now: on each tab activation,
-// check upcoming tasks within next 10 min and notify if needed.
+// Heartbeat: checks the user's REAL tasks for the day and notifies ~10 min
+// before each one. Runs on a 60s interval (not only on tab activation) so a
+// quiet, open tab still fires, plus an immediate check on mount/visibility.
 function useTaskNotifications(user) {
   React.useEffect(() => {
     if (!user) return;
@@ -93,19 +93,22 @@ function useTaskNotifications(user) {
     const check = () => {
       const now = new Date();
       const nowMins = now.getHours() * 60 + now.getMinutes();
-      TODAY_TASKS.forEach(t => {
-        if (t.kind === 'break' || t.status !== 'todo') return;
+      const todays = (window.LOStore ? LOStore.tasksForDate(loDateStr()) : []) || [];
+      todays.forEach(t => {
+        if (t.kind === 'break' || t.status !== 'todo' || !t.start) return;
         const [h, m] = t.start.split(':').map(Number);
         const diff = (h * 60 + m) - nowMins;
         if (diff > 0 && diff <= 10 && !seen.has(t.id)) {
           seen.add(t.id);
-          sendNotif(`En ${diff} min: ${t.title}`, t.subtitle || '', { tag: t.id });
+          sendNotif(`En ${diff} min: ${t.title}`, t.note || t.subtitle || '', { tag: t.id });
         }
       });
     };
+    check();
+    const id = setInterval(check, 60000);
     const onVis = () => { if (document.visibilityState === 'visible') check(); };
     document.addEventListener('visibilitychange', onVis);
-    return () => document.removeEventListener('visibilitychange', onVis);
+    return () => { clearInterval(id); document.removeEventListener('visibilitychange', onVis); };
   }, [user]);
 }
 

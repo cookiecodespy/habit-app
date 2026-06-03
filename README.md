@@ -1,38 +1,46 @@
-# Tomas Flow
+# LifeOS — Tu día, visualizado
 
-Rediseño 2026.4.27: cockpit mobile-first con captura rápida, plan del día, filtros de tareas y mejor visual para foco/hábitos.
+Planner diario + tracker de hábitos, mobile-first y PWA. Timeline visual del día, hábitos con
+rachas, captura rápida (inbox), rutinas, modo enfoque, y un **IA Planner** que crea/mueve/completa/
+borra tareas por lenguaje natural en español (texto y voz) — 100% offline, sin backend.
 
-App web estática, mobile-first y lista para GitHub Pages.
+Pensado para igualar y superar a apps tipo *Structured*, con identidad propia: tipografía con
+carácter (Fraunces display + Hanken Grotesk), tema oscuro cálido con acento ámbar, y micro-interacciones cuidadas.
 
-## Incluye
-- recordatorios convertidos en TODOs con checkbox
-- hábitos con racha diaria
-- premios simples canjeables por puntos
-- presets para universidad, trabajo, OpenClaw, skills y salud
-- persistencia local con `localStorage`
-- PWA básica con `manifest.webmanifest` y `service worker`
+## Funciona en
+- **Teléfono** → app full-screen de una columna.
+- **Desktop / tablet** → layout con sidebar.
+Mismo código, layout responsivo (`App()` en `src/lifeos-app.jsx`).
 
-## Abrir localmente
-- Simple: abre `index.html` en el navegador
-- Recomendado para probar PWA: `python3 -m http.server 8000` y luego `http://localhost:8000`
+## Características
+- Timeline del día por secciones (mañana/tarde/noche), completar tocando el anillo, subtasks con progreso.
+- Hábitos con racha diaria 🔥 (la sección de "Hoy").
+- Tareas recurrentes (cada día / entre semana / semanal), recordatorios, prioridad, posponer.
+- Inbox de captura rápida → agendar en un toque.
+- Rutinas reutilizables (Pomodoro, Día de clases, Workout…) que se agendan de una.
+- IA Planner: *"gym mañana 7am 1h"*, *"reunión con Ana el lunes 10am"*, *"llamar a mamá cada día 8pm"* → tarea real.
+- Agenda mensual, Stats con heatmap, ajustes (tema/acento/densidad), exportar respaldo JSON.
+- Persistencia local (`localStorage`); store sync-ready para una futura capa Supabase (cuentas + sync multi-dispositivo).
 
-## Deploy en GitHub Pages
-1. Crea un repo nuevo en GitHub.
-2. Sube el contenido de esta carpeta al branch `main`.
-3. Ve a **Settings → Pages**.
-4. Elige **Deploy from a branch**.
-5. Selecciona `main` y `/ (root)`.
-6. Guarda y espera la URL publicada.
+## Desarrollo (arquitectura bundle)
+`index.html` es un bundle autocontenido: los módulos JSX viven gzip+base64 en un manifest y se
+transpilan en el navegador con Babel standalone. **La fuente de verdad son los `src/*.jsx`.**
 
-## Estructura
-- `index.html`
-- `styles.css`
-- `app.js`
-- `manifest.webmanifest`
-- `sw.js`
-- `assets/icon.svg`
+```bash
+# 1. editar src/*.jsx
+node check.js          # syntax-check (Babel) de los 9 módulos
+python3 rebuild.py     # reempaqueta src/ -> index.html
+python3 -m http.server 8000   # probar en http://localhost:8000
+node smoke.js          # smoke test headless (Playwright + Chrome del sistema)
+```
 
-Los datos se guardan sólo en el navegador del dispositivo usando `localStorage`.
-## Continuidad de cambios
+> El **entry real** (`ReactDOM.render(<App/>)`) vive en el template inline de `index.html`, que
+> `rebuild.py` no toca — si necesitas cambiar el componente raíz, edita `index.html` directamente.
 
-Antes de cerrar cualquier cambio, dejar una nota en `docs/session/YYYY-MM-DD-HHMM.md`. Ver `CHANGELOG-RULE.md`.
+`check.js`, `smoke.js`, `flow.js`, `node_modules/` y `package*.json` son herramientas de dev locales
+(ignoradas en git y en el deploy).
+
+## Deploy
+App web estática → GitHub Pages / Cloudflare Pages. Sube la carpeta; sirve `index.html` desde la raíz.
+
+Los datos viven sólo en el navegador del dispositivo (`localStorage`).
