@@ -16,3 +16,9 @@ package*.json
 check.js
 smoke.js
 flow.js
+verify-*.js
+rt-test.js
+shot-*.js
+shot-*.png
+.openclaw-polish-backup-*
+.openclaw-backup-before-*
