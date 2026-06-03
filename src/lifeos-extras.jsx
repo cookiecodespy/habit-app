@@ -351,12 +351,12 @@ function RoutinesScreen({ theme, onBack, onApply }) {
           </div>
         </button>
 
-        {custom.length > 0 && <SectionLabel theme={theme} text="Mis rutinas"/>}
+        {custom.length > 0 && <SectionLabel theme={theme}>Mis rutinas</SectionLabel>}
         <div className="lo-stagger" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {all.map((r, i) => {
             const c = LIFE_PALETTE[r.color] || LIFE_PALETTE.coral;
             if (i === custom.length && custom.length > 0) {
-              return <React.Fragment key="__sep"><SectionLabel theme={theme} text="Plantillas"/>{routineCard(r, i, c)}</React.Fragment>;
+              return <React.Fragment key="__sep"><SectionLabel theme={theme}>Plantillas</SectionLabel>{routineCard(r, i, c)}</React.Fragment>;
             }
             return routineCard(r, i, c);
           })}
@@ -393,10 +393,6 @@ function RoutinesScreen({ theme, onBack, onApply }) {
       </button>
     );
   }
-}
-
-function SectionLabel({ theme, text }) {
-  return <div style={{ fontSize: 10.5, fontWeight: 700, color: theme.text3, letterSpacing: 1.2, textTransform: 'uppercase', margin: '6px 4px 8px' }}>{text}</div>;
 }
 
 // Create / edit a custom routine: name, look, and an ordered list of steps.
