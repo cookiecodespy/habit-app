@@ -358,6 +358,20 @@ function LifeIcon({ name = 'sparkle', color = 'coral', size = 40, shape = 'round
   );
 }
 
+// A task glyph: a native emoji on the coloured tile, or fall back to a LifeIcon
+// name. Lets new tasks use real (Apple/iOS) emojis while old ones keep their SVG.
+function loIsEmoji(s) { return typeof s === 'string' && /[^ -]/.test(s); }
+function TaskGlyph({ icon, color = 'coral', size = 40, shape = 'rounded' }) {
+  if (loIsEmoji(icon)) {
+    return (
+      <LifeIconBox color={color} size={size} shape={shape}>
+        <span style={{ fontSize: size * 0.56, lineHeight: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{icon}</span>
+      </LifeIconBox>
+    );
+  }
+  return <LifeIcon name={icon} color={color} size={size} shape={shape} />;
+}
+
 // Inline SVG for nav / chrome (monochrome)
 function UIIcon({ name, size = 22, color = 'currentColor', strokeWidth = 1.8 }) {
   const p = { width: size, height: size, viewBox: '0 0 24 24', fill: 'none', stroke: color, strokeWidth, strokeLinecap: 'round', strokeLinejoin: 'round' };
@@ -398,4 +412,4 @@ function UIIcon({ name, size = 22, color = 'currentColor', strokeWidth = 1.8 }) 
   return <svg {...p}>{paths[name]}</svg>;
 }
 
-Object.assign(window, { LifeIcon, LifeIconBox, UIIcon, LIFE_PALETTE, LIFE_GLYPHS: G });
+Object.assign(window, { LifeIcon, LifeIconBox, UIIcon, TaskGlyph, loIsEmoji, LIFE_PALETTE, LIFE_GLYPHS: G });

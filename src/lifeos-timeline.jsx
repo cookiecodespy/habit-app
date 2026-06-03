@@ -385,7 +385,7 @@ function TimelineClassic({ theme, dense, blockShape, currentTime = '07:55', onOp
                   background: `linear-gradient(135deg, ${c.from}26, ${c.to}1a)`,
                   border: `0.5px solid ${c.to}3a`,
                 }}>
-                  <LifeIcon name={t.icon} color={t.color} size={26} shape={blockShape === 'pill' ? 'pill' : 'rounded'}/>
+                  <TaskGlyph icon={t.icon} color={t.color} size={26} shape={blockShape === 'pill' ? 'pill' : 'rounded'}/>
                   <span style={{ fontSize: 13.5, fontWeight: 600, color: theme.text, textDecoration: isDone ? 'line-through' : 'none' }}>{t.title}</span>
                 </div>
               );
@@ -435,7 +435,7 @@ function TimelineClassic({ theme, dense, blockShape, currentTime = '07:55', onOp
                   : `0 2px 10px rgba(0,0,0,0.14), inset 0 1px 0 rgba(255,255,255,0.04)`,
                 transition: 'all .2s var(--ease-smooth)',
               }}>
-                <LifeIcon name={t.icon} color={t.color} size={d.iconSize} shape={blockShape === 'pill' ? 'pill' : 'rounded'} />
+                <TaskGlyph icon={t.icon} color={t.color} size={d.iconSize} shape={blockShape === 'pill' ? 'pill' : 'rounded'} />
                 <div style={{ flex: 1, minWidth: 0 }}>
                   {isActive ? (
                     <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, marginBottom: 2 }}>
@@ -543,7 +543,7 @@ function TimelineCards({ theme, dense, blockShape }) {
             border: `0.5px solid ${isActive ? c.to + '55' : theme.border}`,
             opacity: t.status === 'done' ? 0.5 : 1,
           }}>
-            <LifeIcon name={t.icon} color={t.color} size={48} shape={blockShape === 'pill' ? 'pill' : blockShape === 'squircle' ? 'squircle' : 'rounded'}/>
+            <TaskGlyph icon={t.icon} color={t.color} size={48} shape={blockShape === 'pill' ? 'pill' : blockShape === 'squircle' ? 'squircle' : 'rounded'}/>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontSize: 11.5, color: theme.text3, fontVariantNumeric: 'tabular-nums', fontWeight: 500 }}>
                 {fmt12(t.start)} · {minutesBetween(t.start, t.end)} min
@@ -611,7 +611,7 @@ function TimelineHourly({ theme, dense, blockShape }) {
               overflow: 'hidden',
               opacity: t.status === 'done' ? 0.45 : 1,
             }}>
-              <LifeIcon name={t.icon} color={t.color} size={26} shape={blockShape}/>
+              <TaskGlyph icon={t.icon} color={t.color} size={26} shape={blockShape}/>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: 12.5, fontWeight: 600, color: theme.text, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{t.title}</div>
                 {h > 36 && <div style={{ fontSize: 10.5, color: theme.text2, fontVariantNumeric: 'tabular-nums' }}>{fmt12(t.start)}–{fmt12(t.end)}</div>}

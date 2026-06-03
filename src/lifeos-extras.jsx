@@ -52,7 +52,7 @@ function FocusMode({ theme, task, onClose, onComplete }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 12px', borderRadius: 999,
           background: 'rgba(0,0,0,0.25)', backdropFilter: 'blur(20px)',
           border: '0.5px solid rgba(255,255,255,0.08)' }}>
-          <LifeIcon name={task.icon} color={task.color} size={20} shape="rounded"/>
+          <TaskGlyph icon={task.icon} color={task.color} size={20} shape="rounded"/>
           <span style={{ fontSize: 12, fontWeight: 600, color: theme.text }}>{task.title}</span>
         </div>
         <div style={{ width: 36 }}/>
@@ -90,7 +90,7 @@ function FocusMode({ theme, task, onClose, onComplete }) {
           {/* center */}
           <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
             <div className="lo-breath" style={{ filter: `drop-shadow(0 12px 32px ${c.to}66)` }}>
-              <LifeIcon name={task.icon} color={task.color} size={72} shape="squircle"/>
+              <TaskGlyph icon={task.icon} color={task.color} size={72} shape="squircle"/>
             </div>
             <div className="lo-display" style={{ fontSize: 56, fontWeight: 600, color: theme.text, letterSpacing: -2, fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
               {String(mm).padStart(2,'0')}<span style={{ opacity: 0.5 }}>:</span>{String(ss).padStart(2,'0')}
@@ -480,7 +480,7 @@ function RoutineEditor({ theme, initial, onCancel, onSaved, onDeleted }) {
           {tasks.map((t, i) => (
             <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, background: theme.surface, border: `1px solid ${theme.border}`, borderRadius: 14, padding: '8px 10px' }}>
               <button onClick={() => cycleStepIcon(i)} className="lo-press" title="Cambiar ícono" style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 0, flexShrink: 0 }}>
-                <LifeIcon name={t.icon} color={color} size={36} shape="rounded"/>
+                <TaskGlyph icon={t.icon} color={color} size={36} shape="rounded"/>
               </button>
               <input value={t.label} onChange={e => setStep(i, { label: e.target.value })} placeholder={`Paso ${i + 1}`} style={{
                 flex: 1, minWidth: 0, background: 'transparent', border: 'none', outline: 'none',
@@ -554,7 +554,7 @@ function RoutineDetail({ theme, routine, onBack, onApply, onEdit }) {
             <React.Fragment key={i}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px' }}>
                 <span style={{ fontSize: 11.5, color: theme.text3, fontWeight: 600, width: 18, fontVariantNumeric: 'tabular-nums' }}>{i + 1}</span>
-                <LifeIcon name={t.icon} color={t.color} size={36} shape="rounded"/>
+                <TaskGlyph icon={t.icon} color={t.color} size={36} shape="rounded"/>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: 14, fontWeight: 600, color: theme.text }}>{t.label}</div>
                   <div style={{ fontSize: 11, color: theme.text2, marginTop: 1 }}>{t.dur} min</div>
@@ -646,7 +646,7 @@ function SearchOverlay({ theme, onClose, onPickTask }) {
                 borderRadius: 14, cursor: 'pointer', textAlign: 'left', color: theme.text,
                 fontFamily: 'inherit',
               }}>
-                <LifeIcon name={t.icon} color={t.color} size={36} shape="rounded"/>
+                <TaskGlyph icon={t.icon} color={t.color} size={36} shape="rounded"/>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: 14, fontWeight: 600, color: theme.text, letterSpacing: -0.1 }}>{t.title}</div>
                   <div style={{ fontSize: 11, color: theme.text2, marginTop: 1, fontVariantNumeric: 'tabular-nums' }}>
@@ -1000,7 +1000,7 @@ function DeadlineCard({ theme, onOpenTask }) {
               padding: '11px 13px', borderRadius: 16, cursor: 'pointer',
               background: theme.surface, border: `0.5px solid ${urgent ? `${c.to}66` : theme.border}`,
             }}>
-              <LifeIcon name={t.icon} color={t.color} size={36} shape="rounded"/>
+              <TaskGlyph icon={t.icon} color={t.color} size={36} shape="rounded"/>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: 14.5, fontWeight: 600, color: theme.text, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{t.title}</div>
                 <div style={{ fontSize: 12, color: theme.text3, textTransform: 'capitalize' }}>{niceDate(t.deadline)}</div>

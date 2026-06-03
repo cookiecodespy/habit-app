@@ -353,7 +353,7 @@ function AgendaTaskRow({ task, theme, onClick, showChevron }) {
       {/* Theme accent bar — colour-coded "rule" down the left edge */}
       <div style={{ width: 3.5, alignSelf: 'stretch', flexShrink: 0,
         background: catC ? `linear-gradient(${catC.from}, ${catC.to})` : 'transparent', borderRadius: 2 }}/>
-      <LifeIcon name={task.icon} color={task.color} size={34} shape="rounded"/>
+      <TaskGlyph icon={task.icon} color={task.color} size={34} shape="rounded"/>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontSize: 13.5, fontWeight: 600, color: theme.text, letterSpacing: -0.1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
           textDecorationLine: task.status === 'done' ? 'line-through' : 'none', textDecorationColor: theme.text3 }}>{task.title}</div>
@@ -520,23 +520,23 @@ function CalendarScreen({ theme, onBack, embedded = false, onOpenTask, onAdd, us
 // ──────────────────────────────────────────────────────────────
 function CreateScreen({ theme, onBack, onSave }) {
   const ICON_CATEGORIES = [
-    { id: 'all',    label: 'Todos',    icons: ['yoga','shower','coffee','bike','briefcase','book','call','meal','meditate','presentation','moon','walk','pencil','cart','sparkle','clock','music','gift','home','car','dumbbell','paw','camera','heart','palm','star','plane','globe','pill','dollar','mail','laptop','gamepad','flower','fire','lightning','target','cake'] },
-    { id: 'health', label: 'Salud',    icons: ['yoga','meditate','shower','walk','dumbbell','heart','pill','flower'] },
-    { id: 'work',   label: 'Trabajo',  icons: ['briefcase','presentation','laptop','mail','call','dollar','target','lightning'] },
-    { id: 'life',   label: 'Vida',     icons: ['home','meal','coffee','cart','car','paw','gift','cake','heart','music'] },
-    { id: 'study',  label: 'Estudio',  icons: ['book','pencil','clock','target','laptop','star'] },
-    { id: 'fun',    label: 'Diversión', icons: ['palm','plane','globe','camera','gamepad','music','star','fire'] },
+    { id: 'all',    label: 'Todos',     icons: ['✨','📝','✅','📅','⏰','🎯','💡','🔥','⭐','📌','🏃','🧘','🥗','💪','😴','🚿','💊','❤️','📚','✏️','🎓','🔬','💼','💻','📊','📈','✉️','📞','💰','🏠','🍽️','☕','🛒','🚗','🐶','🎁','🎂','🎵','🌱','🎮','🎬','🎸','⚽','🏖️','✈️','📷','🎨','🍿','🎉','🛏️','🧺','🧹','💧','🙏','🎤'] },
+    { id: 'health', label: 'Salud',     icons: ['🏃','🧘','🥗','💪','😴','🚿','💊','🩺','🧠','❤️','🦷','🚭','🚴','🏊','⛹️','🧴','💧','🍎'] },
+    { id: 'work',   label: 'Trabajo',   icons: ['💼','💻','📊','📈','📅','✉️','📞','🖊️','📝','💰','🎯','📎','🗂️','🖥️','📠','🤝','🧾','⏱️'] },
+    { id: 'study',  label: 'Estudio',   icons: ['📚','✏️','🎓','🧮','🔬','🧪','📖','🖍️','📐','💡','🗂️','⏰','✒️','📒','🔭','🧠'] },
+    { id: 'life',   label: 'Vida',      icons: ['🏠','🍽️','☕','🛒','🚗','🐶','🐱','🎁','🎂','❤️','🎵','🌱','🧺','🧹','👶','🛏️','🪴','🍳'] },
+    { id: 'fun',    label: 'Diversión', icons: ['🎮','🎬','🎸','⚽','🏀','🏖️','✈️','📷','🎨','🍿','🎉','🕹️','🎤','🎧','🎲','🏕️','🎳','🎯'] },
   ];
   const colors = ['coral','amber','rose','mint','sky','lavender','lime','teal','plum','sun','ember','slate'];
   const COLOR_LABELS = { coral:'Coral', amber:'Ámbar', rose:'Rosa', mint:'Menta', sky:'Cielo', lavender:'Lavanda', lime:'Lima', teal:'Verde', plum:'Ciruela', sun:'Sol', ember:'Fuego', slate:'Pizarra' };
   const PRIORITIES = [
-    { id: 'low',    label: 'Baja',  color: 'mint' },
-    { id: 'medium', label: 'Media', color: 'amber' },
-    { id: 'high',   label: 'Alta',  color: 'coral' },
+    { id: 'low',    label: 'Baja',  desc: 'Sin prisa',   color: 'mint' },
+    { id: 'medium', label: 'Media', desc: 'Importante',  color: 'amber' },
+    { id: 'high',   label: 'Alta',  desc: 'Urgente',     color: 'coral' },
   ];
 
   const [pickedColor, setColor] = React.useState('mint');
-  const [pickedIcon, setIcon] = React.useState('sparkle');
+  const [pickedIcon, setIcon] = React.useState('✨');
   const [iconCat, setIconCat] = React.useState('all');
   const [title, setTitle] = React.useState('');
   const [subtitle, setSub] = React.useState('');
@@ -642,82 +642,80 @@ function CreateScreen({ theme, onBack, onSave }) {
   const blockLeft = Math.max(0, ((startMins - RIBBON_START) / RIBBON_SPAN) * 100);
   const blockWidth = Math.min(100 - blockLeft, (duration / RIBBON_SPAN) * 100);
 
+  const canSave = !!title.trim();
+  const submit = () => {
+    if (!canSave) return;
+    const cleanSteps = subtasks.map(s => ({ ...s, label: s.label.trim() })).filter(s => s.label);
+    const task = {
+      id: loUid('t'), start: startTime, durationMin: duration,
+      title: title.trim(), subtitle: subtitle.trim() || undefined,
+      icon: pickedIcon, color: pickedColor, status: 'todo', priority,
+      date: selectedDate, reminder: reminderOn,
+      recur: repeatOn ? { freq: 'weekdays' } : null,
+      deadline: deadline || null, allDay: allDayOn, category: category || null,
+      subtasks: cleanSteps.length > 0 ? cleanSteps : undefined,
+    };
+    if (onSave) onSave(task);
+    onBack();
+  };
+
   return (
     <div data-screen-label="Create Task" style={{ position: 'relative', minHeight: '100%', background: theme.bg }}>
-      {/* ─── HERO — dark ground, colour used as focused light not a flat fill ─── */}
-      <div style={{ position: 'relative', overflow: 'hidden', paddingBottom: 26, background: theme.bg }}>
-        {/* Aura: a soft halo of the picked colour behind the icon */}
-        <div style={{ position: 'absolute', top: -150, left: '50%', transform: 'translateX(-50%)', width: 480, height: 380, pointerEvents: 'none',
-          background: `radial-gradient(58% 58% at 50% 42%, ${c.to}5e 0%, ${c.from}24 36%, transparent 72%)` }}/>
-        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 140, pointerEvents: 'none',
-          background: `linear-gradient(180deg, ${c.to}1c 0%, transparent 100%)` }}/>
-
-        {/* Top bar */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: 54, padding: '0 16px', position: 'relative', zIndex: 2 }}>
-          <button onClick={onBack} className="lo-press" style={{
-            width: 36, height: 36, borderRadius: 18, cursor: 'pointer',
-            background: theme.surfaceHi, border: `0.5px solid ${theme.border}`,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}>
-            <UIIcon name="x" size={16} color={theme.text2} strokeWidth={2.5}/>
-          </button>
-          <span style={{ fontSize: 11, fontWeight: 700, color: theme.text3, letterSpacing: 1.6, textTransform: 'uppercase' }}>Nueva tarea</span>
-          <div style={{ width: 36 }}/>
+      {/* ─── HEADER BAR — title + subtitle + primary action ─── */}
+      <div style={{
+        position: 'sticky', top: 0, zIndex: 10, display: 'flex', alignItems: 'center', gap: 12,
+        padding: '12px 16px', background: `${theme.bg}f0`,
+        backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
+        borderBottom: `0.5px solid ${theme.border}`,
+      }}>
+        <div style={{
+          width: 40, height: 40, borderRadius: 13, flexShrink: 0,
+          background: `linear-gradient(145deg, ${c.from}, ${c.to})`,
+          display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: `0 5px 14px ${c.to}44`,
+        }}>
+          <UIIcon name="sparkle" size={19} color="#fff"/>
         </div>
-
-        {/* Icon tile — layered aura + drop shadow for real depth */}
-        <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 16, paddingBottom: 4, position: 'relative', zIndex: 2 }}>
-          <div className="lo-scale-in" style={{ position: 'relative' }}>
-            <div style={{ position: 'absolute', inset: -16, borderRadius: 34, background: `radial-gradient(circle, ${c.to}66 0%, transparent 68%)`, filter: 'blur(10px)', pointerEvents: 'none' }}/>
-            <div style={{ position: 'relative', filter: `drop-shadow(0 20px 36px ${c.to}80)` }}>
-              <LifeIcon name={pickedIcon} color={pickedColor} size={90} shape="squircle"/>
-            </div>
-          </div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div className="lo-display" style={{ fontSize: 19, fontWeight: 600, color: theme.text, letterSpacing: -0.3 }}>Nueva tarea</div>
+          <div style={{ fontSize: 12, color: theme.text3, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Crea una tarea y mantén el foco en lo que importa.</div>
         </div>
-
-        {/* Title + note inputs */}
-        <div style={{ padding: '12px 24px 0', position: 'relative', zIndex: 2 }}>
-          <input
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="Nombre de la tarea"
-            autoFocus
-            style={{
-              display: 'block', width: '100%',
-              background: 'transparent', border: 'none', outline: 'none',
-              textAlign: 'center', fontSize: 26, fontWeight: 700, color: theme.text,
-              letterSpacing: -0.6, fontFamily: 'inherit', caretColor: c.to,
-            }}
-          />
-          <input
-            value={subtitle}
-            onChange={(e) => setSub(e.target.value)}
-            placeholder="Añade una nota…"
-            style={{
-              display: 'block', width: '100%', marginTop: 7,
-              background: 'transparent', border: 'none', outline: 'none',
-              textAlign: 'center', fontSize: 13.5, color: theme.text3,
-              fontFamily: 'inherit', caretColor: c.to,
-            }}
-          />
-        </div>
-
-        {/* Selected date + time badge */}
-        <div style={{ display: 'flex', justifyContent: 'center', marginTop: 14, position: 'relative', zIndex: 2 }}>
-          <div style={{
-            background: theme.surfaceHi, border: `0.5px solid ${theme.border}`, borderRadius: 999,
-            padding: '6px 14px', display: 'flex', alignItems: 'center', gap: 7,
-          }}>
-            <UIIcon name="calendar" size={12} color={c.to}/>
-            <span style={{ fontSize: 12.5, color: theme.text, fontWeight: 600, letterSpacing: -0.1, fontVariantNumeric: 'tabular-nums' }}>
-              {fmtDateLabel(selectedDate)}{!allDayOn && ` · ${fmtMin(startMins)}`}
-            </span>
-          </div>
-        </div>
+        <button onClick={onBack} className="lo-press" style={{
+          width: 38, height: 38, borderRadius: 12, cursor: 'pointer', flexShrink: 0,
+          background: theme.surfaceHi, border: `0.5px solid ${theme.border}`,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>
+          <UIIcon name="x" size={16} color={theme.text2} strokeWidth={2.5}/>
+        </button>
+        <button onClick={submit} disabled={!canSave} className="lo-press" style={{
+          flexShrink: 0, display: 'flex', alignItems: 'center', gap: 7, padding: '0 16px', height: 38,
+          borderRadius: 12, border: 'none', fontFamily: 'inherit', fontSize: 14, fontWeight: 700, letterSpacing: -0.2,
+          background: canSave ? `linear-gradient(135deg, ${c.from}, ${c.to})` : theme.rail,
+          color: canSave ? '#fff' : theme.text3, cursor: canSave ? 'pointer' : 'default',
+          boxShadow: canSave ? `0 6px 18px ${c.to}66` : 'none', opacity: canSave ? 1 : 0.55,
+          transition: 'all .2s var(--ease-smooth)',
+        }}>
+          <UIIcon name="check" size={16} color={canSave ? '#fff' : theme.text3} strokeWidth={2.6}/> Guardar
+        </button>
       </div>
 
-      {/* ─── BODY — centered, carded form ─── */}
-      <div style={{ maxWidth: 720, margin: '0 auto', width: '100%', padding: '12px 14px 130px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+      {/* ─── BODY — centered, carded grid ─── */}
+      <div style={{ maxWidth: 880, margin: '0 auto', width: '100%', padding: '14px 14px 130px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+
+        {/* ── Nombre + emoji preview ── */}
+        <div style={{ ...loCardStyle(theme), display: 'flex', alignItems: 'center', gap: 14 }}>
+          <div style={{ position: 'relative', flexShrink: 0 }}>
+            <div style={{ position: 'absolute', inset: -7, borderRadius: 22, background: `radial-gradient(circle, ${c.to}40, transparent 70%)`, filter: 'blur(6px)', pointerEvents: 'none' }}/>
+            <div style={{ position: 'relative' }}><TaskGlyph icon={pickedIcon} color={pickedColor} size={58} shape="squircle"/></div>
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Nombre de la tarea" autoFocus
+              style={{ display: 'block', width: '100%', background: 'transparent', border: 'none', outline: 'none',
+                fontSize: 22, fontWeight: 700, color: theme.text, letterSpacing: -0.4, fontFamily: 'inherit', caretColor: c.to }}/>
+            <input value={subtitle} onChange={(e) => setSub(e.target.value)} placeholder="Añade una nota corta…"
+              style={{ display: 'block', width: '100%', marginTop: 4, background: 'transparent', border: 'none', outline: 'none',
+                fontSize: 13, color: theme.text3, fontFamily: 'inherit', caretColor: c.to }}/>
+          </div>
+        </div>
 
         {/* ── Fecha — 14-day horizontal strip ── */}
         <div style={loCardStyle(theme)}>
@@ -898,6 +896,8 @@ function CreateScreen({ theme, onBack, onSave }) {
           </>)}
         </div>
 
+        {/* ── Color | Icono (par de 2 columnas) ── */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(248px, 1fr))', gap: 12 }}>
         {/* ── Color ── */}
         <div style={loCardStyle(theme)}>
           <CardHead theme={theme} icon="sparkle" accent={pickedColor} title="Color" help="El color de tu tarea" trailing={
@@ -954,13 +954,14 @@ function CreateScreen({ theme, onBack, onSave }) {
                   border: `1.5px solid ${active ? c.to : 'transparent'}`,
                   cursor: 'pointer', transition: 'all .18s var(--ease-smooth)',
                 }}>
-                  <span className={active ? 'lo-pop' : ''} key={n + (active ? 'a' : 'i')}>
-                    <LifeIcon name={n} color={pickedColor} size={32} shape="rounded"/>
+                  <span className={active ? 'lo-pop' : ''} key={n + (active ? 'a' : 'i')} style={{ fontSize: 27, lineHeight: 1, filter: active ? 'none' : 'saturate(1)' }}>
+                    {n}
                   </span>
                 </button>
               );
             })}
           </div>
+        </div>
         </div>
 
         {/* ── Prioridad ── */}
@@ -980,7 +981,8 @@ function CreateScreen({ theme, onBack, onSave }) {
                   transition: 'all .18s var(--ease-smooth)',
                 }}>
                   <div style={{ width: 10, height: 10, borderRadius: 5, background: `linear-gradient(135deg, ${pc.from}, ${pc.to})`, boxShadow: active ? `0 2px 8px ${pc.to}66` : 'none' }}/>
-                  <span style={{ fontSize: 12.5, fontWeight: active ? 700 : 500, color: active ? pc.to : theme.text2 }}>{p.label}</span>
+                  <span style={{ fontSize: 13.5, fontWeight: active ? 700 : 600, color: active ? pc.to : theme.text }}>{p.label}</span>
+                  <span style={{ fontSize: 11, fontWeight: 500, color: theme.text3 }}>{p.desc}</span>
                 </button>
               );
             })}
@@ -1084,57 +1086,6 @@ function CreateScreen({ theme, onBack, onSave }) {
         </div>
       </div>
 
-      {/* ─── Sticky CTA ─── */}
-      <div style={{
-        position: 'sticky', bottom: 0, left: 0, right: 0,
-        padding: '16px 20px 22px',
-        background: `linear-gradient(180deg, transparent 0%, ${theme.bg} 38%)`,
-        zIndex: 5,
-      }}>
-        <button onClick={() => {
-          if (!title.trim()) return;
-          // Absolute date chosen in the strip or the full-month calendar (B14 fix),
-          // never a relative offset re-applied to a fresh `new Date()` at save.
-          const dateStr = selectedDate;
-          const cleanSteps = subtasks.map(s => ({ ...s, label: s.label.trim() })).filter(s => s.label);
-          const task = {
-            id: loUid('t'),
-            start: startTime,
-            durationMin: duration,            // explicit — avoids midnight-wrap end<start
-            title: title.trim(),
-            subtitle: subtitle.trim() || undefined,
-            icon: pickedIcon,
-            color: pickedColor,
-            status: 'todo',
-            priority,
-            date: dateStr,
-            reminder: reminderOn,             // was dropped before (B2)
-            recur: repeatOn ? { freq: 'weekdays' } : null,
-            deadline: deadline || null,       // hard due date (surfaced by DeadlineCard)
-            allDay: allDayOn,                 // no time slot — rides the all-day row
-            category: category || null,       // Agenda theme (vida/trabajo/uni)
-            subtasks: cleanSteps.length > 0 ? cleanSteps : undefined,
-          };
-          if (onSave) onSave(task);
-          onBack();
-        }} disabled={!title.trim()} className="lo-press" style={{
-          width: '100%', height: 56,
-          background: title.trim() ? `linear-gradient(135deg, ${c.from}, ${c.to})` : theme.rail,
-          color: title.trim() ? '#fff' : theme.text3,
-          border: 'none', borderRadius: 18,
-          fontSize: 17, fontWeight: 700,
-          cursor: title.trim() ? 'pointer' : 'default',
-          letterSpacing: -0.3, fontFamily: 'inherit',
-          boxShadow: title.trim() ? `0 8px 28px ${c.to}77, inset 0 1px 0 rgba(255,255,255,0.25)` : 'none',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 9,
-          opacity: title.trim() ? 1 : 0.45,
-          transition: 'all .25s var(--ease-smooth)',
-        }}>
-          {title.trim()
-            ? <><UIIcon name="check" size={20} color="#fff" strokeWidth={2.5}/> Agendar tarea</>
-            : 'Escribe un nombre primero'}
-        </button>
-      </div>
     </div>
   );
 }
@@ -1399,7 +1350,7 @@ function DetailScreen({ theme, task, onBack, onStartFocus, onComplete, onToggleS
         {/* hero icon + title */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: 12, position: 'relative', zIndex: 2 }}>
           <div className="lo-scale-in" style={{ filter: `drop-shadow(0 12px 24px ${c.to}77)` }}>
-            <LifeIcon name={t.icon} color={t.color} size={92} shape="squircle"/>
+            <TaskGlyph icon={t.icon} color={t.color} size={92} shape="squircle"/>
           </div>
           {live ? (
             <input value={titleDraft} onChange={(e) => setTitleDraft(e.target.value)} onBlur={commitTitle}
@@ -2047,7 +1998,7 @@ function AITaskCard({ theme, task }) {
       background: `linear-gradient(135deg, ${c.from}1A, ${theme.surface} 75%)`,
       border: `0.5px solid ${c.to}44`, borderRadius: 16,
     }}>
-      <LifeIcon name={task.icon} color={task.color} size={38} shape="rounded"/>
+      <TaskGlyph icon={task.icon} color={task.color} size={38} shape="rounded"/>
       <div style={{ minWidth: 0 }}>
         <div style={{ fontSize: 14, fontWeight: 600, color: theme.text, letterSpacing: -0.1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{task.title}</div>
         <div style={{ fontSize: 11.5, color: theme.text2, marginTop: 1, fontVariantNumeric: 'tabular-nums' }}>{when}</div>

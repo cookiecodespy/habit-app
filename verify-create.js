@@ -29,7 +29,7 @@ function findChrome(){ for (const c of ['/usr/bin/google-chrome-stable','/usr/bi
   // Save
   let saved = 0;
   if (inp) {
-    await page.evaluate(() => { const b = [...document.querySelectorAll('button')].find(x => /Agendar tarea/i.test(x.textContent)); if (b) b.click(); });
+    await page.evaluate(() => { const b = [...document.querySelectorAll('button')].find(x => /^\s*Guardar\s*$/i.test(x.textContent.replace(/\s+/g,' ').trim()) || /Guardar/i.test(x.textContent)); if (b) b.click(); });
     await page.waitForTimeout(800);
     saved = await page.evaluate(() => LOStore.allTasks().filter(t => /Prueba de c/.test(t.title)).length);
   }
