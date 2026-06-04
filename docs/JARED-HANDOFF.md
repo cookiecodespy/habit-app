@@ -72,3 +72,42 @@ Cambio final:
 
 Siguiente recomendado:
 - B-NLP-2: comandos compuestos (`gym y almuerzo el viernes`) con split intencional, preview y confirmación cuando haya ambigüedad.
+
+---
+
+## 2026-06-03 21:34 America/Santiago — Giro estratégico: proyecto serio y playbook reutilizable
+
+Boss pidió poner todo sobre la mesa antes de seguir features sueltas:
+- Auditar app, stack y herramientas gratis disponibles.
+- Usar GitHub, Cloudflare y posiblemente Supabase de forma seria.
+- Modularizar, optimizar y escalar la app.
+- Convertir lo aprendido aquí en un modo de trabajo replicable para próximos proyectos.
+- Política explícita: todo gratis; si algo cuesta o puede generar costo, consultar antes.
+
+Acción tomada:
+- Se creó `docs/strategy/FREE-FIRST-ENGINEERING-PLAYBOOK.md` con principios, stack objetivo preliminar, gates mínimos y política de costo.
+- Se lanzaron auditorías paralelas para arquitectura y stack free-first.
+
+Siguiente:
+- Consolidar auditoría en un documento maestro: arquitectura actual, stack recomendado, roadmap de migración, modelo Supabase y plan de ejecución por sprints.
+
+---
+
+## 2026-06-03 21:40 America/Santiago — Plan maestro consolidado
+
+Se consolidaron las auditorías de stack free-first y arquitectura frontend en:
+- `docs/strategy/LIFEOS-MASTER-PLAN.md`
+
+Decisión estratégica:
+- No rewrite ciego.
+- Mantener legacy estable.
+- Crear Vite+React+TS en paralelo.
+- Extraer dominio/test primero.
+- Supabase se diseña después de schema/RLS y confirmación de Boss.
+- Todo gratis primero; cualquier costo se consulta.
+
+Próximo recomendado:
+- Commit documental.
+- Inventario de scripts/tests actuales.
+- CI GitHub básico.
+- Luego seguir con B-NLP-2 o B-UX-backdrop.
