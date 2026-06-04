@@ -328,11 +328,17 @@ function MobileApp({ t, setTweak }) {
 // TabletApp — sidebar + main content layout for iPad / wide touch
 // ──────────────────────────────────────────────────────────────
 const TABLET_NAV = [
-  { id: 'timeline', icon: 'timeline', label: 'Hoy' },
-  { id: 'month',    icon: 'calendar', label: 'Agenda' },
-  { id: 'ai',       icon: 'ai',       label: 'IA Planner' },
-  { id: 'stats',    icon: 'stats',    label: 'Stats' },
-  { id: 'settings', icon: 'settings', label: 'Ajustes' },
+  { section: 'Planifica', items: [
+    { id: 'timeline', icon: 'timeline', label: 'Hoy' },
+    { id: 'month',    icon: 'calendar', label: 'Agenda' },
+    { id: 'ai',       icon: 'ai',       label: 'IA Planner' },
+  ] },
+  { section: 'Analiza', items: [
+    { id: 'stats',    icon: 'stats',    label: 'Stats' },
+  ] },
+  { section: 'Cuenta', items: [
+    { id: 'settings', icon: 'settings', label: 'Ajustes' },
+  ] },
 ];
 
 function TabletApp({ t, setTweak }) {
@@ -416,86 +422,101 @@ function TabletApp({ t, setTweak }) {
         paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)',
         paddingLeft: 'env(safe-area-inset-left, 0px)',
       }}>
-        {/* Logo + greeting */}
-        <div style={{ padding: '20px 20px 12px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
-            <div style={{
-              width: 38, height: 38, borderRadius: 11,
-              background: `linear-gradient(135deg, ${theme.accent}, ${theme.accent}cc)`,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: `0 2px 12px ${theme.accent}44`,
-            }}>
-              <span style={{ color: '#fff', fontWeight: 800, fontSize: 20, lineHeight: 1 }}>L</span>
-            </div>
-            <div>
-              <div style={{ fontSize: 10, color: theme.text3, letterSpacing: 1, textTransform: 'uppercase', fontWeight: 700 }}>LifeOS</div>
-              <div style={{ fontSize: 13, color: theme.text2, fontWeight: 500 }}>Hola, {user.name.split(' ')[0]} 👋</div>
-            </div>
+        {/* Brand */}
+        <div style={{ padding: '18px 18px 14px', display: 'flex', alignItems: 'center', gap: 11 }}>
+          <div style={{
+            width: 36, height: 36, borderRadius: 11,
+            background: `linear-gradient(140deg, ${LIFE_PALETTE.mint.from}, ${LIFE_PALETTE.teal.to})`,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            boxShadow: `0 4px 14px ${LIFE_PALETTE.teal.to}44`,
+          }}>
+            <UIIcon name="sparkle" size={19} color="#fff"/>
+          </div>
+          <span className="lo-display" style={{ fontSize: 20, fontWeight: 600, color: theme.text, letterSpacing: -0.3 }}>LifeOS</span>
+        </div>
+
+        {/* User chip */}
+        <div style={{ margin: '0 12px 10px', padding: '10px 12px', borderRadius: 14, background: theme.surfaceHi, border: `0.5px solid ${theme.border}`, display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{ width: 34, height: 34, borderRadius: '50%', flexShrink: 0,
+            background: `linear-gradient(140deg, ${theme.accent}, ${theme.accent}aa)`,
+            display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: 15 }}>
+            {(user.name || 'T').trim().charAt(0).toUpperCase()}
+          </div>
+          <div style={{ minWidth: 0 }}>
+            <div style={{ fontSize: 13.5, fontWeight: 600, color: theme.text, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.name.split(' ')[0]}</div>
+            <div style={{ fontSize: 11, color: theme.text3 }}>Hola, ¡buen día!</div>
           </div>
         </div>
 
-        {/* Date header */}
-        <div style={{ padding: '0 20px 16px', borderBottom: `1px solid ${theme.border}` }}>
-          {(() => {
-            const now = new Date();
-            const DAY_NAMES = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
-            const MON = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-            return (
-              <div>
-                <div className="lo-display" style={{ fontSize: 24, fontWeight: 600, color: theme.text, letterSpacing: -0.4 }}>
-                  {DAY_NAMES[now.getDay()]} <span style={{ color: theme.accent }}>{now.getDate()}</span>
-                </div>
-                <div style={{ fontSize: 12, color: theme.text3, marginTop: 1 }}>
-                  {MON[now.getMonth()]} {now.getFullYear()}
-                </div>
-              </div>
-            );
-          })()}
+        {/* Nav — grouped by section */}
+        <div style={{ flex: 1, padding: '6px 10px', overflowY: 'auto' }}>
+          {TABLET_NAV.map(group => (
+            <div key={group.section} style={{ marginBottom: 12 }}>
+              <div style={{ fontSize: 9.5, fontWeight: 700, color: theme.text3, letterSpacing: 1.2, textTransform: 'uppercase', padding: '4px 12px 6px' }}>{group.section}</div>
+              {group.items.map(item => {
+                const active = tab === item.id;
+                return (
+                  <button key={item.id} className="lo-press" onClick={() => setTab(item.id)} style={{
+                    position: 'relative', width: '100%', display: 'flex', alignItems: 'center', gap: 11,
+                    padding: '9px 12px', borderRadius: 11, marginBottom: 2,
+                    background: active ? theme.accentSoft : 'transparent',
+                    border: 'none', cursor: 'pointer', textAlign: 'left', transition: 'background .15s',
+                  }}>
+                    {active && <div style={{ position: 'absolute', left: 0, top: 8, bottom: 8, width: 3, borderRadius: 2, background: theme.accent }}/>}
+                    <UIIcon name={item.icon} size={18} color={active ? theme.accent : theme.text3}/>
+                    <span style={{ fontSize: 14, fontWeight: active ? 700 : 500, color: active ? theme.text : theme.text2 }}>{item.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          ))}
         </div>
 
-        {/* Nav items */}
-        <div style={{ flex: 1, padding: '12px 10px', overflowY: 'auto' }}>
-          {TABLET_NAV.map(item => {
-            const active = tab === item.id;
+        {/* Enfoque de hoy — real progress */}
+        {(() => {
+          const today = LOStore.tasksForDate(loDateStr()).filter(t => t.kind !== 'break');
+          const total = today.length, done = today.filter(t => t.status === 'done').length;
+          const pct = total ? done / total : 0;
+          const R = 16, C = 2 * Math.PI * R;
+          return (
+            <div style={{ margin: '0 12px 10px', padding: '11px 12px', borderRadius: 14, background: theme.surfaceHi, border: `0.5px solid ${theme.border}`, display: 'flex', alignItems: 'center', gap: 12 }}>
+              <svg width={42} height={42} style={{ flexShrink: 0, transform: 'rotate(-90deg)' }}>
+                <circle cx={21} cy={21} r={R} fill="none" stroke={theme.rail} strokeWidth={4}/>
+                <circle cx={21} cy={21} r={R} fill="none" stroke={theme.accent} strokeWidth={4} strokeLinecap="round"
+                  strokeDasharray={C} strokeDashoffset={C * (1 - pct)} style={{ transition: 'stroke-dashoffset .45s var(--ease-out-quart)' }}/>
+              </svg>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: theme.text }}>Enfoque de hoy</div>
+                <div style={{ fontSize: 11, color: theme.text3 }}>{total ? `${done}/${total} completadas` : 'Sin tareas hoy'}</div>
+              </div>
+            </div>
+          );
+        })()}
+
+        {/* Theme toggle */}
+        <div style={{ margin: '0 12px 8px', display: 'flex', gap: 6 }}>
+          {[['light', '☀'], ['dark', '☾']].map(([mode, glyph]) => {
+            const on = mode === 'dark' ? t.dark : !t.dark;
             return (
-              <button key={item.id}
-                className="lo-press"
-                onClick={() => setTab(item.id)}
-                style={{
-                  width: '100%', display: 'flex', alignItems: 'center', gap: 12,
-                  padding: '11px 14px', borderRadius: 13, marginBottom: 2,
-                  background: active ? theme.accentSoft : 'transparent',
-                  border: 'none', cursor: 'pointer', textAlign: 'left',
-                  transition: 'background 0.15s',
-                }}>
-                <UIIcon name={item.icon} size={20} color={active ? theme.accent : theme.text3}/>
-                <span style={{
-                  fontSize: 15, fontWeight: active ? 700 : 500,
-                  color: active ? theme.accent : theme.text2,
-                }}>
-                  {item.label}
-                </span>
-                {active && <div style={{ marginLeft: 'auto', width: 6, height: 6, borderRadius: 3, background: theme.accent }}/>}
-              </button>
+              <button key={mode} className="lo-press" onClick={() => setTweak('dark', mode === 'dark')} style={{
+                flex: 1, padding: '7px 0', borderRadius: 10, cursor: 'pointer', fontFamily: 'inherit', fontSize: 14,
+                background: on ? theme.accentSoft : theme.surfaceHi, border: `0.5px solid ${on ? theme.accent + '66' : theme.border}`,
+                color: on ? theme.accent : theme.text3, fontWeight: 600,
+              }}>{glyph}</button>
             );
           })}
         </div>
 
         {/* Nueva tarea CTA */}
-        <div style={{ padding: '12px 12px 4px' }}>
-          <button
-            className="lo-press"
-            onClick={() => setOverlay('create')}
-            style={{
-              width: '100%', padding: '13px 16px',
-              background: theme.accent, color: '#fff',
-              border: 'none', borderRadius: 15, cursor: 'pointer',
-              fontSize: 15, fontWeight: 700,
-              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-              boxShadow: `0 4px 16px ${theme.accent}55`,
-            }}>
-            <UIIcon name="plus" size={17} color="#fff"/>
-            Nueva tarea
+        <div style={{ padding: '0 12px' }}>
+          <button className="lo-press" onClick={() => setOverlay('create')} style={{
+            width: '100%', padding: '12px 16px',
+            background: `linear-gradient(135deg, ${theme.accent}, ${theme.accent}cc)`, color: '#fff',
+            border: 'none', borderRadius: 14, cursor: 'pointer', fontSize: 14.5, fontWeight: 700,
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+            boxShadow: `0 6px 18px ${theme.accent}55`,
+          }}>
+            <UIIcon name="plus" size={17} color="#fff"/> Nueva tarea
           </button>
         </div>
       </div>
