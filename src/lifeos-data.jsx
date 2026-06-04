@@ -611,6 +611,10 @@ function loParseRecur(low) {
 }
 
 const LO_CMD_VERBS = /\b(ag[eé]ndame|ag[eé]nda|agendar|agrega|agregar|a[nñ]ade|a[nñ]adir|crea|crear|pon|poner|ponme|programa|programar|recu[eé]rdame|recordar|nueva\s+tarea|necesito|quiero|tengo\s+que|debo)\b/g;
+const loWordListRE = (words, flags = 'giu') => new RegExp(`(?<![\\p{L}\\p{N}_])(?:${words.join('|')})(?![\\p{L}\\p{N}_])`, flags);
+const LO_TITLE_GLUE_RE = loWordListRE(['a\\s+las?', 'para', 'el', 'la', 'los', 'las', 'de', 'del', 'un', 'una', 'esta', 'este', 'pr[oó]ximo', 'que', 'me', 'mi']);
+const LO_DELETE_GLUE_RE = loWordListRE(['borra', 'borrar', 'elimina', 'eliminar', 'quita', 'quitar', 'cancela', 'cancelar', 'la', 'el', 'tarea', 'de', 'mi']);
+const LO_COMPLETE_GLUE_RE = loWordListRE(['completa', 'completar', 'marca', 'marcar', 'como', 'hecho', 'hecha', 'ya', 'hice', 'termin[eé]', 'el', 'la', 'tarea', 'de', 'mi']);
 
 // Main entry: produce an action plan from free text.
 function loParseCommand(text) {
@@ -619,10 +623,10 @@ function loParseCommand(text) {
 
   // Intent: delete / complete / move take priority if their verbs appear.
   if (/\b(borra|borrar|elimina|eliminar|quita|quitar|cancela|cancelar)\b/.test(low)) {
-    return { intent: 'delete', query: raw.replace(/\b(borra|borrar|elimina|eliminar|quita|quitar|cancela|cancelar|la|el|tarea|de|mi)\b/gi, '').trim() };
+    return { intent: 'delete', query: raw.replace(LO_DELETE_GLUE_RE, '').replace(/\s+/g, ' ').trim() };
   }
   if (/\b(complet|marca.*hech|ya\s+hice|termin[eé]|hecho|listo\s+el)\b/.test(low)) {
-    return { intent: 'complete', query: raw.replace(/\b(completa|completar|marca|marcar|como|hecho|hecha|ya|hice|termin[eé]|el|la|tarea|de|mi)\b/gi, '').trim() };
+    return { intent: 'complete', query: raw.replace(LO_COMPLETE_GLUE_RE, '').replace(/\s+/g, ' ').trim() };
   }
   if (/\b(mueve|mover|posterga|postergar|cambia.*hora|reprograma|pasa)\b/.test(low)) {
     const time = loParseTime(low);
@@ -646,7 +650,7 @@ function loParseCommand(text) {
     title = title.replace(new RegExp(k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i'), ' ');
   }
   title = title.replace(LO_CMD_VERBS, ' ')
-    .replace(/\b(a\s+las?|para|el|la|los|las|de|del|un|una|esta|este|pr[oó]ximo|que|me|mi)\b/gi, ' ')
+    .replace(LO_TITLE_GLUE_RE, ' ')
     .replace(/\s+/g, ' ').trim();
   // Capitalize first letter.
   if (title) title = title.charAt(0).toUpperCase() + title.slice(1);
