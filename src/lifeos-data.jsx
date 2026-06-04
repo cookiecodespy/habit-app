@@ -612,7 +612,7 @@ function loParseRecur(low) {
 
 const LO_CMD_VERBS = /\b(ag[eé]ndame|ag[eé]nda|agendar|agrega|agregar|a[nñ]ade|a[nñ]adir|crea|crear|pon|poner|ponme|programa|programar|recu[eé]rdame|recordar|nueva\s+tarea|necesito|quiero|tengo\s+que|debo)\b/g;
 const loWordListRE = (words, flags = 'giu') => new RegExp(`(?<![\\p{L}\\p{N}_])(?:${words.join('|')})(?![\\p{L}\\p{N}_])`, flags);
-const LO_TITLE_GLUE_RE = loWordListRE(['a\\s+las?', 'para', 'el', 'la', 'los', 'las', 'de', 'del', 'un', 'una', 'esta', 'este', 'pr[oó]ximo', 'que', 'me', 'mi']);
+const LO_TITLE_GLUE_RE = loWordListRE(['a\\s+las?', 'para', 'el', 'la', 'los', 'las', 'de', 'del', 'un', 'una', 'esta', 'este', 'pr[oó]ximo', 'que', 'me', 'mi', 'cada', 'todos\\s+los', 'todos', 'todas']);
 const LO_DELETE_GLUE_RE = loWordListRE(['borra', 'borrar', 'elimina', 'eliminar', 'quita', 'quitar', 'cancela', 'cancelar', 'la', 'el', 'tarea', 'de', 'mi']);
 const LO_COMPLETE_GLUE_RE = loWordListRE(['completa', 'completar', 'marca', 'marcar', 'como', 'hecho', 'hecha', 'ya', 'hice', 'termin[eé]', 'el', 'la', 'tarea', 'de', 'mi']);
 
@@ -644,10 +644,19 @@ function loParseCommand(text) {
 
   // Build the title by removing every matched token + command verbs + glue words.
   let title = raw;
-  const kill = [date, time, dur, recur].filter(Boolean).map(x => x.matched);
-  for (const k of kill) {
-    if (!k) continue;
-    title = title.replace(new RegExp(k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i'), ' ');
+  // Remove matched date / time / duration tokens literally.
+  for (const k of [date, time, dur].filter(Boolean).map(x => x.matched)) {
+    if (k) title = title.replace(new RegExp(k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i'), ' ');
+  }
+  // Recurrence: strip the weekday by its real accented name (so "todos los miércoles"
+  // leaves the title clean). The generic stopword pass must NOT touch weekday words.
+  if (recur) {
+    const days = recur.recur && recur.recur.days;
+    if (days && days.length) {
+      title = title.replace(new RegExp(`(cada|todos\\s+los)\\s+${LO_DOW_NAMES[days[0]]}s?`, 'iu'), ' ');
+    } else if (recur.matched) {
+      title = title.replace(new RegExp(recur.matched.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i'), ' ');
+    }
   }
   title = title.replace(LO_CMD_VERBS, ' ')
     .replace(LO_TITLE_GLUE_RE, ' ')

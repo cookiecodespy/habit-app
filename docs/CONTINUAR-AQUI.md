@@ -103,11 +103,12 @@ ajena). **El bug del nombre de onboarding NO es real** (el código guarda el nom
 ## 6. BUGS CONFIRMADOS POR EL TESTING — arreglar UNO POR UNO (priorizado)
 > Mantener este orden; marcar [x] al cerrar cada uno (verificar + deploy + sugerencias).
 
-- [x] **B-NLP-1 · "miércoles → ércoles" (REAL).** El cleanup del título en `loParseCommand`
-  (`lifeos-data.jsx:649`) usa `/\b...\bmi\b.../gi` y, como `\b` en JS es ASCII, la "é" cuenta como borde →
-  borra el "mi" DENTRO de "miércoles". **Fix sugerido:** quitar la palabra del día/recurrencia del título
-  ANTES del paso de stopwords (usar el `matched` de `loParseRecur`/weekday, que ya existe), o usar límites
-  Unicode `(?<![\p{L}])mi(?![\p{L}])/u`. Verificar con un caso "reunión todos los miércoles 10am".
+- [x] **B-NLP-1 · "miércoles → ércoles" — ✅ ARREGLADO Y DESPLEGADO (2026-06-04).** Causa: el stopword
+  `mi` se comía el "mi" de "miércoles" (`\b` ASCII trata "é" como borde) + la frase de recurrencia no se
+  quitaba del título. Fix: stopwords ya usan bordes Unicode (`loWordListRE`); la recurrencia ahora se quita
+  por el nombre del día con su acento real; se añadió `cada/todos` a los stopwords para limpiar huérfanos.
+  Verificado con **`verify-nlp.js`** (5 casos PASS, incl. "reunión…todos los miércoles 10am" → "Reunión con
+  cliente Acme" + weekly/3) y `verify-sprint2.js` 13/13.
 - [ ] **B-NLP-2 · comandos compuestos.** "gym y almuerzo el viernes" crea UNA tarea y descarta la 2ª.
   Dividir por " y "/comas en varias tareas (Martín). Media complejidad.
 - [ ] **B-UX-color · acentos compitiendo.** El acento es coral pero en Crear los toggles salen verde/azul
