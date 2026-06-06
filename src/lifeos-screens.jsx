@@ -519,14 +519,6 @@ function CalendarScreen({ theme, onBack, embedded = false, onOpenTask, onAdd, us
 // Hero gradient · date picker · visual time ribbon · priority
 // ──────────────────────────────────────────────────────────────
 function CreateScreen({ theme, onBack, onSave }) {
-  const ICON_CATEGORIES = [
-    { id: 'all',    label: 'Todos',     icons: ['✨','📝','✅','📅','⏰','🎯','💡','🔥','⭐','📌','🏃','🧘','🥗','💪','😴','🚿','💊','❤️','📚','✏️','🎓','🔬','💼','💻','📊','📈','✉️','📞','💰','🏠','🍽️','☕','🛒','🚗','🐶','🎁','🎂','🎵','🌱','🎮','🎬','🎸','⚽','🏖️','✈️','📷','🎨','🍿','🎉','🛏️','🧺','🧹','💧','🙏','🎤'] },
-    { id: 'health', label: 'Salud',     icons: ['🏃','🧘','🥗','💪','😴','🚿','💊','🩺','🧠','❤️','🦷','🚭','🚴','🏊','⛹️','🧴','💧','🍎'] },
-    { id: 'work',   label: 'Trabajo',   icons: ['💼','💻','📊','📈','📅','✉️','📞','🖊️','📝','💰','🎯','📎','🗂️','🖥️','📠','🤝','🧾','⏱️'] },
-    { id: 'study',  label: 'Estudio',   icons: ['📚','✏️','🎓','🧮','🔬','🧪','📖','🖍️','📐','💡','🗂️','⏰','✒️','📒','🔭','🧠'] },
-    { id: 'life',   label: 'Vida',      icons: ['🏠','🍽️','☕','🛒','🚗','🐶','🐱','🎁','🎂','❤️','🎵','🌱','🧺','🧹','👶','🛏️','🪴','🍳'] },
-    { id: 'fun',    label: 'Diversión', icons: ['🎮','🎬','🎸','⚽','🏀','🏖️','✈️','📷','🎨','🍿','🎉','🕹️','🎤','🎧','🎲','🏕️','🎳','🎯'] },
-  ];
   const colors = ['coral','amber','rose','mint','sky','lavender','lime','teal','plum','sun','ember','slate'];
   const COLOR_LABELS = { coral:'Coral', amber:'Ámbar', rose:'Rosa', mint:'Menta', sky:'Cielo', lavender:'Lavanda', lime:'Lima', teal:'Verde', plum:'Ciruela', sun:'Sol', ember:'Fuego', slate:'Pizarra' };
   const PRIORITIES = [
@@ -537,7 +529,6 @@ function CreateScreen({ theme, onBack, onSave }) {
 
   const [pickedColor, setColor] = React.useState('mint');
   const [pickedIcon, setIcon] = React.useState('✨');
-  const [iconCat, setIconCat] = React.useState('all');
   const [title, setTitle] = React.useState('');
   const [subtitle, setSub] = React.useState('');
   const [duration, setDuration] = React.useState(30);
@@ -560,7 +551,6 @@ function CreateScreen({ theme, onBack, onSave }) {
     if (!catTouched) setCategory(loGuessCategory(title));
   }, [title, catTouched]);
 
-  const iconList = ICON_CATEGORIES.find(cat => cat.id === iconCat).icons;
   const c = LIFE_PALETTE[pickedColor];
 
   // Start time as "HH:MM" string — native <input type="time"> drives it on iOS (opens wheel picker)
@@ -930,37 +920,7 @@ function CreateScreen({ theme, onBack, onSave }) {
         {/* ── Icono ── */}
         <div style={loCardStyle(theme)}>
           <CardHead theme={theme} icon="grip" accent={pickedColor} title="Icono" help="Elige uno que la represente"/>
-          <div style={{ display: 'flex', gap: 7, marginBottom: 14, overflowX: 'auto', paddingBottom: 2 }}>
-            {ICON_CATEGORIES.map(cat => (
-              <button key={cat.id} onClick={() => setIconCat(cat.id)} className="lo-press" style={{
-                flexShrink: 0,
-                background: iconCat === cat.id ? c.to : theme.surfaceHi,
-                color: iconCat === cat.id ? '#fff' : theme.text2,
-                border: `1px solid ${iconCat === cat.id ? 'transparent' : theme.border}`,
-                padding: '7px 14px', borderRadius: 999,
-                fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
-                transition: 'all .18s var(--ease-smooth)',
-              }}>{cat.label}</button>
-            ))}
-          </div>
-          <div key={iconCat} className="lo-fade" style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 8 }}>
-            {iconList.map(n => {
-              const active = pickedIcon === n;
-              return (
-                <button key={n} onClick={() => setIcon(n)} className="lo-press" style={{
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  padding: 6, borderRadius: 13,
-                  background: active ? `${c.to}22` : 'transparent',
-                  border: `1.5px solid ${active ? c.to : 'transparent'}`,
-                  cursor: 'pointer', transition: 'all .18s var(--ease-smooth)',
-                }}>
-                  <span className={active ? 'lo-pop' : ''} key={n + (active ? 'a' : 'i')} style={{ fontSize: 27, lineHeight: 1, filter: active ? 'none' : 'saturate(1)' }}>
-                    {n}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
+          <EmojiPicker theme={theme} value={pickedIcon} onChange={setIcon} color={pickedColor}/>
         </div>
         </div>
 
@@ -1257,7 +1217,7 @@ function Divider({ theme }) { return <div style={{ height: 0.5, background: them
 // ──────────────────────────────────────────────────────────────
 // Detail screen — opened by tapping a task. Hero gradient + content cards.
 // ──────────────────────────────────────────────────────────────
-const DETAIL_DEMO = { id: 'demo', title: 'Bici al estudio', subtitle: '4.2 km · ruta escénica', icon: 'bike', color: 'mint', status: 'todo', start: '08:15', end: '08:45' };
+const DETAIL_DEMO = { id: 'demo', title: 'Bici al estudio', subtitle: '4.2 km · ruta escénica', icon: '🚴', color: 'mint', status: 'todo', start: '08:15', end: '08:45' };
 
 const PRIORITY_LABELS = { low: 'Baja', medium: 'Media', high: 'Alta' };
 const RECUR_LABELS = { daily: 'Cada día', weekdays: 'Entre semana', weekly: 'Cada semana' };
@@ -1284,7 +1244,6 @@ function DetailScreen({ theme, task, onBack, onStartFocus, onComplete, onToggleS
   const setField = (patch) => { if (live) onUpdate(patch); };
 
   const DETAIL_COLORS = ['coral','amber','rose','mint','sky','lavender','lime','teal','plum','sun','ember','slate'];
-  const DETAIL_ICONS = ['yoga','shower','coffee','bike','briefcase','book','call','meal','meditate','presentation','moon','walk','pencil','cart','sparkle','clock','music','gift','home','heart','star','pill','fire','target'];
   const DETAIL_DATES = React.useMemo(() => {
     const _t = new Date(); const DS = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb']; const MS = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
     return Array.from({ length: 14 }, (_, off) => { const d = new Date(_t); d.setDate(_t.getDate() + off); return { off, dow: off === 0 ? 'Hoy' : off === 1 ? 'Mañ' : DS[d.getDay()], day: d.getDate(), mon: (off === 0 || d.getDate() === 1) ? MS[d.getMonth()] : null, dateStr: loDateStr(d) }; });
@@ -1554,17 +1513,7 @@ function DetailScreen({ theme, task, onBack, onStartFocus, onComplete, onToggleS
                   </div>
                   {/* Icono */}
                   <div style={{ fontSize: 10.5, fontWeight: 700, color: theme.text3, letterSpacing: 1, textTransform: 'uppercase', margin: '14px 0 8px' }}>Icono</div>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 8 }}>
-                    {DETAIL_ICONS.map(n => {
-                      const active = t.icon === n;
-                      return (
-                        <button key={n} onClick={() => setField({ icon: n })} className="lo-press" style={{
-                          display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 5, borderRadius: 12, cursor: 'pointer',
-                          background: active ? `${c.to}22` : 'transparent', border: `1.5px solid ${active ? c.to : 'transparent'}`,
-                        }}><LifeIcon name={n} color={t.color} size={28} shape="rounded"/></button>
-                      );
-                    })}
-                  </div>
+                  <EmojiPicker theme={theme} value={t.icon} onChange={(n) => setField({ icon: n })} color={t.color}/>
                 </div>
               )}
             </Card>
@@ -1690,18 +1639,18 @@ function OnboardingScreen({ theme, onBack }) {
 // Onboarding visuals — mini timeline preview
 function OnbVisualTimeline({ theme }) {
   const items = [
-    { icon: 'sun', color: 'amber',  t: '7:00' },
-    { icon: 'coffee', color: 'ember', t: '7:30' },
-    { icon: 'briefcase', color: 'slate', t: '9:00' },
-    { icon: 'meal', color: 'sun', t: '12:30' },
-    { icon: 'walk', color: 'lime', t: '15:00' },
+    { icon: '☀️', color: 'amber',  t: '7:00' },
+    { icon: '☕', color: 'ember', t: '7:30' },
+    { icon: '💼', color: 'slate', t: '9:00' },
+    { icon: '🍽️', color: 'sun', t: '12:30' },
+    { icon: '🏃', color: 'lime', t: '15:00' },
   ];
   return (
     <div style={{ width: 240, padding: 14, background: theme.surface, borderRadius: 22, border: `0.5px solid ${theme.border}`, boxShadow: `0 20px 50px rgba(0,0,0,0.4)` }}>
       {items.map((it, i) => (
         <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '6px 0', opacity: i < 2 ? 0.4 : 1 }}>
           <span style={{ fontSize: 10.5, color: theme.text3, width: 32, textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>{it.t}</span>
-          <LifeIcon name={it.icon} color={it.color} size={28} shape="rounded"/>
+          <TaskGlyph icon={it.icon} color={it.color} size={28} shape="rounded"/>
           <div style={{ flex: 1, height: 4, borderRadius: 2, background: LIFE_PALETTE[it.color].to + '55' }}/>
         </div>
       ))}
@@ -1729,7 +1678,7 @@ function OnbVisualCapture({ theme }) {
       {/* timeline pill */}
       <div style={{ position: 'absolute', right: 0, bottom: 0, width: 140, padding: 10, background: `linear-gradient(135deg, ${LIFE_PALETTE.coral.from}22, ${LIFE_PALETTE.coral.to}11)`, borderRadius: 16, border: `0.5px solid ${LIFE_PALETTE.coral.to}55`, transform: 'rotate(6deg)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <LifeIcon name="call" color="coral" size={34} shape="squircle"/>
+          <TaskGlyph icon="📞" color="coral" size={34} shape="squircle"/>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 9.5, color: theme.text3, fontVariantNumeric: 'tabular-nums' }}>2:00 PM</div>
             <div style={{ fontSize: 11, color: theme.text, fontWeight: 600 }}>Llamar dentista</div>
@@ -1751,7 +1700,7 @@ function OnbVisualAI({ theme }) {
           <span style={{ fontWeight: 600 }}>Listo — bloqué 8–10 AM.</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: 6, background: theme.bg, borderRadius: 8, marginTop: 4 }}>
-          <LifeIcon name="briefcase" color="slate" size={24} shape="rounded"/>
+          <TaskGlyph icon="💼" color="slate" size={24} shape="rounded"/>
           <div style={{ fontSize: 10.5, color: theme.text }}>Deep Work · 2 hr</div>
         </div>
       </div>

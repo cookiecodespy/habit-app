@@ -372,6 +372,61 @@ function TaskGlyph({ icon, color = 'coral', size = 40, shape = 'rounded' }) {
   return <LifeIcon name={icon} color={color} size={size} shape={shape} />;
 }
 
+// ──────────────────────────────────────────────────────────────
+// SHARED EMOJI PICKER — single source of truth for tasks, habits,
+// routines and the detail editor. Categorised native (iOS) emojis so
+// every "thing" in the app speaks the same visual language.
+// ──────────────────────────────────────────────────────────────
+const LO_ICON_CATEGORIES = [
+  { id: 'all',    label: 'Todos',     icons: ['✨','📝','✅','📅','⏰','🎯','💡','🔥','⭐','📌','🏃','🧘','🥗','💪','😴','🚿','💊','❤️','📚','✏️','🎓','🔬','💼','💻','📊','📈','✉️','📞','💰','🏠','🍽️','☕','🛒','🚗','🐶','🎁','🎂','🎵','🌱','🎮','🎬','🎸','⚽','🏖️','✈️','📷','🎨','🍿','🎉','🛏️','🧺','🧹','💧','🙏','🎤'] },
+  { id: 'health', label: 'Salud',     icons: ['🏃','🧘','🥗','💪','😴','🚿','💊','🩺','🧠','❤️','🦷','🚭','🚴','🏊','⛹️','🧴','💧','🍎'] },
+  { id: 'work',   label: 'Trabajo',   icons: ['💼','💻','📊','📈','📅','✉️','📞','🖊️','📝','💰','🎯','📎','🗂️','🖥️','📠','🤝','🧾','⏱️'] },
+  { id: 'study',  label: 'Estudio',   icons: ['📚','✏️','🎓','🧮','🔬','🧪','📖','🖍️','📐','💡','🗂️','⏰','✒️','📒','🔭','🧠'] },
+  { id: 'life',   label: 'Vida',      icons: ['🏠','🍽️','☕','🛒','🚗','🐶','🐱','🎁','🎂','❤️','🎵','🌱','🧺','🧹','👶','🛏️','🪴','🍳'] },
+  { id: 'fun',    label: 'Diversión', icons: ['🎮','🎬','🎸','⚽','🏀','🏖️','✈️','📷','🎨','🍿','🎉','🕹️','🎤','🎧','🎲','🏕️','🎳','🎯'] },
+];
+
+// <EmojiPicker theme value onChange color /> — category tabs + 6-col grid.
+// Reused everywhere so tasks, habits and routines never diverge again.
+function EmojiPicker({ theme, value, onChange, color = 'coral' }) {
+  const [cat, setCat] = React.useState('all');
+  const c = LIFE_PALETTE[color] || LIFE_PALETTE.coral;
+  const list = (LO_ICON_CATEGORIES.find(x => x.id === cat) || LO_ICON_CATEGORIES[0]).icons;
+  return (
+    <div>
+      <div style={{ display: 'flex', gap: 7, marginBottom: 14, overflowX: 'auto', paddingBottom: 2, scrollbarWidth: 'none' }}>
+        {LO_ICON_CATEGORIES.map(ct => (
+          <button key={ct.id} onClick={() => setCat(ct.id)} className="lo-press" style={{
+            flexShrink: 0,
+            background: cat === ct.id ? c.to : theme.surfaceHi,
+            color: cat === ct.id ? '#fff' : theme.text2,
+            border: `1px solid ${cat === ct.id ? 'transparent' : theme.border}`,
+            padding: '7px 14px', borderRadius: 999,
+            fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
+            transition: 'all .18s var(--ease-smooth)',
+          }}>{ct.label}</button>
+        ))}
+      </div>
+      <div key={cat} className="lo-fade" style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 8 }}>
+        {list.map(n => {
+          const active = value === n;
+          return (
+            <button key={n} onClick={() => onChange(n)} className="lo-press" style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              padding: 6, borderRadius: 13,
+              background: active ? `${c.to}22` : 'transparent',
+              border: `1.5px solid ${active ? c.to : 'transparent'}`,
+              cursor: 'pointer', transition: 'all .18s var(--ease-smooth)',
+            }}>
+              <span className={active ? 'lo-pop' : ''} key={n + (active ? 'a' : 'i')} style={{ fontSize: 27, lineHeight: 1 }}>{n}</span>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 // Inline SVG for nav / chrome (monochrome)
 function UIIcon({ name, size = 22, color = 'currentColor', strokeWidth = 1.8 }) {
   const p = { width: size, height: size, viewBox: '0 0 24 24', fill: 'none', stroke: color, strokeWidth, strokeLinecap: 'round', strokeLinejoin: 'round' };
@@ -412,4 +467,4 @@ function UIIcon({ name, size = 22, color = 'currentColor', strokeWidth = 1.8 }) 
   return <svg {...p}>{paths[name]}</svg>;
 }
 
-Object.assign(window, { LifeIcon, LifeIconBox, UIIcon, TaskGlyph, loIsEmoji, LIFE_PALETTE, LIFE_GLYPHS: G });
+Object.assign(window, { LifeIcon, LifeIconBox, UIIcon, TaskGlyph, loIsEmoji, LIFE_PALETTE, LIFE_GLYPHS: G, EmojiPicker, LO_ICON_CATEGORIES });

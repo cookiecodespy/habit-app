@@ -195,13 +195,13 @@ const ROUTINES = [
     name: 'Mañana ideal',
     sub: '5 tareas · 2h 30m',
     color: 'amber',
-    icon: 'sun',
+    icon: '☀️',
     tasks: [
-      { icon: 'sun', color: 'amber', label: 'Despertar suave', dur: 15 },
-      { icon: 'meditate', color: 'lavender', label: 'Meditar 20m', dur: 20 },
-      { icon: 'shower', color: 'sky', label: 'Ducha fría', dur: 15 },
-      { icon: 'coffee', color: 'ember', label: 'Café + lectura', dur: 30 },
-      { icon: 'briefcase', color: 'slate', label: 'Deep work', dur: 90 },
+      { icon: '☀️', color: 'amber', label: 'Despertar suave', dur: 15 },
+      { icon: '🧘', color: 'lavender', label: 'Meditar 20m', dur: 20 },
+      { icon: '🚿', color: 'sky', label: 'Ducha fría', dur: 15 },
+      { icon: '☕', color: 'ember', label: 'Café + lectura', dur: 30 },
+      { icon: '💼', color: 'slate', label: 'Deep work', dur: 90 },
     ],
   },
   {
@@ -209,16 +209,16 @@ const ROUTINES = [
     name: 'Pomodoro · 4 ciclos',
     sub: '8 bloques · 2h',
     color: 'coral',
-    icon: 'clock',
+    icon: '⏰',
     tasks: [
-      { icon: 'book', color: 'plum', label: 'Estudio · ciclo 1', dur: 25 },
-      { icon: 'coffee', color: 'ember', label: 'Pausa corta', dur: 5 },
-      { icon: 'book', color: 'plum', label: 'Estudio · ciclo 2', dur: 25 },
-      { icon: 'coffee', color: 'ember', label: 'Pausa corta', dur: 5 },
-      { icon: 'book', color: 'plum', label: 'Estudio · ciclo 3', dur: 25 },
-      { icon: 'coffee', color: 'ember', label: 'Pausa corta', dur: 5 },
-      { icon: 'book', color: 'plum', label: 'Estudio · ciclo 4', dur: 25 },
-      { icon: 'walk', color: 'lime', label: 'Pausa larga', dur: 15 },
+      { icon: '📚', color: 'plum', label: 'Estudio · ciclo 1', dur: 25 },
+      { icon: '☕', color: 'ember', label: 'Pausa corta', dur: 5 },
+      { icon: '📚', color: 'plum', label: 'Estudio · ciclo 2', dur: 25 },
+      { icon: '☕', color: 'ember', label: 'Pausa corta', dur: 5 },
+      { icon: '📚', color: 'plum', label: 'Estudio · ciclo 3', dur: 25 },
+      { icon: '☕', color: 'ember', label: 'Pausa corta', dur: 5 },
+      { icon: '📚', color: 'plum', label: 'Estudio · ciclo 4', dur: 25 },
+      { icon: '🏃', color: 'lime', label: 'Pausa larga', dur: 15 },
     ],
   },
   {
@@ -226,14 +226,14 @@ const ROUTINES = [
     name: 'Día de clases',
     sub: '6 tareas · 8h',
     color: 'sky',
-    icon: 'book',
+    icon: '📚',
     tasks: [
-      { icon: 'coffee', color: 'ember', label: 'Desayuno + ducha', dur: 45 },
-      { icon: 'bike', color: 'mint', label: 'Camino a la U', dur: 30 },
-      { icon: 'presentation', color: 'sky', label: 'Clase de la mañana', dur: 180 },
-      { icon: 'meal', color: 'sun', label: 'Almuerzo en casino', dur: 45 },
-      { icon: 'book', color: 'plum', label: 'Estudio en biblioteca', dur: 120 },
-      { icon: 'walk', color: 'lime', label: 'Regreso + descanso', dur: 60 },
+      { icon: '☕', color: 'ember', label: 'Desayuno + ducha', dur: 45 },
+      { icon: '🚴', color: 'mint', label: 'Camino a la U', dur: 30 },
+      { icon: '📊', color: 'sky', label: 'Clase de la mañana', dur: 180 },
+      { icon: '🍽️', color: 'sun', label: 'Almuerzo en casino', dur: 45 },
+      { icon: '📚', color: 'plum', label: 'Estudio en biblioteca', dur: 120 },
+      { icon: '🏃', color: 'lime', label: 'Regreso + descanso', dur: 60 },
     ],
   },
   {
@@ -241,12 +241,12 @@ const ROUTINES = [
     name: 'Workout completo',
     sub: '4 tareas · 1h 15m',
     color: 'coral',
-    icon: 'yoga',
+    icon: '💪',
     tasks: [
-      { icon: 'yoga', color: 'coral', label: 'Calentamiento', dur: 10 },
-      { icon: 'walk', color: 'lime', label: 'Cardio', dur: 25 },
-      { icon: 'yoga', color: 'coral', label: 'Fuerza', dur: 30 },
-      { icon: 'meditate', color: 'lavender', label: 'Stretching', dur: 10 },
+      { icon: '💪', color: 'coral', label: 'Calentamiento', dur: 10 },
+      { icon: '🏃', color: 'lime', label: 'Cardio', dur: 25 },
+      { icon: '💪', color: 'coral', label: 'Fuerza', dur: 30 },
+      { icon: '🧘', color: 'lavender', label: 'Stretching', dur: 10 },
     ],
   },
   {
@@ -254,12 +254,12 @@ const ROUTINES = [
     name: 'Date night',
     sub: '4 tareas · 3h',
     color: 'rose',
-    icon: 'meal',
+    icon: '🍽️',
     tasks: [
-      { icon: 'shower', color: 'sky', label: 'Arreglarse', dur: 45 },
-      { icon: 'walk', color: 'lime', label: 'Caminar al lugar', dur: 20 },
-      { icon: 'meal', color: 'rose', label: 'Cena especial', dur: 90 },
-      { icon: 'moon', color: 'lavender', label: 'Caminata nocturna', dur: 30 },
+      { icon: '🚿', color: 'sky', label: 'Arreglarse', dur: 45 },
+      { icon: '🏃', color: 'lime', label: 'Caminar al lugar', dur: 20 },
+      { icon: '🍽️', color: 'rose', label: 'Cena especial', dur: 90 },
+      { icon: '😴', color: 'lavender', label: 'Caminata nocturna', dur: 30 },
     ],
   },
   {
@@ -267,12 +267,12 @@ const ROUTINES = [
     name: 'Cerrar el día',
     sub: '4 tareas · 2h',
     color: 'lavender',
-    icon: 'moon',
+    icon: '😴',
     tasks: [
-      { icon: 'meal', color: 'sun', label: 'Cocinar cena', dur: 60 },
-      { icon: 'pencil', color: 'rose', label: 'Journal', dur: 20 },
-      { icon: 'book', color: 'plum', label: 'Leer', dur: 30 },
-      { icon: 'moon', color: 'lavender', label: 'Bajar revoluciones', dur: 10 },
+      { icon: '🍽️', color: 'sun', label: 'Cocinar cena', dur: 60 },
+      { icon: '✏️', color: 'rose', label: 'Journal', dur: 20 },
+      { icon: '📚', color: 'plum', label: 'Leer', dur: 30 },
+      { icon: '😴', color: 'lavender', label: 'Bajar revoluciones', dur: 10 },
     ],
   },
   {
@@ -280,11 +280,11 @@ const ROUTINES = [
     name: 'Sesión deep work',
     sub: '3 tareas · 3h',
     color: 'slate',
-    icon: 'briefcase',
+    icon: '💼',
     tasks: [
-      { icon: 'briefcase', color: 'slate', label: 'Foco profundo', dur: 90 },
-      { icon: 'walk', color: 'lime', label: 'Caminata break', dur: 15 },
-      { icon: 'briefcase', color: 'slate', label: 'Foco profundo', dur: 75 },
+      { icon: '💼', color: 'slate', label: 'Foco profundo', dur: 90 },
+      { icon: '🏃', color: 'lime', label: 'Caminata break', dur: 15 },
+      { icon: '💼', color: 'slate', label: 'Foco profundo', dur: 75 },
     ],
   },
 ];
@@ -297,9 +297,8 @@ function routineSub(tasks) {
   return `${tasks.length} ${tasks.length === 1 ? 'tarea' : 'tareas'} · ${dur}`;
 }
 
-const ROUTINE_ICONS = ['sparkle', 'sun', 'moon', 'coffee', 'briefcase', 'book', 'yoga', 'meal', 'clock', 'heart', 'dumbbell', 'walk', 'pencil', 'music'];
 const ROUTINE_COLORS = ['coral', 'amber', 'rose', 'mint', 'sky', 'lavender', 'lime', 'teal', 'plum', 'sun', 'ember', 'slate'];
-const STEP_ICONS = ['sparkle', 'coffee', 'book', 'briefcase', 'yoga', 'meal', 'walk', 'shower', 'meditate', 'moon', 'pencil', 'music', 'dumbbell', 'heart', 'pill', 'clock'];
+const STEP_ICONS = ['✨', '☕', '📚', '💼', '🧘', '🍽️', '🏃', '🚿', '🧠', '😴', '✏️', '🎵', '💪', '❤️', '💊', '⏰'];
 
 function RoutinesScreen({ theme, onBack, onApply }) {
   const [picked, setPicked] = React.useState(null);
@@ -376,7 +375,7 @@ function RoutinesScreen({ theme, onBack, onApply }) {
         cursor: 'pointer', color: theme.text, textAlign: 'left',
         fontFamily: 'inherit',
       }}>
-        <LifeIcon name={r.icon} color={r.color} size={50} shape="squircle"/>
+        <TaskGlyph icon={r.icon} color={r.color} size={50} shape="squircle"/>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontSize: 16, fontWeight: 600, letterSpacing: -0.2, display: 'flex', alignItems: 'center', gap: 7 }}>
             {r.name}
@@ -385,7 +384,7 @@ function RoutinesScreen({ theme, onBack, onApply }) {
           <div style={{ fontSize: 12, color: theme.text2, marginTop: 2 }}>{r.sub}</div>
           <div style={{ display: 'flex', gap: 4, marginTop: 8 }}>
             {r.tasks.slice(0, 5).map((t, k) => (
-              <LifeIcon key={k} name={t.icon} color={t.color || r.color} size={22} shape="rounded"/>
+              <TaskGlyph key={k} icon={t.icon} color={t.color || r.color} size={22} shape="rounded"/>
             ))}
           </div>
         </div>
@@ -399,15 +398,15 @@ function RoutinesScreen({ theme, onBack, onApply }) {
 function RoutineEditor({ theme, initial, onCancel, onSaved, onDeleted }) {
   const editing = !!(initial && initial.id);
   const [name, setName] = React.useState(initial?.name || '');
-  const [icon, setIcon] = React.useState(initial?.icon || 'sparkle');
+  const [icon, setIcon] = React.useState(initial?.icon || '✨');
   const [color, setColor] = React.useState(initial?.color || 'coral');
   const [tasks, setTasks] = React.useState(() =>
-    (initial?.tasks?.length ? initial.tasks.map(t => ({ ...t })) : [{ icon: 'sparkle', color: initial?.color || 'coral', label: '', dur: 30 }]));
+    (initial?.tasks?.length ? initial.tasks.map(t => ({ ...t })) : [{ icon: '✨', color: initial?.color || 'coral', label: '', dur: 30 }]));
   const c = LIFE_PALETTE[color] || LIFE_PALETTE.coral;
 
   const setStep = (i, patch) => setTasks(ts => ts.map((t, k) => k === i ? { ...t, ...patch } : t));
   const cycleStepIcon = (i) => setStep(i, { icon: STEP_ICONS[(STEP_ICONS.indexOf(tasks[i].icon) + 1 + STEP_ICONS.length) % STEP_ICONS.length] });
-  const addStep = () => setTasks(ts => [...ts, { icon: 'sparkle', color, label: '', dur: 30 }]);
+  const addStep = () => setTasks(ts => [...ts, { icon: '✨', color, label: '', dur: 30 }]);
   const removeStep = (i) => setTasks(ts => ts.length > 1 ? ts.filter((_, k) => k !== i) : ts);
 
   const valid = name.trim() && tasks.some(t => t.label.trim());
@@ -442,21 +441,7 @@ function RoutineEditor({ theme, initial, onCancel, onSaved, onDeleted }) {
 
         {/* Icon picker */}
         <div style={fieldLabel}>Ícono</div>
-        <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4 }}>
-          {ROUTINE_ICONS.map(ic => {
-            const active = icon === ic;
-            return (
-              <button key={ic} onClick={() => setIcon(ic)} className="lo-press" style={{
-                flexShrink: 0, padding: 5, borderRadius: 13, cursor: 'pointer',
-                background: active ? `${c.to}22` : 'transparent',
-                border: `1.5px solid ${active ? c.to : theme.border}`,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>
-                <LifeIcon name={ic} color={color} size={32} shape="rounded"/>
-              </button>
-            );
-          })}
-        </div>
+        <EmojiPicker theme={theme} value={icon} onChange={setIcon} color={color}/>
 
         {/* Color picker */}
         <div style={fieldLabel}>Color</div>
@@ -541,7 +526,7 @@ function RoutineDetail({ theme, routine, onBack, onApply, onEdit }) {
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: 8, position: 'relative', zIndex: 2 }}>
           <div className="lo-scale-in" style={{ filter: `drop-shadow(0 12px 24px ${c.to}77)` }}>
-            <LifeIcon name={routine.icon} color={routine.color} size={84} shape="squircle"/>
+            <TaskGlyph icon={routine.icon} color={routine.color} size={84} shape="squircle"/>
           </div>
           <div style={{ marginTop: 16, fontSize: 26, fontWeight: 700, color: '#fff', letterSpacing: -0.5 }}>{routine.name}</div>
           <div style={{ marginTop: 4, fontSize: 13, color: 'rgba(255,255,255,0.78)' }}>{routine.sub}</div>
@@ -753,7 +738,7 @@ function HabitsStrip({ theme, onAdd, onEdit }) {
               display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
             }}>
               <div style={{ opacity: doneToday ? 1 : 0.92 }}>
-                <LifeIcon name={h.icon} color={doneToday ? h.color : h.color} size={36} shape="squircle"/>
+                <TaskGlyph icon={h.icon} color={h.color} size={36} shape="squircle"/>
               </div>
               <div style={{ fontSize: 12, fontWeight: 600, color: doneToday ? '#fff' : theme.text, letterSpacing: -0.1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%' }}>{h.title}</div>
               <div style={{ display: 'inline-flex', alignItems: 'center', gap: 3, fontSize: 11, fontWeight: 700,
@@ -769,7 +754,6 @@ function HabitsStrip({ theme, onAdd, onEdit }) {
   );
 }
 
-const HABIT_ICONS = ['fire', 'meditate', 'yoga', 'book', 'walk', 'shower', 'coffee', 'pencil', 'moon', 'pill', 'meal', 'sparkle'];
 const HABIT_COLORS = ['coral', 'amber', 'mint', 'sky', 'lavender', 'rose', 'lime', 'teal'];
 const HABIT_CADENCES = [
   { id: 'daily',    label: 'Diario' },
@@ -831,7 +815,7 @@ function HabitCreateSheet({ theme, onClose, habit = null }) {
   const habits = useHabits();
   const editing = !!habit;
   const [name, setName] = React.useState(habit?.title || '');
-  const [icon, setIcon] = React.useState(habit?.icon || 'fire');
+  const [icon, setIcon] = React.useState(habit?.icon || '🔥');
   const [color, setColor] = React.useState(habit?.color || 'coral');
   const [cadence, setCadence] = React.useState(habit?.cadence || 'daily');
   const [days, setDays] = React.useState(habit?.days || [1, 3, 5]);
@@ -875,7 +859,7 @@ function HabitCreateSheet({ theme, onClose, habit = null }) {
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: 6, position: 'relative', zIndex: 2 }}>
           <div className="lo-scale-in" style={{ filter: `drop-shadow(0 12px 26px ${c.to}AA)` }}>
-            <LifeIcon name={icon} color={color} size={80} shape="squircle"/>
+            <TaskGlyph icon={icon} color={color} size={80} shape="squircle"/>
           </div>
           <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Nombre del hábito" autoFocus
             onKeyDown={(e) => { if (e.key === 'Enter') save(); }}
@@ -900,16 +884,7 @@ function HabitCreateSheet({ theme, onClose, habit = null }) {
           </div>
         )}
         <SectionLabel theme={theme}>Ícono</SectionLabel>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 8 }}>
-          {HABIT_ICONS.map(ic => (
-            <button key={ic} onClick={() => setIcon(ic)} className="lo-press" style={{
-              aspectRatio: '1', borderRadius: 14, cursor: 'pointer',
-              background: icon === ic ? theme.accentSoft : theme.surface,
-              border: `1.5px solid ${icon === ic ? theme.accent : theme.border}`,
-              display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0,
-            }}><LifeIcon name={ic} color={color} size={28} shape="rounded"/></button>
-          ))}
-        </div>
+        <EmojiPicker theme={theme} value={icon} onChange={setIcon} color={color}/>
 
         <SectionLabel theme={theme}>Color</SectionLabel>
         <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>

@@ -1,30 +1,30 @@
 // lifeos-data.jsx — sample task data for the demo day
 
 const TODAY_TASKS_RAW = [
-  { id: 't1', start: '06:30', end: '06:45', title: 'Despertar suave',         subtitle: 'Ritual de la mañana', icon: 'sun',         color: 'amber',    status: 'done',  alarm: true },
-  { id: 't2', start: '06:45', end: '07:15', title: 'Estirar y meditar',      subtitle: '10m respiración, 20m flow', icon: 'meditate',   color: 'lavender', status: 'done' },
-  { id: 't3', start: '07:15', end: '07:45', title: 'Ducha fría',             subtitle: 'Wim Hof · 30s al final', icon: 'shower',     color: 'sky',      status: 'done' },
-  { id: 't4', start: '07:45', end: '08:15', title: 'Espresso lento',           subtitle: 'Leer 5 páginas', icon: 'coffee',     color: 'ember',    status: 'doing', progress: 0.4 },
-  { id: 't5', start: '08:15', end: '08:45', title: 'Bici al estudio',         subtitle: '4.2 km · ruta escénica', icon: 'bike',       color: 'mint',     status: 'todo' },
-  { id: 't6', start: '09:00', end: '11:00', title: 'Deep work — LifeOS Beta', subtitle: '2 hr · sin teléfono', icon: 'briefcase',  color: 'slate',    status: 'todo', subtasks: { done: 2, total: 5 } },
+  { id: 't1', start: '06:30', end: '06:45', title: 'Despertar suave',         subtitle: 'Ritual de la mañana', icon: '☀️',         color: 'amber',    status: 'done',  alarm: true },
+  { id: 't2', start: '06:45', end: '07:15', title: 'Estirar y meditar',      subtitle: '10m respiración, 20m flow', icon: '🧘',   color: 'lavender', status: 'done' },
+  { id: 't3', start: '07:15', end: '07:45', title: 'Ducha fría',             subtitle: 'Wim Hof · 30s al final', icon: '🚿',     color: 'sky',      status: 'done' },
+  { id: 't4', start: '07:45', end: '08:15', title: 'Espresso lento',           subtitle: 'Leer 5 páginas', icon: '☕',     color: 'ember',    status: 'doing', progress: 0.4 },
+  { id: 't5', start: '08:15', end: '08:45', title: 'Bici al estudio',         subtitle: '4.2 km · ruta escénica', icon: '🚴',       color: 'mint',     status: 'todo' },
+  { id: 't6', start: '09:00', end: '11:00', title: 'Deep work — LifeOS Beta', subtitle: '2 hr · sin teléfono', icon: '💼',  color: 'slate',    status: 'todo', subtasks: { done: 2, total: 5 } },
   { id: 'br1', kind: 'break', start: '11:00', end: '11:15', title: 'Descanso — estirar y agua', minutes: 15 },
-  { id: 't7', start: '11:15', end: '12:00', title: 'Revisión de diseño',           subtitle: 'con Tomás · Zoom', icon: 'presentation', color: 'rose', status: 'todo', alarm: true },
-  { id: 't8', start: '12:00', end: '13:00', title: 'Almuerzo con María',        subtitle: 'Café Forma', icon: 'meal',       color: 'sun',      status: 'todo' },
-  { id: 't9', start: '13:00', end: '14:30', title: 'Estudiar inglés',           subtitle: 'Capítulo 7 · 90 min', icon: 'book',       color: 'plum',     status: 'todo', subtasks: { done: 0, total: 3 } },
-  { id: 't10', start: '14:30', end: '15:00', title: 'Caminar en el parque',       subtitle: 'Sin teléfono', icon: 'walk',       color: 'lime',     status: 'todo' },
-  { id: 't11', start: '15:00', end: '17:00', title: 'Llamadas con clientes',           subtitle: '3 llamadas agendadas', icon: 'call',       color: 'teal',     status: 'todo', alarm: true },
+  { id: 't7', start: '11:15', end: '12:00', title: 'Revisión de diseño',           subtitle: 'con Tomás · Zoom', icon: '📊', color: 'rose', status: 'todo', alarm: true },
+  { id: 't8', start: '12:00', end: '13:00', title: 'Almuerzo con María',        subtitle: 'Café Forma', icon: '🍽️',       color: 'sun',      status: 'todo' },
+  { id: 't9', start: '13:00', end: '14:30', title: 'Estudiar inglés',           subtitle: 'Capítulo 7 · 90 min', icon: '📚',       color: 'plum',     status: 'todo', subtasks: { done: 0, total: 3 } },
+  { id: 't10', start: '14:30', end: '15:00', title: 'Caminar en el parque',       subtitle: 'Sin teléfono', icon: '🏃',       color: 'lime',     status: 'todo' },
+  { id: 't11', start: '15:00', end: '17:00', title: 'Llamadas con clientes',           subtitle: '3 llamadas agendadas', icon: '📞',       color: 'teal',     status: 'todo', alarm: true },
   { id: 'br2', kind: 'break', start: '17:00', end: '17:30', title: 'Margen 30 min — ¿algo más?', minutes: 30, suggest: true },
-  { id: 't12', start: '17:30', end: '18:30', title: 'Supermercado',              subtitle: 'Lista lista · 8 items', icon: 'cart',       color: 'coral',    status: 'todo', subtasks: { done: 0, total: 8 } },
-  { id: 't13', start: '19:00', end: '20:00', title: 'Cocinar la cena',            subtitle: 'Salmón + verdes', icon: 'meal',       color: 'sun',      status: 'todo' },
-  { id: 't14', start: '20:30', end: '21:30', title: 'Leer y journaling',         subtitle: '30 min de lectura', icon: 'pencil',     color: 'rose',     status: 'todo' },
-  { id: 't15', start: '22:30', end: '23:00', title: 'Bajar revoluciones',              subtitle: 'Sin pantallas', icon: 'moon',       color: 'lavender', status: 'todo' },
+  { id: 't12', start: '17:30', end: '18:30', title: 'Supermercado',              subtitle: 'Lista lista · 8 items', icon: '🛒',       color: 'coral',    status: 'todo', subtasks: { done: 0, total: 8 } },
+  { id: 't13', start: '19:00', end: '20:00', title: 'Cocinar la cena',            subtitle: 'Salmón + verdes', icon: '🍽️',       color: 'sun',      status: 'todo' },
+  { id: 't14', start: '20:30', end: '21:30', title: 'Leer y journaling',         subtitle: '30 min de lectura', icon: '✏️',     color: 'rose',     status: 'todo' },
+  { id: 't15', start: '22:30', end: '23:00', title: 'Bajar revoluciones',              subtitle: 'Sin pantallas', icon: '😴',       color: 'lavender', status: 'todo' },
 ];
 
 const QUICK_ACTIONS = [
-  { id: 'q1', label: 'Llamar a mamá',     icon: 'call',     color: 'mint' },
-  { id: 'q2', label: 'Planear mañana',    icon: 'sparkle',  color: 'lavender' },
-  { id: 'q3', label: 'Viaje a Tokio',     icon: 'palm',     color: 'sun' },
-  { id: 'q4', label: 'Sesión de gym',     icon: 'yoga',     color: 'coral' },
+  { id: 'q1', label: 'Llamar a mamá',     icon: '📞',     color: 'mint' },
+  { id: 'q2', label: 'Planear mañana',    icon: '✨',  color: 'lavender' },
+  { id: 'q3', label: 'Viaje a Tokio',     icon: '🌴',     color: 'sun' },
+  { id: 'q4', label: 'Sesión de gym',     icon: '💪',     color: 'coral' },
 ];
 
 const INBOX_ITEMS = [
@@ -70,24 +70,24 @@ const MONTH_CELLS = buildMonthCells();
 // different tasks when you tap different days.
 // ──────────────────────────────────────────────────────────────
 const TASK_TEMPLATES = [
-  { title: 'Despertar suave',       sub: 'Ritual de la mañana',           icon: 'sun',        color: 'amber',    dur: 15 },
-  { title: 'Estirar y meditar',   sub: '10m respiración, 20m flow',     icon: 'meditate',   color: 'lavender', dur: 30 },
-  { title: 'Ducha fría',          sub: 'Protocolo Wim Hof',         icon: 'shower',     color: 'sky',      dur: 20 },
-  { title: 'Espresso lento',        sub: 'Leer 5 páginas',             icon: 'coffee',     color: 'ember',    dur: 25 },
-  { title: 'Bici al estudio',      sub: '4.2 km · escénico',          icon: 'bike',       color: 'mint',     dur: 25 },
-  { title: 'Deep work',            sub: 'Sin teléfono · bloque 2 hr',   icon: 'briefcase',  color: 'slate',    dur: 120 },
-  { title: 'Revisión de diseño',        sub: 'Zoom · con Tomás',        icon: 'presentation', color: 'rose',   dur: 45 },
-  { title: 'Almuerzo',                sub: 'Café Forma',               icon: 'meal',       color: 'sun',      dur: 60 },
-  { title: 'Estudiar inglés',        sub: 'Capítulo 7',                icon: 'book',       color: 'plum',     dur: 90 },
-  { title: 'Caminar en el parque',     sub: 'Sin teléfono',                 icon: 'walk',       color: 'lime',     dur: 30 },
-  { title: 'Llamadas con clientes',         sub: '3 llamadas agendadas',        icon: 'call',       color: 'teal',     dur: 60 },
-  { title: 'Supermercado',            sub: 'Lista · 8 items',           icon: 'cart',       color: 'coral',    dur: 60 },
-  { title: 'Cocinar la cena',          sub: 'Salmón + verdes',          icon: 'meal',       color: 'sun',      dur: 60 },
-  { title: 'Leer y journaling',       sub: '30 min de lectura',           icon: 'pencil',     color: 'rose',     dur: 60 },
-  { title: 'Bajar revoluciones',            sub: 'Sin pantallas',               icon: 'moon',       color: 'lavender', dur: 30 },
-  { title: 'Gym',          sub: 'Día de empuje',                 icon: 'yoga',       color: 'coral',    dur: 75 },
-  { title: 'Standup del equipo',         sub: 'Sync diario',               icon: 'message',    color: 'sky',      dur: 15 },
-  { title: 'Planear mañana',        sub: 'Review de 10 min',            icon: 'sparkle',    color: 'lavender', dur: 10 },
+  { title: 'Despertar suave',       sub: 'Ritual de la mañana',           icon: '☀️',        color: 'amber',    dur: 15 },
+  { title: 'Estirar y meditar',   sub: '10m respiración, 20m flow',     icon: '🧘',   color: 'lavender', dur: 30 },
+  { title: 'Ducha fría',          sub: 'Protocolo Wim Hof',         icon: '🚿',     color: 'sky',      dur: 20 },
+  { title: 'Espresso lento',        sub: 'Leer 5 páginas',             icon: '☕',     color: 'ember',    dur: 25 },
+  { title: 'Bici al estudio',      sub: '4.2 km · escénico',          icon: '🚴',       color: 'mint',     dur: 25 },
+  { title: 'Deep work',            sub: 'Sin teléfono · bloque 2 hr',   icon: '💼',  color: 'slate',    dur: 120 },
+  { title: 'Revisión de diseño',        sub: 'Zoom · con Tomás',        icon: '📊', color: 'rose',   dur: 45 },
+  { title: 'Almuerzo',                sub: 'Café Forma',               icon: '🍽️',       color: 'sun',      dur: 60 },
+  { title: 'Estudiar inglés',        sub: 'Capítulo 7',                icon: '📚',       color: 'plum',     dur: 90 },
+  { title: 'Caminar en el parque',     sub: 'Sin teléfono',                 icon: '🏃',       color: 'lime',     dur: 30 },
+  { title: 'Llamadas con clientes',         sub: '3 llamadas agendadas',        icon: '📞',       color: 'teal',     dur: 60 },
+  { title: 'Supermercado',            sub: 'Lista · 8 items',           icon: '🛒',       color: 'coral',    dur: 60 },
+  { title: 'Cocinar la cena',          sub: 'Salmón + verdes',          icon: '🍽️',       color: 'sun',      dur: 60 },
+  { title: 'Leer y journaling',       sub: '30 min de lectura',           icon: '✏️',     color: 'rose',     dur: 60 },
+  { title: 'Bajar revoluciones',            sub: 'Sin pantallas',               icon: '😴',       color: 'lavender', dur: 30 },
+  { title: 'Gym',          sub: 'Día de empuje',                 icon: '💪',       color: 'coral',    dur: 75 },
+  { title: 'Standup del equipo',         sub: 'Sync diario',               icon: '💬',    color: 'sky',      dur: 15 },
+  { title: 'Planear mañana',        sub: 'Review de 10 min',            icon: '✨',    color: 'lavender', dur: 10 },
 ];
 
 // Returns tasks for a given day (year, month0-indexed, day).
@@ -369,7 +369,7 @@ const LOStore = {
   saveHabits(list) { loWrite(LO_KEYS.habits, list); return list; },
   addHabit(partial) {
     const list = LOStore.allHabits();
-    const habit = { id: loUid('h'), title: '', icon: 'fire', color: 'coral', cadence: 'daily',
+    const habit = { id: loUid('h'), title: '', icon: '🔥', color: 'coral', cadence: 'daily',
       days: null, log: {}, createdAt: Date.now(), updatedAt: Date.now(), ...partial };
     list.push(habit); LOStore.saveHabits(list); return habit;
   },
@@ -402,7 +402,7 @@ const LOStore = {
   customRoutines() { return loRead(LO_KEYS.routines, []); },
   addRoutine(partial) {
     const list = LOStore.customRoutines();
-    const routine = { id: loUid('r'), name: 'Mi rutina', icon: 'sparkle', color: 'coral',
+    const routine = { id: loUid('r'), name: 'Mi rutina', icon: '✨', color: 'coral',
       tasks: [], custom: true, createdAt: Date.now(), updatedAt: Date.now(), ...partial };
     list.push(routine); loWrite(LO_KEYS.routines, list);
     return routine;
@@ -510,27 +510,27 @@ function loGuessCategory(text) {
 
 // Icon + color guessed from the task wording — mirrors Structured's auto-icon.
 const LO_ICON_RULES = [
-  [/\b(gym|gimnasio|entren|ejercicio|pesas|crossfit|deporte|workout|correr|running|trotar)\b/, 'yoga', 'coral'],
-  [/\b(yoga|estir|medita|respira|mindful)\b/, 'meditate', 'lavender'],
-  [/\b(camin|paseo|pasear|caminata)\b/, 'walk', 'lime'],
-  [/\b(estudi|leer|lectura|libro|clase|tarea|examen|prueba|universidad|repasar|ingl[eé]s)\b/, 'book', 'plum'],
-  [/\b(reuni[oó]n|meeting|junta|zoom|call|llamada|videollamada|sync|standup|entrevista)\b/, 'presentation', 'sky'],
-  [/\b(llamar|telefon|tel[eé]fono)\b/, 'call', 'teal'],
-  [/\b(almuerzo|almorzar|comer|comida|cena|cenar|desayun|brunch|restaurant)\b/, 'meal', 'sun'],
-  [/\b(caf[eé]|coffee|espresso)\b/, 'coffee', 'ember'],
-  [/\b(compr|super|mercado|tienda|mall)\b/, 'cart', 'coral'],
-  [/\b(dormir|sue[nñ]o|acostar|noche|descansar)\b/, 'moon', 'lavender'],
-  [/\b(trabaj|deep work|foco|proyecto|c[oó]digo|programar|dise[nñ]ar|oficina|openclaw)\b/, 'briefcase', 'slate'],
-  [/\b(ducha|ba[nñ]o|ducharme)\b/, 'shower', 'sky'],
-  [/\b(doctor|dentista|m[eé]dico|cita|salud|pastilla|remedio|medicamento)\b/, 'pill', 'rose'],
-  [/\b(bici|bicicleta|andar)\b/, 'bike', 'mint'],
-  [/\b(journal|diario|escribir|anotar|nota)\b/, 'pencil', 'rose'],
-  [/\b(planear|planificar|organizar|revisar|review)\b/, 'sparkle', 'lavender'],
+  [/\b(gym|gimnasio|entren|ejercicio|pesas|crossfit|deporte|workout|correr|running|trotar)\b/, '💪', 'coral'],
+  [/\b(yoga|estir|medita|respira|mindful)\b/, '🧘', 'lavender'],
+  [/\b(camin|paseo|pasear|caminata)\b/, '🏃', 'lime'],
+  [/\b(estudi|leer|lectura|libro|clase|tarea|examen|prueba|universidad|repasar|ingl[eé]s)\b/, '📚', 'plum'],
+  [/\b(reuni[oó]n|meeting|junta|zoom|call|llamada|videollamada|sync|standup|entrevista)\b/, '📊', 'sky'],
+  [/\b(llamar|telefon|tel[eé]fono)\b/, '📞', 'teal'],
+  [/\b(almuerzo|almorzar|comer|comida|cena|cenar|desayun|brunch|restaurant)\b/, '🍽️', 'sun'],
+  [/\b(caf[eé]|coffee|espresso)\b/, '☕', 'ember'],
+  [/\b(compr|super|mercado|tienda|mall)\b/, '🛒', 'coral'],
+  [/\b(dormir|sue[nñ]o|acostar|noche|descansar)\b/, '😴', 'lavender'],
+  [/\b(trabaj|deep work|foco|proyecto|c[oó]digo|programar|dise[nñ]ar|oficina|openclaw)\b/, '💼', 'slate'],
+  [/\b(ducha|ba[nñ]o|ducharme)\b/, '🚿', 'sky'],
+  [/\b(doctor|dentista|m[eé]dico|cita|salud|pastilla|remedio|medicamento)\b/, '💊', 'rose'],
+  [/\b(bici|bicicleta|andar)\b/, '🚴', 'mint'],
+  [/\b(journal|diario|escribir|anotar|nota)\b/, '✏️', 'rose'],
+  [/\b(planear|planificar|organizar|revisar|review)\b/, '✨', 'lavender'],
 ];
 function loGuessIconColor(title) {
   const t = loStrip(title);
   for (const [re, icon, color] of LO_ICON_RULES) if (re.test(t)) return { icon, color };
-  return { icon: 'star', color: 'mint' };
+  return { icon: '✨', color: 'mint' };
 }
 
 // Parse a date reference. Returns { date, matched } or null.
