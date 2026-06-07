@@ -724,7 +724,7 @@ function HabitsStrip({ theme, onAdd, onEdit }) {
         {list.map(h => {
           const c = LIFE_PALETTE[h.color] || LIFE_PALETTE.coral;
           const doneToday = !!(h.log || {})[today];
-          const streak = habits.streak(h);
+          const mcount = loHabitCounts(h).month;
           // Streaks-style ring around the glyph: 30-day consistency, fills as you keep it.
           const rate = Math.max(0, Math.min(1, (window.loHabitRate ? loHabitRate(h, 30) : 0) / 100));
           const R = 23, CIRC = 2 * Math.PI * R;
@@ -758,16 +758,180 @@ function HabitsStrip({ theme, onAdd, onEdit }) {
               <div style={{ fontSize: 11.5, fontWeight: 600, color: doneToday ? '#fff' : theme.text, letterSpacing: -0.1,
                 lineHeight: 1.15, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
                 overflow: 'hidden', maxWidth: '100%', minHeight: 27 }}>{h.title}</div>
-              {/* streak — positive framing when there's no streak yet */}
+              {/* times done this month — honest tracking, no streak/fire */}
               <div style={{ display: 'inline-flex', alignItems: 'center', gap: 3, fontSize: 11, fontWeight: 700,
-                color: doneToday ? 'rgba(255,255,255,0.95)' : (streak > 0 ? c.to : theme.text3) }}>
-                {streak > 0
-                  ? <><UIIcon name="flame" size={11} color={doneToday ? '#fff' : c.to} strokeWidth={2}/>{streak}</>
-                  : <span style={{ fontWeight: 600, opacity: 0.75, letterSpacing: 0.2 }}>{doneToday ? '¡vas!' : 'nueva'}</span>}
+                color: doneToday ? 'rgba(255,255,255,0.95)' : (mcount > 0 ? c.to : theme.text3) }}>
+                {mcount > 0
+                  ? <><UIIcon name="check" size={11} color={doneToday ? '#fff' : c.to} strokeWidth={2.4}/>{mcount}</>
+                  : <span style={{ fontWeight: 600, opacity: 0.75, letterSpacing: 0.2 }}>nuevo</span>}
               </div>
             </button>
           );
         })}
+      </div>
+    </div>
+  );
+}
+
+// Honest counts from a habit's log — no streaks, just what actually happened.
+function loHabitCounts(habit) {
+  const log = habit.log || {};
+  const keys = Object.keys(log).filter(d => log[d]);
+  const now = new Date();
+  const ym = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  const month = keys.filter(d => d.startsWith(ym)).length;
+  const ws = new Date(now); ws.setHours(0, 0, 0, 0); ws.setDate(now.getDate() - ((now.getDay() + 6) % 7));
+  let week = 0;
+  for (let i = 0; i < 7; i++) { const d = new Date(ws); d.setDate(ws.getDate() + i); if (log[loDateStr(d)]) week++; }
+  return { month, week, total: keys.length };
+}
+
+// Month calendar of a single habit — done days marked as filled squares,
+// with month navigation. The "por mes" view Tomas asked for.
+function HabitMonthGrid({ theme, habit }) {
+  const c = LIFE_PALETTE[habit.color] || LIFE_PALETTE.coral;
+  const [cursor, setCursor] = React.useState(() => { const n = new Date(); return { y: n.getFullYear(), m: n.getMonth() }; });
+  const log = habit.log || {};
+  const MON = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  const first = new Date(cursor.y, cursor.m, 1);
+  const lead = (first.getDay() + 6) % 7;
+  const daysIn = new Date(cursor.y, cursor.m + 1, 0).getDate();
+  const todayStr = loDateStr();
+  const endToday = new Date(); endToday.setHours(23, 59, 59, 999);
+  const cells = [];
+  for (let i = 0; i < lead; i++) cells.push(null);
+  for (let d = 1; d <= daysIn; d++) {
+    const ds = `${cursor.y}-${String(cursor.m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+    cells.push({ d, ds, done: !!log[ds], today: ds === todayStr, future: new Date(cursor.y, cursor.m, d) > endToday });
+  }
+  const monthDone = cells.filter(x => x && x.done).length;
+  const shift = (delta) => setCursor(cur => { const m = cur.m + delta; return { y: cur.y + Math.floor(m / 12), m: ((m % 12) + 12) % 12 }; });
+  const DOW = ['L','M','X','J','V','S','D'];
+  const nav = { width: 30, height: 30, borderRadius: 10, background: theme.surfaceHi, border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 };
+  return (
+    <div>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+        <button onClick={() => shift(-1)} className="lo-press" style={nav}><UIIcon name="chevronL" size={15} color={theme.text2}/></button>
+        <span style={{ fontSize: 14, fontWeight: 700, color: theme.text, letterSpacing: -0.2 }}>{MON[cursor.m]} {cursor.y}</span>
+        <button onClick={() => shift(1)} className="lo-press" style={nav}><UIIcon name="chevronR" size={15} color={theme.text2}/></button>
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', gap: 6, marginBottom: 6 }}>
+        {DOW.map((d, i) => <div key={i} style={{ textAlign: 'center', fontSize: 10, fontWeight: 700, color: theme.text3, letterSpacing: 0.3 }}>{d}</div>)}
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', gap: 6 }}>
+        {cells.map((cell, i) => cell ? (
+          <div key={i} style={{ aspectRatio: '1', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 11.5, fontWeight: cell.done ? 700 : 500,
+            color: cell.done ? '#fff' : (cell.future ? theme.text3 : theme.text2),
+            background: cell.done ? `linear-gradient(145deg, ${c.from}, ${c.to})` : (cell.future ? 'transparent' : theme.surfaceHi),
+            border: cell.today && !cell.done ? `1.5px solid ${c.to}` : `1px solid ${cell.done ? 'transparent' : theme.border}`,
+            boxShadow: cell.done ? `0 2px 8px ${c.to}55` : 'none', fontVariantNumeric: 'tabular-nums',
+          }}>{cell.d}</div>
+        ) : <div key={i}/>)}
+      </div>
+      <div style={{ marginTop: 14, fontSize: 13, color: theme.text2, textAlign: 'center' }}>
+        <span className="lo-display" style={{ color: c.to, fontWeight: 700, fontSize: 16 }}>{monthDone}</span> {monthDone === 1 ? 'vez' : 'veces'} este mes
+      </div>
+    </div>
+  );
+}
+
+// HABITS SCREEN — dedicated tab (replaces Stats). Clean list; tap a habit to
+// see its month-by-month activity. No streaks — just honest tracking.
+function HabitsScreen({ theme, embedded, onAddHabit, onEditHabit }) {
+  const habits = useHabits();
+  const list = habits.all;
+  const [selId, setSelId] = React.useState(null);
+  const sel = list.find(h => h.id === selId);
+  const today = loDateStr();
+  const ib = { width: 34, height: 34, borderRadius: 11, background: theme.surfaceHi, border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 };
+
+  if (sel) {
+    const c = LIFE_PALETTE[sel.color] || LIFE_PALETTE.coral;
+    const counts = loHabitCounts(sel);
+    const doneToday = !!(sel.log || {})[today];
+    return (
+      <div data-screen-label="Habit detail" className="lo-fade">
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '4px 12px 12px' }}>
+          <button onClick={() => setSelId(null)} className="lo-press" style={ib}><UIIcon name="chevronL" size={18} color={theme.text}/></button>
+          <span style={{ flex: 1, textAlign: 'center', fontSize: 16, fontWeight: 700, color: theme.text, letterSpacing: -0.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{sel.title}</span>
+          <button onClick={() => onEditHabit && onEditHabit(sel)} className="lo-press" style={ib}><UIIcon name="pencil" size={16} color={theme.text2}/></button>
+        </div>
+        <div style={{ padding: '0 16px 24px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14, padding: '6px 0 20px' }}>
+            <div style={{ filter: `drop-shadow(0 12px 28px ${c.to}66)` }}><TaskGlyph icon={sel.icon} color={sel.color} size={76} shape="squircle"/></div>
+            <button onClick={() => habits.toggleToday(sel.id)} className="lo-press" style={{
+              padding: '10px 20px', borderRadius: 999, cursor: 'pointer', fontFamily: 'inherit', fontSize: 13.5, fontWeight: 700,
+              border: doneToday ? 'none' : `1px solid ${theme.border}`, display: 'inline-flex', alignItems: 'center', gap: 7,
+              background: doneToday ? `linear-gradient(135deg, ${c.from}, ${c.to})` : theme.surfaceHi,
+              color: doneToday ? '#fff' : theme.text, boxShadow: doneToday ? `0 6px 18px ${c.to}55` : 'none',
+            }}>
+              <UIIcon name="check" size={15} color={doneToday ? '#fff' : theme.text3} strokeWidth={2.6}/>
+              {doneToday ? 'Hecho hoy' : 'Marcar hoy'}
+            </button>
+          </div>
+          <div style={{ display: 'flex', gap: 8, marginBottom: 18 }}>
+            {[['Este mes', counts.month], ['Esta semana', counts.week], ['Total', counts.total]].map(([label, val]) => (
+              <div key={label} style={{ flex: 1, background: theme.surface, border: `0.5px solid ${theme.border}`, borderRadius: 16, padding: '12px 8px', textAlign: 'center' }}>
+                <div className="lo-display" style={{ fontSize: 22, fontWeight: 600, color: theme.text, letterSpacing: -0.5, fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>{val}</div>
+                <div style={{ fontSize: 9.5, color: theme.text3, fontWeight: 600, letterSpacing: 0.4, textTransform: 'uppercase', marginTop: 5 }}>{label}</div>
+              </div>
+            ))}
+          </div>
+          <SectionLabel theme={theme}>Actividad por mes</SectionLabel>
+          <div style={{ background: theme.surface, border: `0.5px solid ${theme.border}`, borderRadius: 18, padding: 16, marginBottom: 18 }}>
+            <HabitMonthGrid theme={theme} habit={sel}/>
+          </div>
+          <SectionLabel theme={theme}>Consistencia</SectionLabel>
+          <div style={{ background: theme.surface, border: `0.5px solid ${theme.border}`, borderRadius: 18, padding: 16 }}>
+            <HabitHeatmap theme={theme} habit={sel}/>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div data-screen-label="Habits" className="lo-fade">
+      <div style={{ padding: '4px 16px 6px', display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+        <h1 className="lo-display" style={{ fontSize: 30, fontWeight: 600, color: theme.text, letterSpacing: -0.5 }}>Hábitos</h1>
+        <span style={{ fontSize: 12.5, color: theme.text3 }}>{list.length} {list.length === 1 ? 'hábito' : 'hábitos'}</span>
+      </div>
+      <div style={{ padding: '8px 16px 24px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+        {list.length === 0 && (
+          <EmptyState theme={theme} icon="sparkle" title="Sin hábitos aún" body="Crea tu primer hábito y empieza a trackear lo que de verdad importa." ctaLabel="Crear hábito" onCta={onAddHabit}/>
+        )}
+        {list.map(h => {
+          const c = LIFE_PALETTE[h.color] || LIFE_PALETTE.coral;
+          const counts = loHabitCounts(h);
+          const doneToday = !!(h.log || {})[today];
+          const dots = Array.from({ length: 7 }, (_, i) => { const d = new Date(); d.setDate(d.getDate() - (6 - i)); return !!(h.log || {})[loDateStr(d)]; });
+          return (
+            <button key={h.id} onClick={() => setSelId(h.id)} className="lo-press" style={{
+              display: 'flex', alignItems: 'center', gap: 14, padding: '13px 14px', borderRadius: 18, cursor: 'pointer',
+              background: theme.surface, border: `0.5px solid ${theme.border}`, fontFamily: 'inherit', textAlign: 'left',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
+            }}>
+              <TaskGlyph icon={h.icon} color={h.color} size={46} shape="squircle"/>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 15.5, fontWeight: 600, color: theme.text, letterSpacing: -0.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{h.title}</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 8 }}>
+                  {dots.map((on, i) => (<div key={i} style={{ width: 8, height: 8, borderRadius: 2.5, background: on ? c.to : theme.rail }}/>))}
+                  <span style={{ fontSize: 11.5, color: theme.text3, marginLeft: 6 }}>{counts.month} este mes</span>
+                </div>
+              </div>
+              {doneToday
+                ? <div style={{ width: 26, height: 26, borderRadius: 13, background: c.to, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><UIIcon name="check" size={15} color="#fff" strokeWidth={2.6}/></div>
+                : <UIIcon name="chevronR" size={16} color={theme.text3}/>}
+            </button>
+          );
+        })}
+        {list.length > 0 && (
+          <button onClick={onAddHabit} className="lo-press" style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '13px', borderRadius: 16, cursor: 'pointer',
+            background: 'transparent', border: `1px dashed ${theme.accent}66`, color: theme.accent, fontFamily: 'inherit', fontSize: 14, fontWeight: 700, marginTop: 2,
+          }}><UIIcon name="plus" size={16} color={theme.accent} strokeWidth={2.4}/> Nuevo hábito</button>
+        )}
       </div>
     </div>
   );
@@ -892,9 +1056,9 @@ function HabitCreateSheet({ theme, onClose, habit = null }) {
         {editing && (
           <div className="lo-fade" style={{ marginBottom: 6 }}>
             <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
-              <HabitStatPill theme={theme} label="Racha" value={habits.streak(habit)} accent={c.to}/>
-              <HabitStatPill theme={theme} label="Mejor" value={loHabitBestStreak(habit)}/>
-              <HabitStatPill theme={theme} label="30 días" value={loHabitRate(habit, 30) + '%'}/>
+              <HabitStatPill theme={theme} label="Este mes" value={loHabitCounts(habit).month} accent={c.to}/>
+              <HabitStatPill theme={theme} label="Esta semana" value={loHabitCounts(habit).week}/>
+              <HabitStatPill theme={theme} label="Total" value={loHabitCounts(habit).total}/>
             </div>
             <SectionLabel theme={theme}>Consistencia</SectionLabel>
             <div style={{ background: theme.surface, border: `0.5px solid ${theme.border}`, borderRadius: 16, padding: 14 }}>
@@ -1015,5 +1179,5 @@ function DeadlineCard({ theme, onOpenTask }) {
 
 Object.assign(window, {
   FocusMode, QuickAddMenu, RoutinesScreen, SearchOverlay, EmptyState, DeadlineCard, ROUTINES,
-  HabitsStrip, HabitCreateSheet, HabitHeatmap, HabitStatPill,
+  HabitsStrip, HabitCreateSheet, HabitHeatmap, HabitStatPill, HabitsScreen, HabitMonthGrid, loHabitCounts,
 });

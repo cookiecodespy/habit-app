@@ -33,10 +33,10 @@ const findChrome = () => ['/usr/bin/google-chrome-stable','/usr/bin/google-chrom
   }
   const editVisible = await page.getByText(/Editar hábito/i).count();
   const consistency = await page.getByText(/Consistencia/i).count();
-  const bestLabel = await page.getByText(/Mejor/i).count();
+  const monthPill = await page.getByText(/Este mes/i).count(); // streak pills replaced by honest counts
   await page.screenshot({ path: '/tmp/lo-heatmap.png' });
   // also screenshot full edit sheet
-  console.log('editSheet:', editVisible > 0, '| consistencia:', consistency > 0, '| mejorPill:', bestLabel > 0);
+  console.log('editSheet:', editVisible > 0, '| consistencia:', consistency > 0, '| mesPill:', monthPill > 0);
   console.log('errors:', errs.length ? errs.join('\n') : '(none)');
   await browser.close();
   process.exit(errs.length || !consistency ? 1 : 0);

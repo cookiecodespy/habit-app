@@ -6,7 +6,7 @@ function TabBar({ theme, current, onChange }) {
     { id: 'timeline', icon: 'timeline', label: 'Hoy' },
     { id: 'month',    icon: 'calendar', label: 'Agenda' },
     { id: 'ai',       icon: 'ai',       label: 'IA' },
-    { id: 'stats',    icon: 'stats',    label: 'Stats' },
+    { id: 'stats',    icon: 'repeat',   label: 'Hábitos' },
     { id: 'settings', icon: 'settings', label: 'Ajustes' },
   ];
   return (

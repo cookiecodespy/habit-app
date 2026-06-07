@@ -107,9 +107,11 @@ function PrototypeFrame({ t, setTweak }) {
               else if (k === 'search') setOverlay('search');
             }}/>
           </div>
-          {/* Scrollable rest */}
+          {/* Scrollable rest — flex column so the empty state can fill the
+              leftover height exactly (centered, never cut off by the tab bar). */}
           <div style={{
             flex: 1, overflowY: 'auto', minHeight: 0,
+            display: 'flex', flexDirection: 'column',
             paddingBottom: 'calc(max(env(safe-area-inset-bottom, 0px), 6px) + 88px)',
           }}>
             <TimelineHeaderBody theme={theme} userTasks={userTasks}/>
@@ -135,7 +137,7 @@ function PrototypeFrame({ t, setTweak }) {
           overflowY: 'auto',
         }}>
           {tab === 'month' && <CalendarScreen theme={theme} onBack={() => setTab('timeline')} embedded onOpenTask={openTaskDetail} onAdd={() => setOverlay('create')} userTasks={userTasks}/>}
-          {tab === 'stats' && <StatsScreen theme={theme} onBack={() => setTab('timeline')} embedded userTasks={userTasks}/>}
+          {tab === 'stats' && <HabitsScreen theme={theme} embedded onAddHabit={() => setOverlay('habit')} onEditHabit={openHabitEdit}/>}
           {tab === 'settings' && <SettingsScreen theme={theme} onBack={() => setTab('timeline')} embedded
             user={user} userTasks={userTasks} t={t} setTweak={setTweak}
             onEditName={() => setOverlay('editname')}/>}
@@ -338,7 +340,7 @@ const TABLET_NAV = [
     { id: 'ai',       icon: 'ai',       label: 'IA Planner' },
   ] },
   { section: 'Analiza', items: [
-    { id: 'stats',    icon: 'stats',    label: 'Stats' },
+    { id: 'stats',    icon: 'repeat',   label: 'Hábitos' },
   ] },
   { section: 'Cuenta', items: [
     { id: 'settings', icon: 'settings', label: 'Ajustes' },
@@ -592,7 +594,7 @@ function TabletApp({ t, setTweak }) {
             position: 'absolute', inset: 0, overflowY: 'auto',
             paddingTop: 'max(env(safe-area-inset-top, 0px), 16px)', paddingBottom: 32,
           }}>
-            <StatsScreen theme={theme} onBack={() => setTab('timeline')} embedded userTasks={userTasks}/>
+            <HabitsScreen theme={theme} embedded onAddHabit={() => setOverlay('habit')} onEditHabit={openHabitEdit}/>
           </div>
         )}
 

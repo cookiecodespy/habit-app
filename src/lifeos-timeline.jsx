@@ -343,12 +343,12 @@ function TimelineClassic({ theme, dense, blockShape, currentTime = '07:55', onOp
   // Empty state — nothing scheduled today (timed or all-day)
   if (tasks.length === 0 && allDayTasks.length === 0) {
     return (
-      <div style={{ minHeight: 'calc(100dvh - 468px)', display: 'flex', flexDirection: 'column', justifyContent: 'center', paddingBottom: 8 }}>
+      <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: '12px 0' }}>
         <EmptyState theme={theme}
           icon="sparkle"
-          title="Aún no tienes nada para hoy"
-          body="Tu día está libre. Toca + para agendar tu primera tarea."
-          ctaLabel="Agendar mi primera tarea"
+          title="Empieza tu día"
+          body="Agenda tu primera tarea y aparecerá aquí en tu línea de tiempo."
+          ctaLabel="Agendar una tarea"
           onCta={onAdd}/>
       </div>
     );
