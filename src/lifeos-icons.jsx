@@ -6,27 +6,39 @@
 
 // Reduced 5-colour story, anchored on Ferrari red + violet (a palette with
 // meaning, not 12 random hues). The 12 names are kept so existing data/code
-// keeps working — they now collapse into 5 visible families + a neutral slate.
+// keeps working — but they now genuinely COLLAPSE into 5 families + a neutral.
+// Within a family the gradient is identical: no more "Skittles" agenda. Tones
+// are pulled ~15% off neon so colour reads as sophisticated, not candy.
 const LIFE_PALETTE = {
-  // ── Red (Ferrari) — primary / brand ──────────────────────────
-  coral:    { from: '#FF5A4D', to: '#E0241B' },
-  ember:    { from: '#FF6A52', to: '#D11F12' },
-  // ── Violet — secondary ───────────────────────────────────────
-  lavender: { from: '#B79EFF', to: '#7C4DEF' },
-  plum:     { from: '#B388FF', to: '#6D3BD6' },
-  rose:     { from: '#C79BFF', to: '#8A4BE0' },
+  // ── Red (Ferrari) — primary / brand · Tomás ──────────────────
+  coral:    { from: '#F0463A', to: '#D41F14' },
+  ember:    { from: '#F0463A', to: '#D41F14' },
+  // ── Violet — secondary · la polola ───────────────────────────
+  lavender: { from: '#A98BF0', to: '#7A52DE' },
+  plum:     { from: '#A98BF0', to: '#7A52DE' },
+  rose:     { from: '#A98BF0', to: '#7A52DE' },
   // ── Amber / gold ─────────────────────────────────────────────
-  amber:    { from: '#FFC15E', to: '#F5A623' },
-  sun:      { from: '#FFD06B', to: '#F39A12' },
+  amber:    { from: '#F2B45A', to: '#DC9320' },
+  sun:      { from: '#F2B45A', to: '#DC9320' },
   // ── Emerald ──────────────────────────────────────────────────
-  mint:     { from: '#5FE0C0', to: '#22B8A0' },
-  teal:     { from: '#4FD8C4', to: '#1AA894' },
-  lime:     { from: '#74E0B0', to: '#2BB389' },
+  mint:     { from: '#4FC6AB', to: '#1C9C86' },
+  teal:     { from: '#4FC6AB', to: '#1C9C86' },
+  lime:     { from: '#4FC6AB', to: '#1C9C86' },
   // ── Blue ─────────────────────────────────────────────────────
-  sky:      { from: '#6FB8FF', to: '#3C8DF0' },
+  sky:      { from: '#67A6EA', to: '#3B7ED4' },
   // ── Neutral ──────────────────────────────────────────────────
-  slate:    { from: '#8FA0B5', to: '#5C6E85' },
+  slate:    { from: '#8392A6', to: '#5A6B80' },
 };
+
+// ──────────────────────────────────────────────────────────────
+// DESIGN TOKENS — single source of truth for type scale, spacing,
+// radii. Replaces the magic numbers (13.5 / 14.5 / gap 7,11,12…) that
+// made the UI feel hand-made instead of systematic. Type steps ~1.25×,
+// spacing on a strict 4px base.
+// ──────────────────────────────────────────────────────────────
+const LO_TYPE   = { display: 30, h1: 22, h2: 17, body: 15, sub: 13, caption: 11, micro: 10 };
+const LO_SPACE  = { xs: 4, sm: 8, md: 12, lg: 16, xl: 24, xxl: 32 };
+const LO_RADIUS = { sm: 10, md: 14, lg: 18, xl: 24, pill: 999 };
 
 // Shared squircle wrapper: rounded-square w/ diagonal gradient, glossy top
 // highlight and a soft inner vignette so the white glyph never floats flatly.
@@ -38,7 +50,9 @@ function LifeIconBox({ color = 'coral', size = 40, shape = 'rounded', children }
       width: size, height: size,
       borderRadius: radius,
       background: `linear-gradient(155deg, ${c.from} 0%, ${c.to} 92%)`,
-      boxShadow: `inset 0 1px 0 rgba(255,255,255,0.34), inset 0 -2px 4px rgba(0,0,0,0.14), 0 2px 5px ${c.to}55`,
+      // Neutral elevation only — the coloured glow under every tile was what
+      // made the whole app "shine from everywhere". Depth stays via the insets.
+      boxShadow: `inset 0 1px 0 rgba(255,255,255,0.28), inset 0 -2px 4px rgba(0,0,0,0.16), 0 1px 3px rgba(0,0,0,0.22)`,
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       position: 'relative', flexShrink: 0, overflow: 'hidden',
     }}>
@@ -476,4 +490,4 @@ function UIIcon({ name, size = 22, color = 'currentColor', strokeWidth = 1.8 }) 
   return <svg {...p}>{paths[name]}</svg>;
 }
 
-Object.assign(window, { LifeIcon, LifeIconBox, UIIcon, TaskGlyph, loIsEmoji, LIFE_PALETTE, LIFE_GLYPHS: G, EmojiPicker, LO_ICON_CATEGORIES });
+Object.assign(window, { LifeIcon, LifeIconBox, UIIcon, TaskGlyph, loIsEmoji, LIFE_PALETTE, LIFE_GLYPHS: G, EmojiPicker, LO_ICON_CATEGORIES, LO_TYPE, LO_SPACE, LO_RADIUS });

@@ -63,13 +63,9 @@ function dateStr(d){ return `${d.getFullYear()}-${String(d.getMonth()+1).padStar
   });
   await page.waitForTimeout(900);
 
-  // Count rendered task blocks (absolute buttons with a linear-gradient bg inside swimlanes)
-  const blocks = await page.evaluate(() => {
-    return [...document.querySelectorAll('button')].filter(b => {
-      const s = b.getAttribute('style')||'';
-      return s.includes('position: absolute') && s.includes('linear-gradient');
-    }).length;
-  });
+  // Count rendered task blocks by a stable test id (decoupled from styling so a
+  // visual redesign of the block — Fantastical tint+rail vs gradient — can't break it).
+  const blocks = await page.evaluate(() => document.querySelectorAll('[data-testid="week-block"]').length);
 
   await page.screenshot({ path: 'shot-week.png', fullPage: false });
   console.log('opened calendar tab:', opened, '· clicked Semana:', weekBtn);

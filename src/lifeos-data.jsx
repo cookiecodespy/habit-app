@@ -196,7 +196,11 @@ function loNormalizeTask(raw) {
   t.targetDate = t.date; // legacy alias kept in sync for old screens
   t.start = t.start || '09:00';
   if (typeof t.durationMin !== 'number') {
-    t.durationMin = (t.start && t.end) ? Math.max(5, loHHMMtoMin(t.end) - loHHMMtoMin(t.start)) : 30;
+    if (t.start && t.end) {
+      let dur = loHHMMtoMin(t.end) - loHHMMtoMin(t.start);
+      if (dur < 0) dur += 1440; // task crosses midnight → keep duration positive
+      t.durationMin = Math.max(5, dur);
+    } else t.durationMin = 30;
   }
   t.end = loMinToHHMM(loHHMMtoMin(t.start) + t.durationMin);
   // Subtasks are always an array of {id,label,done}. Legacy {done,total}
@@ -429,19 +433,27 @@ const LOStore = {
     if (!data || data.app !== 'lifeos' || !Array.isArray(data.tasks)) {
       throw new Error('Archivo inválido: no es un respaldo de LifeOS.');
     }
+    // Only accept well-formed records (objects with an id) so a malformed backup
+    // can't inject junk that crashes a render downstream.
+    const asArr = (a) => Array.isArray(a) ? a.filter(x => x && typeof x === 'object' && x.id) : [];
     if (merge) {
       const byId = (arr, extra) => { const m = {}; [...extra, ...arr].forEach(x => { if (x && x.id) m[x.id] = x; }); return Object.values(m); };
-      loWrite(LO_KEYS.tasks, byId(data.tasks, loRead(LO_KEYS.tasks, [])));
-      loWrite(LO_KEYS.habits, byId(data.habits || [], LOStore.allHabits()));
-      loWrite(LO_KEYS.inbox, byId(data.inbox || [], LOStore.allInbox()));
-      loWrite(LO_KEYS.routines, byId(data.routines || [], LOStore.customRoutines()));
+      loWrite(LO_KEYS.tasks, byId(asArr(data.tasks), loRead(LO_KEYS.tasks, [])));
+      loWrite(LO_KEYS.habits, byId(asArr(data.habits), LOStore.allHabits()));
+      loWrite(LO_KEYS.inbox, byId(asArr(data.inbox), LOStore.allInbox()));
+      loWrite(LO_KEYS.routines, byId(asArr(data.routines), LOStore.customRoutines()));
     } else {
-      loWrite(LO_KEYS.tasks, data.tasks.map(loNormalizeTask));
-      loWrite(LO_KEYS.habits, data.habits || []);
-      loWrite(LO_KEYS.inbox, data.inbox || []);
-      loWrite(LO_KEYS.routines, data.routines || []);
+      loWrite(LO_KEYS.tasks, asArr(data.tasks).map(loNormalizeTask));
+      loWrite(LO_KEYS.habits, asArr(data.habits));
+      loWrite(LO_KEYS.inbox, asArr(data.inbox));
+      loWrite(LO_KEYS.routines, asArr(data.routines));
     }
-    return { tasks: data.tasks.length, habits: (data.habits || []).length, inbox: (data.inbox || []).length };
+    // Restore the user profile too — export has always included it, but import
+    // dropped it, wiping the name/onboarding after a "restore". Merge keeps current fields.
+    if (data.user && typeof data.user === 'object') {
+      loWrite('lifeos.user', merge ? { ...loRead('lifeos.user', {}), ...data.user } : data.user);
+    }
+    return { tasks: asArr(data.tasks).length, habits: asArr(data.habits).length, inbox: asArr(data.inbox).length };
   },
 
   // -- routines: schedule a pack of tasks on a given day, skipping busy slots --
@@ -737,14 +749,14 @@ function loExecuteCommand(parsed) {
   if (parsed.intent === 'complete') {
     const { hit, ambiguous } = loFindTaskByQuery(LOStore.tasksForDate(loDateStr()), parsed.query);
     if (ambiguous) return { reply: 'Tengo varias parecidas hoy. ¿Cuál exactamente?' };
-    if (hit) { LOStore.toggleTask(hit.id.split('@')[0]); return { reply: `¡Hecho! Marqué "${hit.title}" como completada. 🎉` }; }
+    if (hit) { LOStore.toggleTask(hit.id); return { reply: `¡Hecho! Marqué "${hit.title}" como completada. 🎉` }; }
     return { reply: 'No vi esa tarea en tu día de hoy.' };
   }
   if (parsed.intent === 'move') {
     const q = (parsed.query || '').replace(/\b(a\s+las?|hora)\b/g, '').trim();
     const { hit, ambiguous } = loFindTaskByQuery(LOStore.tasksForDate(loDateStr()), q);
     if (ambiguous) return { reply: 'Hay varias parecidas. Dime cuál mover con su nombre exacto.' };
-    if (hit && parsed.start) { LOStore.updateTask(hit.id.split('@')[0], { start: parsed.start }); return { reply: `Moví "${hit.title}" a las ${fmt12(parsed.start)}.` }; }
+    if (hit && parsed.start) { LOStore.updateTask(hit.id, { start: parsed.start }); return { reply: `Moví "${hit.title}" a las ${fmt12(parsed.start)}.` }; }
     return { reply: 'Dime qué tarea mover y a qué hora — ej: "mueve gym a las 6pm".' };
   }
   return null; // help / unknown handled by caller

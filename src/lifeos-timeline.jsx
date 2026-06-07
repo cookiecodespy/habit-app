@@ -11,8 +11,8 @@ const TL_THEMES = {
     railFilled: 'rgba(255,255,255,0.18)',
     border: 'rgba(255,255,255,0.07)',
     text: '#FFFFFF',
-    text2: 'rgba(255,255,255,0.62)',
-    text3: 'rgba(255,255,255,0.38)',
+    text2: 'rgba(255,255,255,0.72)',
+    text3: 'rgba(255,255,255,0.52)',
     accent: '#E0241B',
     accentSoft: 'rgba(224,36,27,0.13)',
     doneTick: 'rgba(255,255,255,0.4)',
@@ -26,8 +26,8 @@ const TL_THEMES = {
     railFilled: 'rgba(20,20,30,0.22)',
     border: 'rgba(20,20,30,0.07)',
     text: '#15151B',
-    text2: 'rgba(20,20,30,0.62)',
-    text3: 'rgba(20,20,30,0.38)',
+    text2: 'rgba(20,20,30,0.70)',
+    text3: 'rgba(20,20,30,0.52)',
     accent: '#D11F12',
     accentSoft: 'rgba(209,31,18,0.10)',
     doneTick: 'rgba(20,20,30,0.4)',
@@ -49,7 +49,9 @@ function fmt12(hhmm) {
 }
 function minutesBetween(a, b) {
   const [ah, am] = a.split(':').map(Number), [bh, bm] = b.split(':').map(Number);
-  return (bh*60 + bm) - (ah*60 + am);
+  let d = (bh*60 + bm) - (ah*60 + am);
+  if (d < 0) d += 1440; // task crosses midnight → keep the shown duration positive
+  return d;
 }
 
 // ──────────────────────────────────────────────────────────────
@@ -132,7 +134,9 @@ function TimelineHeaderBody({ theme, userTasks }) {
 
   return (
     <div style={{ padding: '0 16px 16px' }}>
-      {/* Premium progress card */}
+      {/* Progress card — only when the day actually has tasks. An empty day gets
+          the single focused EmptyState hero below, never a second "empty" message. */}
+      {total > 0 && (
       <div className="lo-slide-in" style={{
         borderRadius: 24, position: 'relative', overflow: 'hidden',
         background: total > 0
@@ -141,7 +145,7 @@ function TimelineHeaderBody({ theme, userTasks }) {
         border: `0.5px solid ${total > 0 ? theme.accent + '55' : theme.border}`,
         padding: '16px',
         boxShadow: total > 0
-          ? `0 8px 32px ${theme.accent}18, inset 0 1px 0 rgba(255,255,255,0.06)`
+          ? `0 6px 22px ${theme.accent}12, inset 0 1px 0 rgba(255,255,255,0.05)`
           : `0 2px 8px rgba(0,0,0,0.14)`,
       }}>
         {total > 0 && (
@@ -166,7 +170,7 @@ function TimelineHeaderBody({ theme, userTasks }) {
             <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
               {total > 0 ? (
                 <>
-                  <span style={{ fontSize: 17, fontWeight: 800, color: theme.text, lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>{pct}</span>
+                  <span className="lo-display" style={{ fontSize: 20, fontWeight: 600, color: theme.text, lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>{pct}</span>
                   <span style={{ fontSize: 9, color: theme.text3, fontWeight: 700, marginTop: 1 }}>%</span>
                 </>
               ) : (
@@ -209,6 +213,7 @@ function TimelineHeaderBody({ theme, userTasks }) {
           </div>
         </div>
       </div>
+      )}
 
       {/* Week strip with per-day task dots */}
       <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 14 }}>
@@ -224,7 +229,7 @@ function TimelineHeaderBody({ theme, userTasks }) {
               color: day.today ? '#fff' : theme.text,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontSize: 14.5, fontWeight: day.today ? 700 : 500,
-              boxShadow: day.today ? `0 4px 14px ${theme.accent}66` : 'none',
+              boxShadow: day.today ? `0 2px 8px ${theme.accent}3A` : 'none',
               border: day.count > 0 && !day.today ? `1.5px solid ${theme.border}` : 'none',
               transition: 'all .2s var(--ease-out-back)',
             }}>{day.d}</div>
@@ -326,7 +331,7 @@ function StatusRing({ task, theme }) {
 // ──────────────────────────────────────────────────────────────
 // VARIANT 1: Classic — pill-rail timeline (the main one)
 // ──────────────────────────────────────────────────────────────
-function TimelineClassic({ theme, dense, blockShape, currentTime = '07:55', onOpenTask, onAdd, onToggle, userTasks }) {
+function TimelineClassic({ theme, dense, blockShape, currentTime = null, onOpenTask, onAdd, onToggle, userTasks }) {
   const d = dense ? DENSITY.compact : DENSITY.comfy;
   // Pull today's concrete tasks straight from the store so recurring
   // templates expand into occurrences and completions stay in sync.
@@ -336,9 +341,12 @@ function TimelineClassic({ theme, dense, blockShape, currentTime = '07:55', onOp
   const allDayTasks = all.filter(t => t.allDay);
   const tasks = all.filter(t => !t.allDay);
 
-  // Compute remaining minutes for active task
-  const [nowH, nowM] = currentTime.split(':').map(Number);
-  const nowMins = nowH * 60 + nowM;
+  // Remaining minutes for the active task, from the REAL current time. The old
+  // '07:55' default made "Nm restantes" show a wrong number all day.
+  const nowMins = (() => {
+    if (currentTime) { const [h, m] = currentTime.split(':').map(Number); return h * 60 + m; }
+    const n = new Date(); return n.getHours() * 60 + n.getMinutes();
+  })();
 
   // Empty state — nothing scheduled today (timed or all-day)
   if (tasks.length === 0 && allDayTasks.length === 0) {
@@ -431,7 +439,7 @@ function TimelineClassic({ theme, dense, blockShape, currentTime = '07:55', onOp
                 borderLeft: `3.5px solid ${isActive ? c.to : c.to + 'AA'}`,
                 cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit', color: theme.text,
                 boxShadow: isActive
-                  ? `0 6px 24px ${c.to}28, inset 0 1px 0 rgba(255,255,255,0.06)`
+                  ? `0 4px 16px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.05)`
                   : `0 2px 10px rgba(0,0,0,0.14), inset 0 1px 0 rgba(255,255,255,0.04)`,
                 transition: 'all .2s var(--ease-smooth)',
               }}>

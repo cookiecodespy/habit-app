@@ -183,8 +183,8 @@ function MonthScreen({ theme, onBack, embedded = false, onOpenTask, onAdd, userT
                   opacity: c.inMonth ? 1 : 0.22,
                   transition: 'background .15s',
                 }}>
-                <span style={{
-                  fontSize: 14, fontWeight: isSelected || isToday ? 700 : 500,
+                <span className="lo-display" style={{
+                  fontSize: 15, fontWeight: isSelected || isToday ? 600 : 500,
                   color: isSelected ? '#fff' : (isToday ? theme.accent : theme.text),
                   fontVariantNumeric: 'tabular-nums',
                 }}>{c.d}</span>
@@ -432,7 +432,7 @@ function WeekScreen({ theme, onOpenTask, userTasks = [] }) {
                 width: 24, height: 24, borderRadius: 12, margin: '3px auto 0',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontVariantNumeric: 'tabular-nums',
-                boxShadow: d.isToday ? `0 3px 12px ${theme.accent}66` : 'none',
+                boxShadow: 'none',
               }}>{d.dayNum}</div>
             </div>
           ))}
@@ -467,23 +467,23 @@ function WeekScreen({ theme, onOpenTask, userTasks = [] }) {
                 const bh = Math.max(9, h - 2);
                 const done = t.status === 'done';
                 return (
-                  <button key={t.id} onClick={() => onOpenTask && onOpenTask(t)} className="lo-press" title={`${t.start} · ${t.title}`} style={{
+                  <button key={t.id} data-testid="week-block" onClick={() => onOpenTask && onOpenTask(t)} className="lo-press" title={`${t.start} · ${t.title}`} style={{
                     position: 'absolute', left: 2, right: 2,
                     top: Math.max(0, top), height: bh,
-                    background: done ? `${c.to}3A` : `linear-gradient(150deg, ${c.from}, ${c.to})`,
-                    borderRadius: 6, border: 'none', cursor: 'pointer',
-                    padding: bh >= 22 ? '3px 5px' : 0, overflow: 'hidden', textAlign: 'left',
-                    boxShadow: done ? 'none' : `0 2px 8px ${c.to}55, inset 0 1px 0 rgba(255,255,255,0.28)`,
-                    opacity: done ? 0.6 : 1,
+                    background: done ? `${c.to}12` : `${c.to}24`,
+                    borderRadius: 5, border: 'none', borderLeft: `3px solid ${done ? c.to + '99' : c.to}`, cursor: 'pointer',
+                    padding: bh >= 22 ? '3px 5px 3px 6px' : 0, overflow: 'hidden', textAlign: 'left',
+                    boxShadow: 'none',
+                    opacity: done ? 0.65 : 1,
                     display: 'flex', flexDirection: 'column', gap: 1,
                   }}>
                     {bh >= 22 && (
-                      <span style={{ fontSize: 8.5, fontWeight: 700, color: '#fff', lineHeight: 1.1,
-                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textShadow: '0 1px 2px rgba(0,0,0,0.35)',
+                      <span style={{ fontSize: 8.5, fontWeight: 700, color: theme.text, lineHeight: 1.1,
+                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                         textDecoration: done ? 'line-through' : 'none' }}>{t.title}</span>
                     )}
                     {bh >= 34 && (
-                      <span style={{ fontSize: 7.5, fontWeight: 600, color: 'rgba(255,255,255,0.85)', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>{t.start}</span>
+                      <span style={{ fontSize: 7.5, fontWeight: 600, color: theme.text2, lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>{t.start}</span>
                     )}
                   </button>
                 );
@@ -685,7 +685,7 @@ function CreateScreen({ theme, onBack, onSave }) {
         <div style={{
           width: 40, height: 40, borderRadius: 13, flexShrink: 0,
           background: `linear-gradient(145deg, ${c.from}, ${c.to})`,
-          display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: `0 5px 14px ${c.to}44`,
+          display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: `0 2px 6px rgba(0,0,0,0.22)`,
         }}>
           <UIIcon name="sparkle" size={19} color="#fff"/>
         </div>
@@ -705,7 +705,7 @@ function CreateScreen({ theme, onBack, onSave }) {
           borderRadius: 12, border: 'none', fontFamily: 'inherit', fontSize: 14, fontWeight: 700, letterSpacing: -0.2,
           background: canSave ? `linear-gradient(135deg, ${c.from}, ${c.to})` : theme.rail,
           color: canSave ? '#fff' : theme.text3, cursor: canSave ? 'pointer' : 'default',
-          boxShadow: canSave ? `0 6px 18px ${c.to}66` : 'none', opacity: canSave ? 1 : 0.55,
+          boxShadow: canSave ? `0 5px 16px ${c.to}4d` : 'none', opacity: canSave ? 1 : 0.55,
           transition: 'all .2s var(--ease-smooth)',
         }}>
           <UIIcon name="check" size={16} color={canSave ? '#fff' : theme.text3} strokeWidth={2.6}/> Guardar
@@ -717,9 +717,8 @@ function CreateScreen({ theme, onBack, onSave }) {
 
         {/* ── Nombre + emoji preview ── */}
         <div style={{ ...loCardStyle(theme), display: 'flex', alignItems: 'center', gap: 14 }}>
-          <div style={{ position: 'relative', flexShrink: 0 }}>
-            <div style={{ position: 'absolute', inset: -7, borderRadius: 22, background: `radial-gradient(circle, ${c.to}40, transparent 70%)`, filter: 'blur(6px)', pointerEvents: 'none' }}/>
-            <div style={{ position: 'relative' }}><TaskGlyph icon={pickedIcon} color={pickedColor} size={58} shape="squircle"/></div>
+          <div style={{ flexShrink: 0 }}>
+            <TaskGlyph icon={pickedIcon} color={pickedColor} size={58} shape="squircle"/>
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
             <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Nombre de la tarea" autoFocus
@@ -757,11 +756,11 @@ function CreateScreen({ theme, onBack, onSave }) {
                   background: active ? `linear-gradient(145deg, ${c.from}, ${c.to})` : theme.surfaceHi,
                   border: `1.5px solid ${active ? 'transparent' : theme.border}`,
                   cursor: 'pointer', fontFamily: 'inherit',
-                  boxShadow: active ? `0 6px 20px ${c.to}55` : 'none',
+                  boxShadow: 'none',
                   transition: 'all .22s var(--ease-smooth)',
                 }}>
                   <span style={{ fontSize: 10, fontWeight: 600, color: active ? 'rgba(255,255,255,0.82)' : theme.text3, letterSpacing: 0.4 }}>{dow}</span>
-                  <span style={{ fontSize: 24, fontWeight: 800, color: active ? '#fff' : theme.text, letterSpacing: -0.5, marginTop: 3, fontVariantNumeric: 'tabular-nums' }}>{day}</span>
+                  <span className="lo-display" style={{ fontSize: 24, fontWeight: 600, color: active ? '#fff' : theme.text, letterSpacing: -0.5, marginTop: 3, fontVariantNumeric: 'tabular-nums' }}>{day}</span>
                   {mon && <span style={{ fontSize: 9, fontWeight: 700, color: active ? 'rgba(255,255,255,0.68)' : theme.text3, marginTop: 2, letterSpacing: 0.5 }}>{mon}</span>}
                 </button>
               );
@@ -815,7 +814,7 @@ function CreateScreen({ theme, onBack, onSave }) {
                         color: active ? '#fff' : (isToday ? c.to : theme.text),
                         fontSize: 13.5, fontWeight: active || isToday ? 800 : 500,
                         fontVariantNumeric: 'tabular-nums',
-                        boxShadow: active ? `0 4px 14px ${c.to}66` : 'none',
+                        boxShadow: 'none',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         transition: 'all .16s var(--ease-smooth)',
                       }}>{day}</button>
@@ -862,12 +861,9 @@ function CreateScreen({ theme, onBack, onSave }) {
           {/* Ribbon */}
           <div style={{ position: 'relative', height: 48, marginBottom: 18 }}>
             <div style={{
-              position: 'absolute', top: 16, left: 0, right: 0, height: 14, borderRadius: 8,
-              background: `linear-gradient(90deg, ${LIFE_PALETTE.slate.to}44 0%, ${LIFE_PALETTE.amber.from}55 18%, ${LIFE_PALETTE.sun.from}55 36%, ${LIFE_PALETTE.sky.from}55 60%, ${LIFE_PALETTE.plum.to}55 84%, ${LIFE_PALETTE.slate.to}44 100%)`,
-              border: `0.5px solid ${theme.border}`, overflow: 'hidden',
-            }}>
-              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(255,255,255,0.10) 0%, transparent 50%)' }}/>
-            </div>
+              position: 'absolute', top: 16, left: 0, right: 0, height: 12, borderRadius: 6,
+              background: theme.rail, border: `0.5px solid ${theme.border}`, overflow: 'hidden',
+            }}/>
             {[6, 9, 12, 15, 18, 21, 24].map(h => {
               const left = ((h*60 - RIBBON_START) / RIBBON_SPAN) * 100;
               return (
@@ -881,7 +877,7 @@ function CreateScreen({ theme, onBack, onSave }) {
               position: 'absolute', top: 13, left: `${blockLeft}%`, width: `${blockWidth}%`,
               height: 20, minWidth: 14, borderRadius: 10,
               background: `linear-gradient(135deg, ${c.from}, ${c.to})`,
-              boxShadow: `0 0 0 2.5px ${theme.bg}, 0 0 0 4px ${c.to}88, 0 4px 12px ${c.to}66, inset 0 1px 0 rgba(255,255,255,0.35)`,
+              boxShadow: `0 0 0 2.5px ${theme.bg}, inset 0 1px 0 rgba(255,255,255,0.25)`,
               display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 4px', zIndex: 2,
             }}>
               <div style={{ width: 2, height: 8, background: 'rgba(255,255,255,0.75)', borderRadius: 1 }}/>
@@ -901,7 +897,7 @@ function CreateScreen({ theme, onBack, onSave }) {
                   border: `1px solid ${active ? 'transparent' : theme.border}`,
                   padding: '9px 16px', borderRadius: 999, fontSize: 13,
                   fontWeight: active ? 700 : 500, cursor: 'pointer', fontFamily: 'inherit',
-                  boxShadow: active ? `0 4px 12px ${c.to}55` : 'none',
+                  boxShadow: 'none',
                   transition: 'all .18s var(--ease-out-back)',
                 }}>{d < 60 ? `${d}m` : `${Math.floor(d/60)}h${d%60 ? `${d%60}m` : ''}`}</button>
               );
@@ -928,7 +924,7 @@ function CreateScreen({ theme, onBack, onSave }) {
                   borderRadius: '50%',
                   background: `linear-gradient(145deg, ${cc.from}, ${cc.to})`,
                   border: 'none', cursor: 'pointer', padding: 0,
-                  boxShadow: active ? `0 0 0 3px ${theme.bg}, 0 0 0 5.5px ${cc.to}, 0 4px 14px ${cc.to}66` : `0 2px 8px ${cc.to}44`,
+                  boxShadow: active ? `0 0 0 3px ${theme.bg}, 0 0 0 5px ${cc.to}` : 'none',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   transition: 'all .22s var(--ease-out-back)',
                 }}>
@@ -964,7 +960,7 @@ function CreateScreen({ theme, onBack, onSave }) {
                   display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5,
                   transition: 'all .18s var(--ease-smooth)',
                 }}>
-                  <div style={{ width: 10, height: 10, borderRadius: 5, background: `linear-gradient(135deg, ${pc.from}, ${pc.to})`, boxShadow: active ? `0 2px 8px ${pc.to}66` : 'none' }}/>
+                  <div style={{ width: 10, height: 10, borderRadius: 5, background: `linear-gradient(135deg, ${pc.from}, ${pc.to})` }}/>
                   <span style={{ fontSize: 13.5, fontWeight: active ? 700 : 600, color: active ? pc.to : theme.text }}>{p.label}</span>
                   <span style={{ fontSize: 11, fontWeight: 500, color: theme.text3 }}>{p.desc}</span>
                 </button>
@@ -1095,31 +1091,25 @@ function Card({ theme, children, style }) {
   );
 }
 
-// Card header: icon badge + title + helper line. The senior-grade "labeled card" pattern.
+// Section header — a thin accent tick + an uppercase label. The 40px gradient
+// icon-tiles (each with its own coloured glow) + per-field "help" microcopy were
+// exactly the dashboard chrome that made Create feel heavy; this is the calm,
+// editorial label Things/Linear would use. `icon`/`help` kept in the signature
+// for call-site compatibility but intentionally no longer rendered.
 function CardHead({ theme, icon, accent, title, help, trailing }) {
-  const cc = accent ? (LIFE_PALETTE[accent] || null) : null;
+  const tick = accent ? (LIFE_PALETTE[accent]?.to || theme.accent) : theme.accent;
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
-      <div style={{
-        width: 40, height: 40, borderRadius: 13, flexShrink: 0,
-        background: cc ? `linear-gradient(145deg, ${cc.from}, ${cc.to})` : theme.surfaceHi,
-        border: cc ? 'none' : `1px solid ${theme.border}`,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        boxShadow: cc ? `0 5px 14px ${cc.to}40` : 'none',
-      }}>
-        <UIIcon name={icon} size={18} color={cc ? '#fff' : theme.text2} strokeWidth={2}/>
-      </div>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontSize: 14.5, fontWeight: 700, color: theme.text, letterSpacing: -0.2 }}>{title}</div>
-        {help && <div style={{ fontSize: 11.5, color: theme.text3, marginTop: 1 }}>{help}</div>}
-      </div>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 13 }}>
+      <span style={{ width: 3, height: 13, borderRadius: 2, background: tick, flexShrink: 0 }}/>
+      <div style={{ flex: 1, minWidth: 0, fontSize: 12, fontWeight: 700, color: theme.text2, letterSpacing: 0.6, textTransform: 'uppercase' }}>{title}</div>
       {trailing}
     </div>
   );
 }
-// Card surface shared by the Create form sections.
+// Section surface for the Create form. Flat — no bordered box, softer radius.
+// The bordered "card per field" was the heaviest "this is a dashboard" tell.
 function loCardStyle(theme) {
-  return { padding: 16, background: theme.surface, border: `0.5px solid ${theme.border}`, borderRadius: 20 };
+  return { padding: '15px 16px', background: theme.surface, border: 'none', borderRadius: 16 };
 }
 
 // Section header with a small colour tick — the recurring "intention" motif.
@@ -1146,7 +1136,7 @@ function CategoryPicker({ theme, value, onChange }) {
             color: active ? '#fff' : theme.text2,
             background: active ? `linear-gradient(135deg, ${cc.from}, ${cc.to})` : theme.surface,
             border: `1.5px solid ${active ? 'transparent' : theme.border}`,
-            boxShadow: active ? `0 4px 12px ${cc.to}55` : 'none',
+            boxShadow: 'none',
             transition: 'all .18s var(--ease-out-back)',
           }}>
             <span style={{ width: 8, height: 8, borderRadius: 4, background: active ? 'rgba(255,255,255,0.92)' : cc.to }}/>

@@ -653,7 +653,7 @@ function SearchOverlay({ theme, onClose, onPickTask }) {
 function EmptyState({ theme, icon = 'sparkle', title, body, ctaLabel, onCta }) {
   return (
     <div style={{ padding: '40px 24px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
-      <div className="lo-breath" style={{ filter: `drop-shadow(0 12px 32px ${theme.accent}55)` }}>
+      <div className="lo-breath" style={{ filter: `drop-shadow(0 10px 26px ${LIFE_PALETTE.plum.to}38)` }}>
         <LifeIcon name={icon} color="lavender" size={72} shape="squircle"/>
       </div>
       <div>
@@ -738,18 +738,22 @@ function HabitsStrip({ theme, onAdd, onEdit }) {
               fontFamily: 'inherit', textAlign: 'center',
               background: doneToday ? `linear-gradient(160deg, ${c.from}, ${c.to})` : theme.surface,
               border: `0.5px solid ${doneToday ? c.to : theme.border}`,
-              boxShadow: doneToday ? `0 8px 24px ${c.to}55` : '0 2px 8px rgba(0,0,0,0.12)',
+              boxShadow: doneToday ? `0 4px 14px rgba(0,0,0,0.22)` : '0 2px 8px rgba(0,0,0,0.12)',
               transition: 'all .2s var(--ease-smooth)',
               display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 7,
             }}>
               {/* glyph wrapped in a consistency ring */}
               <div style={{ position: 'relative', width: 52, height: 52, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                {/* Consistency ring only once there's real history — a new habit
+                    shows a clean tile, not a meaningless gray halo. */}
+                {(rate > 0 || doneToday) && (
                 <svg width="52" height="52" viewBox="0 0 52 52" style={{ position: 'absolute', inset: 0, transform: 'rotate(-90deg)' }}>
                   <circle cx="26" cy="26" r={R} fill="none" stroke={trackColor} strokeWidth="3"/>
                   <circle cx="26" cy="26" r={R} fill="none" stroke={ringColor} strokeWidth="3" strokeLinecap="round"
                     strokeDasharray={CIRC} strokeDashoffset={CIRC * (1 - rate)}
                     style={{ transition: 'stroke-dashoffset .7s var(--ease-out-quart)' }}/>
                 </svg>
+                )}
                 <div style={{ opacity: doneToday ? 1 : 0.95 }}>
                   <TaskGlyph icon={h.icon} color={h.color} size={34} shape="squircle"/>
                 </div>
@@ -999,7 +1003,8 @@ function HabitCreateSheet({ theme, onClose, habit = null }) {
   const editing = !!habit;
   const [name, setName] = React.useState(habit?.title || '');
   const [icon, setIcon] = React.useState(habit?.icon || '🔥');
-  const [color, setColor] = React.useState(habit?.color || 'coral');
+  // New habits rotate through the 5 families so a fresh list isn't a wall of red.
+  const [color, setColor] = React.useState(habit?.color || ['coral','sky','amber','mint','lavender'][habits.all.length % 5]);
   const [cadence, setCadence] = React.useState(habit?.cadence || 'daily');
   const [days, setDays] = React.useState(habit?.days || [1, 3, 5]);
   const c = LIFE_PALETTE[color];

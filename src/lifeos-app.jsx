@@ -432,9 +432,9 @@ function TabletApp({ t, setTweak }) {
         <div style={{ padding: '18px 18px 14px', display: 'flex', alignItems: 'center', gap: 11 }}>
           <div style={{
             width: 36, height: 36, borderRadius: 11,
-            background: `linear-gradient(140deg, ${LIFE_PALETTE.mint.from}, ${LIFE_PALETTE.teal.to})`,
+            background: `linear-gradient(140deg, ${theme.accent}, ${LIFE_PALETTE.plum.to})`,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            boxShadow: `0 4px 14px ${LIFE_PALETTE.teal.to}44`,
+            boxShadow: `0 4px 12px ${theme.accent}40`,
           }}>
             <UIIcon name="sparkle" size={19} color="#fff"/>
           </div>
@@ -687,7 +687,13 @@ function useLifeOSFonts() {
     style.id = 'lo-font-vars';
     style.textContent = `
 :root{--font-ui:'Hanken Grotesk',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
---font-display:'Fraunces','Georgia',serif;}
+--font-display:'Fraunces','Georgia',serif;
+/* Type scale (px) — no decimals, ~1.25 steps */
+--lo-display:30px;--lo-h1:22px;--lo-h2:17px;--lo-body:15px;--lo-sub:13px;--lo-caption:11px;
+/* Spacing — strict 4px base */
+--lo-xs:4px;--lo-sm:8px;--lo-md:12px;--lo-lg:16px;--lo-xl:24px;--lo-xxl:32px;
+/* Radii */
+--lo-r-sm:10px;--lo-r-md:14px;--lo-r-lg:18px;--lo-r-xl:24px;}
 html,body,input,button,textarea,select{font-family:var(--font-ui);}
 /* Display font carries optical weight + editorial character on big numbers/headers */
 .lo-display{font-family:var(--font-display);font-optical-sizing:auto;letter-spacing:-0.01em;}

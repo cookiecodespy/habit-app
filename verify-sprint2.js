@@ -76,6 +76,21 @@ const ok = (n, c) => (c ? pass : fail).push(n);
     const res = loExecuteCommand(loParseCommand('borra gym'));
     out.nlp_ambiguousGuard = /varias|exact/i.test(res.reply);
 
+    // 🔴 NLP-complete/move on a recurring task must hit only TODAY's occurrence,
+    // never the base template (was: hit.id.split('@')[0] → completed the whole series).
+    const yest = (() => { const d = new Date(); d.setDate(d.getDate()-1); return loDateStr(d); })();
+    const recBase = S.addTask({ title: 'Meditar NLP', date: yest, start: '06:30', durationMin: 20, recur: { freq: 'daily' } });
+    loExecuteCommand({ intent: 'complete', query: 'meditar nlp' });
+    const recBaseAfter = S.allTasks().find(t => t.id === recBase.id);
+    const recOccToday = S.tasksForDate(loDateStr()).find(t => /Meditar NLP/.test(t.title));
+    out.nlp_recur_keepsBase = !!recBaseAfter && recBaseAfter.status === 'todo'
+      && !!recOccToday && recOccToday.status === 'done';
+
+    // 🟡 Overnight task derived from end (no explicit durationMin) must wrap past
+    // midnight, not collapse to the 5-min floor (was: Math.max(5, negative)).
+    const overnight = S.addTask({ title: 'Turno noche', date: loDateStr(), start: '23:00', end: '01:00' });
+    out.overnight_duration = overnight.durationMin === 120;
+
     return out;
   });
 
