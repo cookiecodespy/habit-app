@@ -24,3 +24,10 @@ flow.js
 
 # test artifacts (regression screenshots)
 shot-*.png
+
+# dev capture artifacts
+cap*.js
+h-*.png
+v-*.png
+accent-*.png
+tour-*.png
