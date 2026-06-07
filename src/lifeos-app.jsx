@@ -87,7 +87,9 @@ function PrototypeFrame({ t, setTweak }) {
 
   // Scrollable content holder; tab bar pinned at bottom.
   return (
-    <div data-screen-label="Prototype" style={{ position: 'relative', width: '100%', height: '100%', background: theme.bg, overflow: 'hidden' }}>
+    <div data-screen-label="Prototype" style={{ position: 'relative', width: '100%', height: '100%',
+      background: `radial-gradient(78% 36% at 8% -6%, ${theme.accent}1F, transparent 70%), radial-gradient(68% 34% at 96% -3%, #9B6DFF18, transparent 70%), ${theme.bg}`,
+      overflow: 'hidden' }}>
       {tab === 'timeline' && (
         <div className="lo-tab-fade" style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column' }}>
           {/* Sticky top bar with safe-area + solid bg */}

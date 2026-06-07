@@ -725,26 +725,45 @@ function HabitsStrip({ theme, onAdd, onEdit }) {
           const c = LIFE_PALETTE[h.color] || LIFE_PALETTE.coral;
           const doneToday = !!(h.log || {})[today];
           const streak = habits.streak(h);
+          // Streaks-style ring around the glyph: 30-day consistency, fills as you keep it.
+          const rate = Math.max(0, Math.min(1, (window.loHabitRate ? loHabitRate(h, 30) : 0) / 100));
+          const R = 23, CIRC = 2 * Math.PI * R;
+          const ringColor = doneToday ? '#fff' : c.to;
+          const trackColor = doneToday ? 'rgba(255,255,255,0.28)' : theme.rail;
           return (
             <button key={h.id} onClick={() => onTapHabit(h)}
               onPointerDown={() => startPress(h)} onPointerUp={endPress} onPointerLeave={endPress}
               className="lo-press" style={{
-              flexShrink: 0, width: 96, padding: '12px 10px', borderRadius: 18, cursor: 'pointer',
+              flexShrink: 0, width: 100, padding: '14px 9px 12px', borderRadius: 18, cursor: 'pointer',
               fontFamily: 'inherit', textAlign: 'center',
               background: doneToday ? `linear-gradient(160deg, ${c.from}, ${c.to})` : theme.surface,
               border: `0.5px solid ${doneToday ? c.to : theme.border}`,
-              boxShadow: doneToday ? `0 6px 20px ${c.to}44` : '0 2px 8px rgba(0,0,0,0.12)',
+              boxShadow: doneToday ? `0 8px 24px ${c.to}55` : '0 2px 8px rgba(0,0,0,0.12)',
               transition: 'all .2s var(--ease-smooth)',
-              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
+              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 7,
             }}>
-              <div style={{ opacity: doneToday ? 1 : 0.92 }}>
-                <TaskGlyph icon={h.icon} color={h.color} size={36} shape="squircle"/>
+              {/* glyph wrapped in a consistency ring */}
+              <div style={{ position: 'relative', width: 52, height: 52, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <svg width="52" height="52" viewBox="0 0 52 52" style={{ position: 'absolute', inset: 0, transform: 'rotate(-90deg)' }}>
+                  <circle cx="26" cy="26" r={R} fill="none" stroke={trackColor} strokeWidth="3"/>
+                  <circle cx="26" cy="26" r={R} fill="none" stroke={ringColor} strokeWidth="3" strokeLinecap="round"
+                    strokeDasharray={CIRC} strokeDashoffset={CIRC * (1 - rate)}
+                    style={{ transition: 'stroke-dashoffset .7s var(--ease-out-quart)' }}/>
+                </svg>
+                <div style={{ opacity: doneToday ? 1 : 0.95 }}>
+                  <TaskGlyph icon={h.icon} color={h.color} size={34} shape="squircle"/>
+                </div>
               </div>
-              <div style={{ fontSize: 12, fontWeight: 600, color: doneToday ? '#fff' : theme.text, letterSpacing: -0.1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%' }}>{h.title}</div>
+              {/* title — up to 2 lines, no truncation mid-word */}
+              <div style={{ fontSize: 11.5, fontWeight: 600, color: doneToday ? '#fff' : theme.text, letterSpacing: -0.1,
+                lineHeight: 1.15, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
+                overflow: 'hidden', maxWidth: '100%', minHeight: 27 }}>{h.title}</div>
+              {/* streak — positive framing when there's no streak yet */}
               <div style={{ display: 'inline-flex', alignItems: 'center', gap: 3, fontSize: 11, fontWeight: 700,
-                color: doneToday ? 'rgba(255,255,255,0.92)' : (streak > 0 ? theme.accent : theme.text3) }}>
-                <UIIcon name="flame" size={11} color={doneToday ? '#fff' : (streak > 0 ? theme.accent : theme.text3)} strokeWidth={2}/>
-                {streak}
+                color: doneToday ? 'rgba(255,255,255,0.95)' : (streak > 0 ? c.to : theme.text3) }}>
+                {streak > 0
+                  ? <><UIIcon name="flame" size={11} color={doneToday ? '#fff' : c.to} strokeWidth={2}/>{streak}</>
+                  : <span style={{ fontWeight: 600, opacity: 0.75, letterSpacing: 0.2 }}>{doneToday ? '¡vas!' : 'nueva'}</span>}
               </div>
             </button>
           );

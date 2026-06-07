@@ -78,6 +78,7 @@ function avatarLetter(name) {
 // Saludo según hora
 function greetingFor(date = new Date()) {
   const h = date.getHours();
+  if (h < 6) return 'Buenas noches';
   if (h < 12) return 'Buenos días';
   if (h < 19) return 'Buenas tardes';
   return 'Buenas noches';
