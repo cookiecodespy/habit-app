@@ -4,10 +4,10 @@ const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
   "dark": true,
   "density": "comfy",
   "blockShape": "rounded",
-  "accent": "#FF8765"
+  "accent": "#E0241B"
 }/*EDITMODE-END*/;
 
-const ACCENT_SWATCHES = ['#FF8765', '#FFB347', '#5BE0B5', '#B79EFF'];
+const ACCENT_SWATCHES = ['#E0241B', '#9B6DFF', '#F5A623', '#22B8A0', '#3C8DF0'];
 
 // First free 30-min slot on a day — from now if it's today, else 9:00.
 // Used when scheduling an inbox item so it doesn't stomp on a busy hour (B12).
@@ -220,7 +220,9 @@ function PrototypeFrame({ t, setTweak }) {
         }}/>
       )}
 
-      {tab === 'timeline' && !overlay && <FAB theme={theme} onClick={() => setOverlay('quickadd')}/>}
+      {/* Hide the + when today is empty — the empty state shows its own hero CTA. */}
+      {tab === 'timeline' && !overlay && (LOStore.tasksForDate(loDateStr()) || []).some(t => t.kind !== 'break') &&
+        <FAB theme={theme} onClick={() => setOverlay('quickadd')}/>}
       {!overlay && <TabBar theme={theme} current={tab} onChange={setTab}/>}
       <ToastStack theme={theme}/>
     </div>

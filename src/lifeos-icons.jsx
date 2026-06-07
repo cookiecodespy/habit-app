@@ -4,19 +4,28 @@
 // small sizes, plus a single low-opacity dark accent for depth (duotone).
 // No glyph copies another app's iconography — all paths are original.
 
+// Reduced 5-colour story, anchored on Ferrari red + violet (a palette with
+// meaning, not 12 random hues). The 12 names are kept so existing data/code
+// keeps working — they now collapse into 5 visible families + a neutral slate.
 const LIFE_PALETTE = {
-  coral:    { from: '#FF8B6B', to: '#F46B4D' },
-  amber:    { from: '#FFC15E', to: '#F59E0B' },
-  rose:     { from: '#FF8AA8', to: '#E85B85' },
-  mint:     { from: '#7AE2C3', to: '#3FBF9C' },
+  // ── Red (Ferrari) — primary / brand ──────────────────────────
+  coral:    { from: '#FF5A4D', to: '#E0241B' },
+  ember:    { from: '#FF6A52', to: '#D11F12' },
+  // ── Violet — secondary ───────────────────────────────────────
+  lavender: { from: '#B79EFF', to: '#7C4DEF' },
+  plum:     { from: '#B388FF', to: '#6D3BD6' },
+  rose:     { from: '#C79BFF', to: '#8A4BE0' },
+  // ── Amber / gold ─────────────────────────────────────────────
+  amber:    { from: '#FFC15E', to: '#F5A623' },
+  sun:      { from: '#FFD06B', to: '#F39A12' },
+  // ── Emerald ──────────────────────────────────────────────────
+  mint:     { from: '#5FE0C0', to: '#22B8A0' },
+  teal:     { from: '#4FD8C4', to: '#1AA894' },
+  lime:     { from: '#74E0B0', to: '#2BB389' },
+  // ── Blue ─────────────────────────────────────────────────────
   sky:      { from: '#6FB8FF', to: '#3C8DF0' },
-  lavender: { from: '#B79EFF', to: '#8B6BE8' },
-  lime:     { from: '#C8E66B', to: '#9DC634' },
-  teal:     { from: '#5FD4D4', to: '#22A8A8' },
+  // ── Neutral ──────────────────────────────────────────────────
   slate:    { from: '#8FA0B5', to: '#5C6E85' },
-  ember:    { from: '#FF9A78', to: '#D26A45' },
-  plum:     { from: '#D67BB5', to: '#A24B85' },
-  sun:      { from: '#FFD96B', to: '#FFA32E' },
 };
 
 // Shared squircle wrapper: rounded-square w/ diagonal gradient, glossy top

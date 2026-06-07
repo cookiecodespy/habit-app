@@ -13,8 +13,8 @@ const TL_THEMES = {
     text: '#FFFFFF',
     text2: 'rgba(255,255,255,0.62)',
     text3: 'rgba(255,255,255,0.38)',
-    accent: '#FF8765',
-    accentSoft: 'rgba(255,135,101,0.12)',
+    accent: '#E0241B',
+    accentSoft: 'rgba(224,36,27,0.13)',
     doneTick: 'rgba(255,255,255,0.4)',
   },
   light: {
@@ -28,8 +28,8 @@ const TL_THEMES = {
     text: '#15151B',
     text2: 'rgba(20,20,30,0.62)',
     text3: 'rgba(20,20,30,0.38)',
-    accent: '#E8623C',
-    accentSoft: 'rgba(232,98,60,0.10)',
+    accent: '#D11F12',
+    accentSoft: 'rgba(209,31,18,0.10)',
     doneTick: 'rgba(20,20,30,0.4)',
   },
 };
@@ -200,9 +200,9 @@ function TimelineHeaderBody({ theme, userTasks }) {
               </>
             ) : (
               <>
-                <div style={{ fontSize: 18, fontWeight: 700, color: theme.text, letterSpacing: -0.3 }}>Tu día empieza aquí</div>
+                <div style={{ fontSize: 18, fontWeight: 700, color: theme.text, letterSpacing: -0.3 }}>Tu día está libre</div>
                 <div style={{ fontSize: 12.5, color: theme.text2, marginTop: 4, lineHeight: 1.4 }}>
-                  Toca <span style={{ fontWeight: 700, color: theme.accent }}>+</span> para añadir tu primera tarea de hoy.
+                  Sin tareas todavía — disfrútalo o planifica algo.
                 </div>
               </>
             )}
@@ -343,11 +343,11 @@ function TimelineClassic({ theme, dense, blockShape, currentTime = '07:55', onOp
   // Empty state — nothing scheduled today (timed or all-day)
   if (tasks.length === 0 && allDayTasks.length === 0) {
     return (
-      <div style={{ paddingTop: 12, paddingBottom: 40 }}>
+      <div style={{ minHeight: 'calc(100dvh - 468px)', display: 'flex', flexDirection: 'column', justifyContent: 'center', paddingBottom: 8 }}>
         <EmptyState theme={theme}
           icon="sparkle"
           title="Aún no tienes nada para hoy"
-          body="¿Quieres anotar algo para hoy, esta semana o este mes? Empieza con una tarea simple."
+          body="Tu día está libre. Toca + para agendar tu primera tarea."
           ctaLabel="Agendar mi primera tarea"
           onCta={onAdd}/>
       </div>

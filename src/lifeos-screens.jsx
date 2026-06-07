@@ -402,7 +402,8 @@ function WeekScreen({ theme, onOpenTask, userTasks = [] }) {
   const rangeLabel = `${monday.getDate()} – ${week[6].dayNum} ${monthLabel}`;
   const empty = week.every(d => d.tasks.length === 0);
 
-  const startH = 6, endH = 23, hPx = 20, span = endH - startH;
+  const startH = 6, endH = 23, hPx = 30, span = endH - startH;
+  const nowMins = (() => { const n = new Date(); return n.getHours() * 60 + n.getMinutes(); })();
 
   return (
     <div className="lo-fade">
@@ -419,59 +420,82 @@ function WeekScreen({ theme, onOpenTask, userTasks = [] }) {
 
       <div style={{ padding: '0 10px' }}>
         {/* day headers */}
-        <div style={{ display: 'grid', gridTemplateColumns: '26px repeat(7, 1fr)', gap: 3 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '30px repeat(7, 1fr)', gap: 4 }}>
           <div/>
           {week.map((d, i) => (
             <div key={i} style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: 9.5, color: theme.text3, fontWeight: 600 }}>{dayLabels[i]}</div>
+              <div style={{ fontSize: 9.5, color: d.isToday ? theme.accent : theme.text3, fontWeight: 700, letterSpacing: 0.3 }}>{dayLabels[i]}</div>
               <div style={{
-                fontSize: 12.5, fontWeight: d.isToday ? 700 : 500,
+                fontSize: 13, fontWeight: d.isToday ? 700 : 500,
                 color: d.isToday ? '#fff' : theme.text,
                 background: d.isToday ? theme.accent : 'transparent',
-                width: 21, height: 21, borderRadius: 11, margin: '2px auto 0',
+                width: 24, height: 24, borderRadius: 12, margin: '3px auto 0',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontVariantNumeric: 'tabular-nums',
+                boxShadow: d.isToday ? `0 3px 12px ${theme.accent}66` : 'none',
               }}>{d.dayNum}</div>
             </div>
           ))}
         </div>
 
         {/* swimlanes with real tasks */}
-        <div style={{ display: 'grid', gridTemplateColumns: '26px repeat(7, 1fr)', gap: 3, marginTop: 12, position: 'relative' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '30px repeat(7, 1fr)', gap: 4, marginTop: 12, position: 'relative' }}>
           {/* hour rail */}
           <div>
             {Array.from({ length: span + 1 }).map((_, i) => (
-              <div key={i} style={{ height: hPx, fontSize: 8.5, color: theme.text3, lineHeight: 1, textAlign: 'right', paddingRight: 3 }}>
+              <div key={i} style={{ height: hPx, fontSize: 9, color: theme.text3, lineHeight: 1, textAlign: 'right', paddingRight: 4, transform: 'translateY(-4px)' }}>
                 {startH + i === 12 ? '12p' : startH + i > 12 ? `${startH + i - 12}p` : `${startH + i}a`}
               </div>
             ))}
           </div>
-          {week.map((d, di) => (
+          {week.map((d, di) => {
+            const showNow = d.isToday && nowMins >= startH * 60 && nowMins <= endH * 60;
+            const nowTop = ((nowMins / 60) - startH) * hPx;
+            return (
             <div key={di} style={{
-              position: 'relative', borderLeft: `0.5px solid ${theme.border}`,
-              background: d.isToday ? `${theme.accent}0d` : 'transparent',
+              position: 'relative', borderRadius: 7, overflow: 'hidden',
+              background: d.isToday ? `${theme.accent}12` : 'rgba(255,255,255,0.015)',
             }}>
               {Array.from({ length: span + 1 }).map((_, hi) => (
-                <div key={hi} style={{ height: hPx, borderTop: `0.5px solid ${theme.border}` }}/>
+                <div key={hi} style={{ height: hPx, borderTop: `0.5px solid ${hi === 0 ? 'transparent' : theme.border}` }}/>
               ))}
               {d.tasks.map((t) => {
                 const c = LIFE_PALETTE[t.color] || LIFE_PALETTE.coral;
                 const top = ((loHHMMtoMin(t.start) / 60) - startH) * hPx;
                 const h = (Math.max(20, minutesBetween(t.start, t.end)) / 60) * hPx;
                 if (top + h < 0 || top > span * hPx) return null;
+                const bh = Math.max(9, h - 2);
+                const done = t.status === 'done';
                 return (
                   <button key={t.id} onClick={() => onOpenTask && onOpenTask(t)} className="lo-press" title={`${t.start} · ${t.title}`} style={{
-                    position: 'absolute', left: 1.5, right: 1.5,
-                    top: Math.max(0, top), height: Math.max(7, h - 1.5),
-                    background: `linear-gradient(135deg, ${c.from}66, ${c.to}88)`,
-                    borderRadius: 5, border: 'none', cursor: 'pointer', padding: 0,
-                    boxShadow: `inset 0 1px 0 rgba(255,255,255,0.18)`,
-                    opacity: t.status === 'done' ? 0.4 : 1,
-                  }}/>
+                    position: 'absolute', left: 2, right: 2,
+                    top: Math.max(0, top), height: bh,
+                    background: done ? `${c.to}3A` : `linear-gradient(150deg, ${c.from}, ${c.to})`,
+                    borderRadius: 6, border: 'none', cursor: 'pointer',
+                    padding: bh >= 22 ? '3px 5px' : 0, overflow: 'hidden', textAlign: 'left',
+                    boxShadow: done ? 'none' : `0 2px 8px ${c.to}55, inset 0 1px 0 rgba(255,255,255,0.28)`,
+                    opacity: done ? 0.6 : 1,
+                    display: 'flex', flexDirection: 'column', gap: 1,
+                  }}>
+                    {bh >= 22 && (
+                      <span style={{ fontSize: 8.5, fontWeight: 700, color: '#fff', lineHeight: 1.1,
+                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textShadow: '0 1px 2px rgba(0,0,0,0.35)',
+                        textDecoration: done ? 'line-through' : 'none' }}>{t.title}</span>
+                    )}
+                    {bh >= 34 && (
+                      <span style={{ fontSize: 7.5, fontWeight: 600, color: 'rgba(255,255,255,0.85)', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>{t.start}</span>
+                    )}
+                  </button>
                 );
               })}
+              {showNow && (
+                <div style={{ position: 'absolute', left: 0, right: 0, top: nowTop, height: 0, zIndex: 5, pointerEvents: 'none' }}>
+                  <div style={{ height: 2, background: theme.accent, boxShadow: `0 0 6px ${theme.accent}` }}/>
+                  <div style={{ position: 'absolute', left: -1, top: -2, width: 6, height: 6, borderRadius: 3, background: theme.accent }}/>
+                </div>
+              )}
             </div>
-          ))}
+          );})}
         </div>
 
         {empty && (
@@ -527,7 +551,7 @@ function CreateScreen({ theme, onBack, onSave }) {
     { id: 'high',   label: 'Alta',  desc: 'Urgente',     color: 'coral' },
   ];
 
-  const [pickedColor, setColor] = React.useState('mint');
+  const [pickedColor, setColor] = React.useState('coral');
   const [pickedIcon, setIcon] = React.useState('✨');
   const [title, setTitle] = React.useState('');
   const [subtitle, setSub] = React.useState('');
@@ -2457,7 +2481,7 @@ function SettingsScreen({ theme, onBack, embedded, user, onEditName, userTasks =
             <SettingsIconBadge name="sparkle" color="plum" size={32}/>
             <span style={{ fontSize: 14.5, color: theme.text, letterSpacing: -0.1 }}>Acento</span>
             <div style={{ flex: 1, display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
-              {['#FF8765', '#FFB347', '#5BE0B5', '#B79EFF'].map((c) => {
+              {['#E0241B', '#9B6DFF', '#F5A623', '#22B8A0', '#3C8DF0'].map((c) => {
                 const active = (t.accent || '').toLowerCase() === c.toLowerCase();
                 return (
                   <button key={c} className="lo-press" onClick={() => setTweak && setTweak('accent', c)} style={{

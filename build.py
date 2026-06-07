@@ -65,9 +65,11 @@ def main():
         manifest[uuid] = {**manifest[uuid], 'data': enc(js.encode('utf-8')),
                           'mime': 'text/javascript', 'compressed': True}
 
-    # 2. Drop the Babel standalone blob entirely
-    babel_uuid = short_to_full[BABEL_SHORT]
-    del manifest[babel_uuid]
+    # 2. Drop the Babel standalone blob entirely (idempotent — already gone after
+    #    the first Sprint A build, so only remove it if it's still present).
+    babel_uuid = short_to_full.get(BABEL_SHORT)
+    if babel_uuid:
+        del manifest[babel_uuid]
 
     # 3. Template: remove Babel <script>, de-babel the file scripts,
     #    transpile the inline bootstrap script.
@@ -97,7 +99,7 @@ def main():
                             1)
 
     open('index.html', 'w', encoding='utf-8').write(html)
-    print('Built: precompiled 9 files, removed Babel (%s), added CSP.' % babel_uuid[:8])
+    print('Built: precompiled 9 files%s, CSP ok.' % (', removed Babel' if babel_uuid else ''))
 
 if __name__ == '__main__':
     main()
