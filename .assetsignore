@@ -2,6 +2,8 @@
 src
 docs
 rebuild.py
+build.py
+transpile.js
 CHANGELOG-RULE.md
 README.md
 INSTRUCCIONES-OPENCLAW.md
