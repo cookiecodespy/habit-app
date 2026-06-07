@@ -22,5 +22,9 @@ verify-*.js
 rt-test.js
 shot-*.js
 shot-*.png
+cap-*.js
+v-*.png
+v-*.js
+h-*.png
 .openclaw-polish-backup-*
 .openclaw-backup-before-*
