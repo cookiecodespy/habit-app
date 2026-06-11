@@ -8,6 +8,11 @@ Pensado para igualar y superar a apps tipo *Structured*, con identidad propia: t
 carácter (Fraunces display + Hanken Grotesk), tema oscuro con acento **rojo Ferrari + violeta**,
 grano de película, y micro-interacciones cuidadas.
 
+<p align="center">
+  <img src="shot-agenda.png" alt="LifeOS — agenda mensual en desktop" width="68%">
+  <img src="shot-coherence-today.png" alt="LifeOS — vista Hoy en móvil" width="24%">
+</p>
+
 ## Funciona en
 - **Teléfono** → app full-screen de una columna.
 - **Desktop / tablet** → layout con sidebar.
