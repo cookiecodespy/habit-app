@@ -1,12 +1,8 @@
-# LifeOS — Tu día, visualizado
+# LifeOS 
 
 Planner diario + tracker de hábitos, mobile-first y PWA. Timeline visual del día, hábitos con
 rachas, captura rápida (inbox), rutinas, modo enfoque, y un **IA Planner** que crea/mueve/completa/
 borra tareas por lenguaje natural en español (texto y voz) — 100% offline, sin backend.
-
-Pensado para igualar y superar a apps tipo *Structured*, con identidad propia: tipografía con
-carácter (Fraunces display + Hanken Grotesk), tema oscuro con acento **rojo Ferrari + violeta**,
-grano de película, y micro-interacciones cuidadas.
 
 <p align="center">
   <img src="shot-agenda.png" alt="LifeOS — agenda mensual en desktop" width="68%">
