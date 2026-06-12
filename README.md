@@ -20,7 +20,6 @@ Mismo código, layout responsivo (`App()` en `src/lifeos-app.jsx`).
 
 ## Características
 - Timeline del día por secciones (mañana/tarde/noche), completar tocando el anillo, subtasks con progreso.
-- Hábitos con racha diaria 🔥 (la sección de "Hoy").
 - Tareas recurrentes (cada día / entre semana / semanal), recordatorios, prioridad, posponer.
 - Inbox de captura rápida → agendar en un toque.
 - Rutinas reutilizables (Pomodoro, Día de clases, Workout…) que se agendan de una.
