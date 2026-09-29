@@ -3,8 +3,6 @@ Thumbs.db
 
 # dev tooling (local syntax-check + headless smoke tests)
 node_modules
-package.json
-package-lock.json
 package.dev.json
 check.js
 smoke.js
@@ -31,3 +29,6 @@ h-*.png
 v-*.png
 accent-*.png
 tour-*.png
+
+# Local browser evidence
+artifacts/

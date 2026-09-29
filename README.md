@@ -31,19 +31,23 @@ gzip+base64. **Ya NO se transpila en el navegador** (sin `@babel/standalone`, CS
 
 ```bash
 # 1. editar src/*.jsx
-node check.js          # syntax-check (Babel) de los 9 módulos
+npm ci                 # herramientas con versiones fijadas
+npm test               # regresión del store y recordatorios
 python3 build.py       # precompila src/ -> index.html  (rebuild.py delega aquí)
 python3 -m http.server 8755   # probar en http://localhost:8755
-node verify-builda.js  # boot + CSP check headless (Playwright + Chrome del sistema)
+npm run test:browser   # flujos móvil/escritorio en Chromium
+node verify-builda.js   # arranque y CSP (servidor :8755)
 ```
 
 > El **entry real** (`ReactDOM.render(<App/>)`) vive en el template inline de `index.html`;
 > `build.py` lo transpila junto con los módulos, así que basta con correr `build.py` tras editar `src/`.
 
-`check.js`, `verify-*.js`, `smoke.js`, `node_modules/` y `package*.json` son herramientas de dev
-locales (ignoradas en git y en el deploy).
+Las dependencias y pruebas están versionadas. `node_modules/`, pruebas y documentación
+se excluyen de los assets públicos. `CHROME_PATH` permite indicar el ejecutable de Chromium.
 
 ## Deploy
-App web estática → GitHub Pages / Cloudflare Pages. Sube la carpeta; sirve `index.html` desde la raíz.
+App estática en **Cloudflare Workers**, conectada a `main` mediante Workers Builds.
+URL: https://habit-app.tomas-sotz.workers.dev. Ver [despliegue](DEPLOY-CLOUDFLARE.md) y
+[auditoría/cronología](docs/AUDITORIA-2026-09-29.md).
 
 Los datos viven sólo en el navegador del dispositivo (`localStorage`).

@@ -88,19 +88,19 @@ function sendNotif(title, body, options = {}) {
 function useTaskNotifications(user) {
   React.useEffect(() => {
     if (!user) return;
-    if (notifPermission() !== 'granted') return;
     const seen = new Set();
     const check = () => {
+      if (notifPermission() !== 'granted') return;
       const now = new Date();
       const nowMins = now.getHours() * 60 + now.getMinutes();
       const todays = (window.LOStore ? LOStore.tasksForDate(loDateStr()) : []) || [];
       todays.forEach(t => {
-        if (t.kind === 'break' || t.status !== 'todo' || !t.start) return;
+        if (t.kind === 'break' || t.status !== 'todo' || !t.start || !t.reminder || t.allDay) return;
         const [h, m] = t.start.split(':').map(Number);
         const diff = (h * 60 + m) - nowMins;
-        if (diff > 0 && diff <= 10 && !seen.has(t.id)) {
-          seen.add(t.id);
-          sendNotif(`En ${diff} min: ${t.title}`, t.note || t.subtitle || '', { tag: t.id });
+        const key = `${t.id}:${t.date}:${t.start}`;
+        if (diff > 0 && diff <= 10 && !seen.has(key)) {
+          if (sendNotif(`En ${diff} min: ${t.title}`, t.note || t.subtitle || '', { tag: t.id })) seen.add(key);
         }
       });
     };
@@ -108,7 +108,9 @@ function useTaskNotifications(user) {
     const id = setInterval(check, 60000);
     const onVis = () => { if (document.visibilityState === 'visible') check(); };
     document.addEventListener('visibilitychange', onVis);
-    return () => { clearInterval(id); document.removeEventListener('visibilitychange', onVis); };
+    window.addEventListener('lo-store-change', check);
+    window.addEventListener('lo-notification-permission', check);
+    return () => { clearInterval(id); document.removeEventListener('visibilitychange', onVis); window.removeEventListener('lo-store-change', check); window.removeEventListener('lo-notification-permission', check); };
   }, [user]);
 }
 
@@ -120,8 +122,9 @@ function NotifSettingsRow({ theme }) {
   const enable = async () => {
     const p = await requestNotifPermission();
     setPerm(p);
+    window.dispatchEvent(new CustomEvent('lo-notification-permission'));
     if (p === 'granted') {
-      sendNotif('Notificaciones activadas', 'Te avisaré antes de cada tarea.');
+      sendNotif('Notificaciones activadas', 'Te avisaré de las tareas con recordatorio mientras LifeOS esté abierta.');
       toast('Notificaciones activadas', { tone: 'success', icon: 'check' });
     } else if (p === 'denied') {
       toast('Permiso denegado · actívalas desde ajustes del sistema', { tone: 'error' });
@@ -139,7 +142,7 @@ function NotifSettingsRow({ theme }) {
       fontFamily: 'inherit',
     }}>
       <SettingsIconBadge name="bell" color="coral" size={32}/>
-      <span style={{ flex: 1, fontSize: 14.5, color: theme.text, letterSpacing: -0.1 }}>Notificaciones</span>
+      <span style={{ flex: 1, fontSize: 14.5, color: theme.text, letterSpacing: -0.1 }}>Notificaciones<small style={{ display: 'block', fontWeight: 400, fontSize: 11, marginTop: 3 }}>Recordatorios con la app abierta</small></span>
       <span style={{ fontSize: 13, color: perm === 'granted' ? LIFE_PALETTE.mint.to : theme.text2 }}>{label}</span>
     </button>
   );

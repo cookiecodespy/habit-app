@@ -1,7 +1,7 @@
 // Verify habit heatmap + edit sheet renders with history.
 const { chromium } = require('playwright-core');
 const fs = require('fs');
-const findChrome = () => ['/usr/bin/google-chrome-stable','/usr/bin/google-chrome','/usr/bin/chromium-browser','/snap/bin/chromium'].find(p => fs.existsSync(p));
+const findChrome = () => [process.env.CHROME_PATH || '/usr/bin/chromium','/usr/bin/google-chrome-stable','/usr/bin/google-chrome','/usr/bin/chromium-browser','/snap/bin/chromium'].find(p => fs.existsSync(p));
 (async () => {
   const browser = await chromium.launch({ executablePath: findChrome() });
   const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } });

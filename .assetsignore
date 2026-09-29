@@ -28,3 +28,23 @@ v-*.js
 h-*.png
 .openclaw-polish-backup-*
 .openclaw-backup-before-*
+
+tests
+artifacts
+.github
+
+# Exclude directory contents explicitly from Workers static assets.
+node_modules/**
+.git/**
+src/**
+docs/**
+tests/**
+artifacts/**
+.wrangler/**
+.github/**
+deploy/**
+wrangler.jsonc
+
+.env*
+.dev.vars*
+.gitignore

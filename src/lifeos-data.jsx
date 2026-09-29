@@ -162,6 +162,7 @@ function loWrite(key, val) {
     } else if (window.toast) {
       window.toast('No se pudo guardar el cambio.', { tone: 'error' });
     }
+    throw e;
   }
   // Broadcast so every mounted hook re-reads — keeps phone/tablet shells and
   // any open screen in lockstep without prop drilling.
@@ -213,9 +214,10 @@ function loNormalizeTask(raw) {
   } else {
     t.subtasks = [];
   }
-  t.note = t.note || t.subtitle || '';
+  t.note = t.note ?? t.subtitle ?? '';
   t.subtitle = t.note || undefined; // legacy alias
-  t.reminder = !!t.reminder || !!t.alarm;
+  t.reminder = t.reminder == null ? !!t.alarm : !!t.reminder;
+  t.alarm = t.reminder;
   t.recur = t.recur || null;           // { freq:'daily'|'weekly'|'weekdays', days:[0..6] }
   t.deadline = t.deadline || null;     // 'YYYY-MM-DD'
   t.allDay = !!t.allDay;               // no time slot — rides the all-day pill row
@@ -252,7 +254,7 @@ function loMaterializeOccurrence(list, id) {
 // its virtual form. We drop those so overrides don't pile up forever (bad for
 // storage and sync). An edited occurrence (_edited) is always kept.
 function loIsPristineOccurrence(t) {
-  return t._from && String(t.id).includes('@') && t.status === 'todo' && !t._edited
+  return t._from && String(t.id).includes('@') && t.status === 'todo' && !t._edited && !t._deleted
     && !(t.subtasks || []).some(s => s.done);
 }
 
@@ -302,7 +304,14 @@ const LOStore = {
     return next.find(t => t.id === id);
   },
   removeTask(id) {
-    LOStore.saveTasks(LOStore.allTasks().filter(t => t.id !== id));
+    const list = LOStore.allTasks();
+    if (String(id).includes('@')) {
+      const occurrence = loMaterializeOccurrence(list, id);
+      if (occurrence) Object.assign(occurrence, { _deleted: true, _edited: true, updatedAt: Date.now() });
+      LOStore.saveTasks(list);
+    } else {
+      LOStore.saveTasks(list.filter(t => t.id !== id && t._from !== id));
+    }
   },
   toggleTask(id) {
     const list = LOStore.allTasks();
@@ -346,16 +355,15 @@ const LOStore = {
   // virtual occurrences (id suffixed with @date so completion is per-day).
   tasksForDate(dateStr) {
     const all = LOStore.allTasks();
-    // Materialized recurring occurrences (id "base@date") are surfaced by the
-    // recurring branch below — keep them out of `direct` to avoid duplicates.
-    const direct = all.filter(t => !t.recur && t.date === dateStr && !String(t.id).includes('@'));
+    // Overrides retain their original occurrence ID even when rescheduled.
+    // Show concrete records at their actual date; their existence suppresses
+    // the original virtual occurrence (including deletion tombstones).
+    const direct = all.filter(t => !t.recur && !t._deleted && t.date === dateStr);
+    const ids = new Set(all.map(t => t.id));
     const recurring = all
-      .filter(t => t.recur && loRecurOccursOn(t, dateStr))
-      .map(t => {
-        const occId = `${t.id}@${dateStr}`;
-        const override = all.find(o => o.id === occId); // a materialized completion
-        return override || loNormalizeTask({ ...t, id: occId, date: dateStr, recur: null, _from: t.id });
-      });
+      .filter(t => t.recur && !t._deleted && loRecurOccursOn(t, dateStr))
+      .filter(t => !ids.has(`${t.id}@${dateStr}`))
+      .map(t => loNormalizeTask({ ...t, id: `${t.id}@${dateStr}`, date: dateStr, recur: null, _from: t.id }));
     return [...direct, ...recurring].sort((a, b) => loHHMMtoMin(a.start) - loHHMMtoMin(b.start));
   },
 
@@ -363,7 +371,7 @@ const LOStore = {
   upcomingDeadlines(limit = 3) {
     const today = loDateStr();
     return LOStore.allTasks()
-      .filter(t => t.deadline && t.status !== 'done' && !String(t.id).includes('@') && t.deadline >= today)
+      .filter(t => !t._deleted && t.deadline && t.status !== 'done' && !String(t.id).includes('@') && t.deadline >= today)
       .sort((a, b) => a.deadline < b.deadline ? -1 : a.deadline > b.deadline ? 1 : 0)
       .slice(0, limit);
   },
@@ -433,27 +441,60 @@ const LOStore = {
     if (!data || data.app !== 'lifeos' || !Array.isArray(data.tasks)) {
       throw new Error('Archivo inválido: no es un respaldo de LifeOS.');
     }
-    // Only accept well-formed records (objects with an id) so a malformed backup
-    // can't inject junk that crashes a render downstream.
-    const asArr = (a) => Array.isArray(a) ? a.filter(x => x && typeof x === 'object' && x.id) : [];
-    if (merge) {
-      const byId = (arr, extra) => { const m = {}; [...extra, ...arr].forEach(x => { if (x && x.id) m[x.id] = x; }); return Object.values(m); };
-      loWrite(LO_KEYS.tasks, byId(asArr(data.tasks), loRead(LO_KEYS.tasks, [])));
-      loWrite(LO_KEYS.habits, byId(asArr(data.habits), LOStore.allHabits()));
-      loWrite(LO_KEYS.inbox, byId(asArr(data.inbox), LOStore.allInbox()));
-      loWrite(LO_KEYS.routines, byId(asArr(data.routines), LOStore.customRoutines()));
-    } else {
-      loWrite(LO_KEYS.tasks, asArr(data.tasks).map(loNormalizeTask));
-      loWrite(LO_KEYS.habits, asArr(data.habits));
-      loWrite(LO_KEYS.inbox, asArr(data.inbox));
-      loWrite(LO_KEYS.routines, asArr(data.routines));
+    // Validate every collection before touching existing data. Reject malformed
+    // records rather than silently filtering them out of a restore.
+    const object = x => x && typeof x === 'object' && !Array.isArray(x);
+    const str = x => typeof x === 'string';
+    const date = x => str(x) && /^\d{4}-\d{2}-\d{2}$/.test(x) && loDateStr(new Date(x + 'T12:00:00')) === x;
+    const valid = (x, type) => {
+      if (!object(x) || !str(x.id) || !x.id) return false;
+      for (const k of ['title','text','name','note','subtitle','icon','color','status','priority','category','_from']) {
+        if (x[k] != null && !str(x[k])) return false;
+      }
+      if (type === 'tasks') {
+        if (!str(x.title)) return false;
+        for (const k of ['date','targetDate','deadline']) if (x[k] != null && !date(x[k])) return false;
+        for (const k of ['start','end']) if (x[k] != null && (!str(x[k]) || !/^([01]\d|2[0-3]):[0-5]\d$/.test(x[k]))) return false;
+        if (x.durationMin != null && (!Number.isFinite(x.durationMin) || x.durationMin <= 0 || x.durationMin > 1440)) return false;
+        if (x.recur != null && (!object(x.recur) || !['daily','weekdays','weekly'].includes(x.recur.freq) || (x.recur.until != null && !date(x.recur.until)))) return false;
+        if (x.recur?.days != null && (!Array.isArray(x.recur.days) || !x.recur.days.every(d => Number.isInteger(d) && d >= 0 && d <= 6))) return false;
+        if (x.subtasks != null && !(Array.isArray(x.subtasks) ? x.subtasks.every(t => object(t) && str(t.label) && (t.id == null || str(t.id))) : object(x.subtasks) && Number.isInteger(x.subtasks.total) && x.subtasks.total >= 0 && x.subtasks.total <= 1000)) return false;
+      }
+      if (type === 'habits' && (!str(x.title) || (x.log != null && !object(x.log)) || (x.days != null && (!Array.isArray(x.days) || !x.days.every(d => Number.isInteger(d) && d >= 0 && d <= 6))))) return false;
+      if (type === 'inbox' && !str(x.text)) return false;
+      if (type === 'routines' && (!str(x.name) || !Array.isArray(x.tasks) || !x.tasks.every(t => object(t) && str(t.label) && (t.icon == null || str(t.icon)) && (t.color == null || str(t.color)) && (t.dur == null || (Number.isFinite(t.dur) && t.dur > 0 && t.dur <= 1440))))) return false;
+      return true;
+    };
+    const pending = {};
+    for (const type of Object.keys(LO_KEYS)) {
+      const records = data[type] ?? [];
+      if (!Array.isArray(records) || !records.every(x => valid(x, type)) || new Set(records.map(x => x.id)).size !== records.length) {
+        throw new Error(`Respaldo inválido: revisa ${type}. No se modificaron tus datos.`);
+      }
+      const incoming = type === 'tasks' ? records.map(loNormalizeTask) : records;
+      pending[LO_KEYS[type]] = merge ? Array.from(new Map([...loRead(LO_KEYS[type], []), ...incoming].map(x => [x.id, x])).values()) : incoming;
     }
-    // Restore the user profile too — export has always included it, but import
-    // dropped it, wiping the name/onboarding after a "restore". Merge keeps current fields.
-    if (data.user && typeof data.user === 'object') {
-      loWrite('lifeos.user', merge ? { ...loRead('lifeos.user', {}), ...data.user } : data.user);
+    if (data.user != null) {
+      if (!object(data.user) || (data.user.name != null && !str(data.user.name))) throw new Error('Perfil inválido en el respaldo.');
+      pending['lifeos.user'] = merge ? { ...loRead('lifeos.user', {}), ...data.user } : data.user;
     }
-    return { tasks: asArr(data.tasks).length, habits: asArr(data.habits).length, inbox: asArr(data.inbox).length };
+    // Serialize and snapshot first; notify observers only after every write.
+    // Roll back completed writes if the browser refuses a later collection.
+    const entries = Object.entries(pending).map(([key, value]) => [key, JSON.stringify(value)]);
+    const previous = new Map(entries.map(([key]) => [key, localStorage.getItem(key)]));
+    const written = [];
+    try {
+      for (const [key, value] of entries) { localStorage.setItem(key, value); written.push(key); }
+    } catch (error) {
+      let restored = true;
+      for (const key of written.reverse()) {
+        try { const old = previous.get(key); if (old === null) localStorage.removeItem(key); else localStorage.setItem(key, old); }
+        catch { restored = false; }
+      }
+      throw new Error(restored ? 'No se pudo importar. Se conservaron los datos anteriores.' : 'Falló la restauración. Conserva el archivo de respaldo y libera espacio antes de reintentar.');
+    }
+    window.dispatchEvent(new CustomEvent('lo-store-change', { detail: {} }));
+    return { tasks: data.tasks.length, habits: (data.habits || []).length, inbox: (data.inbox || []).length };
   },
 
   // -- routines: schedule a pack of tasks on a given day, skipping busy slots --
@@ -467,23 +508,30 @@ const LOStore = {
       cursor = Math.ceil((n.getHours() * 60 + n.getMinutes()) / 30) * 30;
     } else cursor = 9 * 60;
     const list = LOStore.allTasks();
-    // Don't stack on top of what's already scheduled that day.
-    const busy = LOStore.tasksForDate(date)
-      .map(t => ({ s: loHHMMtoMin(t.start), e: loHHMMtoMin(t.start) + (t.durationMin || 30) }));
-    const overlaps = (s, dur) => busy.find(o => s < o.e && (s + dur) > o.s);
-    (routine.tasks || []).forEach(rt => {
+    const origin = new Date(date + 'T12:00:00');
+    const busy = new Map();
+    const dayAt = offset => { const d = new Date(origin); d.setDate(d.getDate() + offset); return loDateStr(d); };
+    const slots = offset => {
+      if (!busy.has(offset)) busy.set(offset, LOStore.tasksForDate(dayAt(offset)).filter(t => !t.allDay).map(t => ({ s: offset * 1440 + loHHMMtoMin(t.start), e: offset * 1440 + loHHMMtoMin(t.start) + t.durationMin })));
+      return busy.get(offset);
+    };
+    for (const rt of routine.tasks || []) {
       const dur = rt.dur || 30;
-      let guard = 0;
-      let clash;
-      while ((clash = overlaps(cursor, dur)) && guard++ < 48) cursor = clash.e; // jump past the busy block
-      list.push(loNormalizeTask({
-        title: rt.label, icon: rt.icon, color: rt.color,
-        start: loMinToHHMM(cursor), durationMin: dur, date,
-        routineId: routine.id,
-      }));
-      busy.push({ s: cursor, e: cursor + dur });
-      cursor += dur;
-    });
+      if (!Number.isFinite(dur) || dur <= 0 || dur > 1440 || !Number.isFinite(cursor) || cursor < 0) throw new Error('Horario de rutina inválido.');
+      let placed = false;
+      for (let attempt = 0; attempt < 10000; attempt++) {
+        const day = Math.floor(cursor / 1440);
+        const clashes = [day - 1, day, Math.floor((cursor + dur - 1) / 1440)].flatMap(slots).filter(o => cursor < o.e && cursor + dur > o.s);
+        if (clashes.length) { cursor = Math.max(...clashes.map(o => o.e)); continue; }
+        const actualDate = dayAt(day);
+        list.push(loNormalizeTask({ title: rt.label, icon: rt.icon, color: rt.color, start: loMinToHHMM(cursor), durationMin: dur, date: actualDate, routineId: routine.id }));
+        slots(day).push({ s: cursor, e: cursor + dur });
+        cursor += dur;
+        placed = true;
+        break;
+      }
+      if (!placed) throw new Error('No se encontró espacio para la rutina.');
+    }
     LOStore.saveTasks(list);
     return (routine.tasks || []).length;
   },
@@ -548,6 +596,9 @@ function loGuessIconColor(title) {
 // Parse a date reference. Returns { date, matched } or null.
 function loParseDate(low, base = new Date()) {
   const today = new Date(base);
+  today.setHours(0, 0, 0, 0);
+  const thisMorning = low.match(/\besta\s+ma[nñ]ana\b/);
+  if (thisMorning) return { date: loDateStr(today), matched: thisMorning[0] };
   const mk = (off) => { const d = new Date(today); d.setDate(today.getDate() + off); return loDateStr(d); };
   if (/\bpasado\s+ma[nñ]ana\b/.test(low)) return { date: mk(2), matched: 'pasado mañana' };
   if (/\bma[nñ]ana\b/.test(low)) return { date: mk(1), matched: 'mañana' };
@@ -637,12 +688,12 @@ function loParseCommand(text) {
   if (/\b(borra|borrar|elimina|eliminar|quita|quitar|cancela|cancelar)\b/.test(low)) {
     return { intent: 'delete', query: raw.replace(LO_DELETE_GLUE_RE, '').replace(/\s+/g, ' ').trim() };
   }
-  if (/\b(complet|marca.*hech|ya\s+hice|termin[eé]|hecho|listo\s+el)\b/.test(low)) {
+  if (/\b(completa|completar|marca.*hech[oa]|ya\s+hice|termine|hecho|listo\s+el)\b/.test(low)) {
     return { intent: 'complete', query: raw.replace(LO_COMPLETE_GLUE_RE, '').replace(/\s+/g, ' ').trim() };
   }
   if (/\b(mueve|mover|posterga|postergar|cambia.*hora|reprograma|pasa)\b/.test(low)) {
     const time = loParseTime(low);
-    return { intent: 'move', query: raw.replace(LO_CMD_VERBS, '').trim(), start: time && time.start };
+    return { intent: 'move', query: raw.replace(/\b(mueve|mover|posterga|postergar|reprograma|pasa|cambia\s+la\s+hora\s+de)\b/gi, '').replace(time ? time.matched : /$^/, '').trim(), start: time && time.start };
   }
   if (/\b(c[oó]mo|ayuda|qu[eé]\s+puedo|qu[eé]\s+haces|tutorial|funciona)\b/.test(low)) {
     return { intent: 'help' };
@@ -707,12 +758,12 @@ function loFindTaskByQuery(tasks, query) {
     if (title === q) score = 100;
     else if (title.includes(q)) score = 60;
     else if (words.length && words.every(w => title.includes(w))) score = 40;
-    else if (words.length && title.includes(words[0])) score = 15;
+    // A first-word-only match is unsafe for delete/complete/move.
     return { t, score };
   }).filter(x => x.score > 0).sort((a, b) => b.score - a.score);
   if (!scored.length) return { hit: null, ambiguous: false };
   // Two tasks tied at the top and neither is an exact title match → too risky, ask.
-  if (scored.length > 1 && scored[0].score === scored[1].score && scored[0].score < 100) {
+  if (scored.length > 1 && scored[0].score === scored[1].score) {
     return { hit: null, ambiguous: true };
   }
   return { hit: scored[0].t, ambiguous: false };
@@ -741,7 +792,7 @@ function loExecuteCommand(parsed) {
     return { reply: `Listo ✅ Agendé "${saved.title}" ${when}. La puedes ver en tu timeline.`, task: saved };
   }
   if (parsed.intent === 'delete') {
-    const { hit, ambiguous } = loFindTaskByQuery(LOStore.allTasks(), parsed.query);
+    const { hit, ambiguous } = loFindTaskByQuery(LOStore.allTasks().filter(t => !t._deleted && !t._from), parsed.query);
     if (ambiguous) return { reply: 'Hay varias tareas parecidas. Dime el nombre más exacto para no borrar la equivocada.' };
     if (hit) { LOStore.removeTask(hit.id); return { reply: `Eliminé "${hit.title}".` }; }
     return { reply: 'No encontré esa tarea. ¿Cómo se llama exactamente?' };
@@ -749,7 +800,7 @@ function loExecuteCommand(parsed) {
   if (parsed.intent === 'complete') {
     const { hit, ambiguous } = loFindTaskByQuery(LOStore.tasksForDate(loDateStr()), parsed.query);
     if (ambiguous) return { reply: 'Tengo varias parecidas hoy. ¿Cuál exactamente?' };
-    if (hit) { LOStore.toggleTask(hit.id); return { reply: `¡Hecho! Marqué "${hit.title}" como completada. 🎉` }; }
+    if (hit) { if (hit.status !== 'done') LOStore.toggleTask(hit.id); return { reply: `¡Hecho! Marqué "${hit.title}" como completada. 🎉` }; }
     return { reply: 'No vi esa tarea en tu día de hoy.' };
   }
   if (parsed.intent === 'move') {
@@ -849,7 +900,7 @@ function useStoreVersion() {
 function useTasks() {
   useStoreVersion();
   return {
-    all: LOStore.allTasks(),
+    all: LOStore.allTasks().filter(t => !t._deleted),
     forDate: LOStore.tasksForDate,
     add: LOStore.addTask, update: LOStore.updateTask, remove: LOStore.removeTask,
     toggle: LOStore.toggleTask, toggleSubtask: LOStore.toggleSubtask,

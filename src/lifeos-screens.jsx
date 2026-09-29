@@ -46,7 +46,7 @@ function TabBar({ theme, current, onChange }) {
 // FAB
 function FAB({ theme, onClick }) {
   return (
-    <button onClick={onClick} className="lo-press lo-scale-in" style={{
+    <button aria-label="Añadir" onClick={onClick} className="lo-press lo-scale-in" style={{
       position: 'absolute', right: 20,
       bottom: 'calc(max(env(safe-area-inset-bottom, 0px), 4px) + 84px)',
       zIndex: 11,
@@ -1283,7 +1283,10 @@ function DetailScreen({ theme, task, onBack, onStartFocus, onComplete, onToggleS
   };
   const snooze = () => {
     if (!onUpdate) return;
-    onUpdate({ start: loMinToHHMM(loHHMMtoMin(t.start) + 30) });
+    const minutes = loHHMMtoMin(t.start) + 30;
+    const date = new Date(t.date + 'T12:00:00');
+    date.setDate(date.getDate() + Math.floor(minutes / 1440));
+    onUpdate({ start: loMinToHHMM(minutes), date: loDateStr(date) });
     toast('Pospuesta 30 min', { icon: 'clock' });
   };
   const del = () => {
@@ -2382,7 +2385,7 @@ function SettingsScreen({ theme, onBack, embedded, user, onEditName, userTasks =
   const resetApp = () => {
     if (typeof window !== 'undefined' && !window.confirm('Esto borra TODAS tus tareas, hábitos y datos de este dispositivo. ¿Seguro?')) return;
     try {
-      [LO_KEYS.tasks, LO_KEYS.habits, LO_KEYS.inbox, 'lifeos.user', 'lifeos.user_tasks'].forEach(k => localStorage.removeItem(k));
+      [LO_KEYS.tasks, LO_KEYS.habits, LO_KEYS.inbox, LO_KEYS.routines, 'lifeos.user', 'lifeos.user_tasks'].forEach(k => localStorage.removeItem(k));
       window.dispatchEvent(new CustomEvent('lo-store-change', { detail: {} }));
       location.reload();
     } catch {}
@@ -2550,7 +2553,7 @@ function SettingsScreen({ theme, onBack, embedded, user, onEditName, userTasks =
         </div>
 
         <div style={{ textAlign: 'center', padding: '22px 0 8px', color: theme.text3, fontSize: 11 }}>
-          LifeOS · Hecho con cariño en Chile 🇨🇱
+          LifeOS · 2026.09.29 · Hecho con cariño en Chile 🇨🇱
         </div>
       </div>
     </div>

@@ -1,7 +1,7 @@
 // Runtime test for LifeOS — drives real flows on mobile viewport, captures bugs.
 const { chromium } = require('playwright-core');
 const fs = require('fs');
-const findChrome = () => ['/usr/bin/google-chrome-stable','/usr/bin/google-chrome','/usr/bin/chromium-browser','/snap/bin/chromium'].find(p => fs.existsSync(p));
+const findChrome = () => [process.env.CHROME_PATH || '/usr/bin/chromium','/usr/bin/google-chrome-stable','/usr/bin/google-chrome','/usr/bin/chromium-browser','/snap/bin/chromium'].find(p => fs.existsSync(p));
 
 const URL = 'http://localhost:8755/index.html';
 const MOBILE = { width: 390, height: 844 };

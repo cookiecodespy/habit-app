@@ -2,7 +2,7 @@
 // (Todo el mes), theme filter chips, grouped-by-date list. Tablet sidebar path.
 const { chromium } = require('playwright-core');
 const fs = require('fs');
-function findChrome(){ for (const c of ['/usr/bin/google-chrome-stable','/usr/bin/google-chrome','/usr/bin/chromium-browser','/snap/bin/chromium']) if (fs.existsSync(c)) return c; }
+function findChrome(){ for (const c of [process.env.CHROME_PATH || '/usr/bin/chromium','/usr/bin/google-chrome-stable','/usr/bin/google-chrome','/usr/bin/chromium-browser','/snap/bin/chromium']) if (fs.existsSync(c)) return c; }
 function ds(d){ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
 (async () => {
   const browser = await chromium.launch({ executablePath: findChrome(), args: ['--no-sandbox'] });
@@ -16,7 +16,7 @@ function ds(d){ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'
   page.on('console', m => { if (m.type()==='error' && !/404|favicon/i.test(m.text())) errors.push('console.error: ' + m.text()); });
   await page.goto('http://localhost:8755/index.html', { waitUntil: 'load' });
 
-  const today = new Date(); today.setHours(0,0,0,0);
+  const today = new Date(); today.setDate(10); today.setHours(0,0,0,0);
   const d = (n) => { const x = new Date(today); x.setDate(today.getDate()+n); return ds(x); };
   const tasks = [
     { id:'a1', date: d(0), start:'08:00', end:'09:00', title:'Gym', icon:'yoga', color:'coral', status:'todo', category:'vida' },
@@ -79,4 +79,5 @@ function ds(d){ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'
   console.log('errors:', errors.length ? errors.join(' | ') : '(none)');
   console.log(guessPass && uiPass && errors.length===0 ? 'AGENDA PASS ✅' : 'AGENDA CHECK ⚠️');
   await browser.close();
+  process.exitCode = guessPass && uiPass && errors.length === 0 ? 0 : 1;
 })().catch(e => { console.error('FAILED:', e.message); process.exit(1); });

@@ -1,7 +1,7 @@
 // Direct verification of Sprint 2 fixes — drives the real LOStore in-page.
 const { chromium } = require('playwright-core');
 const fs = require('fs');
-const findChrome = () => ['/usr/bin/google-chrome-stable','/usr/bin/google-chrome','/usr/bin/chromium-browser','/snap/bin/chromium'].find(p => fs.existsSync(p));
+const findChrome = () => [process.env.CHROME_PATH || '/usr/bin/chromium','/usr/bin/google-chrome-stable','/usr/bin/google-chrome','/usr/bin/chromium-browser','/snap/bin/chromium'].find(p => fs.existsSync(p));
 const URL = 'http://localhost:8755/index.html';
 const pass = [], fail = [];
 const ok = (n, c) => (c ? pass : fail).push(n);

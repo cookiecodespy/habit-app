@@ -154,7 +154,7 @@ function QuickAddMenu({ theme, onClose, onSelect }) {
     { id: 'voice',   label: 'Dictar con IA',   icon: 'sparkle',  color: 'sky'      },
   ];
   return (
-    <div className="lo-fade" onClick={onClose} style={{
+    <div data-screen-label="Quick Add" className="lo-fade" onClick={onClose} style={{
       position: 'absolute', inset: 0, zIndex: 40,
       background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(10px)',
       display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',

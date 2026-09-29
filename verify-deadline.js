@@ -3,7 +3,7 @@
 const { chromium } = require('playwright-core');
 const fs = require('fs');
 function findChrome() {
-  for (const c of ['/usr/bin/google-chrome-stable','/usr/bin/google-chrome','/usr/bin/chromium-browser','/snap/bin/chromium'])
+  for (const c of [process.env.CHROME_PATH || '/usr/bin/chromium','/usr/bin/google-chrome-stable','/usr/bin/google-chrome','/usr/bin/chromium-browser','/snap/bin/chromium'])
     if (fs.existsSync(c)) return c;
 }
 function ds(d){ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }

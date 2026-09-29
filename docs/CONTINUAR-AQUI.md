@@ -1,3 +1,5 @@
+> **Actualización 2026-09-29:** esta nota es histórica. Leer primero [la auditoría y cronología actual](AUDITORIA-2026-09-29.md). Babel en navegador ya fue eliminado en junio.
+
 # CONTINUAR-AQUÍ — Estado y handoff de LifeOS / habit-app
 
 > **Léeme primero al abrir una sesión nueva de Claude Code.** Resume TODO lo reciente para

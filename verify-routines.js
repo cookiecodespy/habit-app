@@ -2,7 +2,7 @@
 // (add/update/remove + export) and best-effort renders the "MÍA" card.
 const { chromium } = require('playwright-core');
 const fs = require('fs');
-function findChrome(){ for (const c of ['/usr/bin/google-chrome-stable','/usr/bin/google-chrome','/usr/bin/chromium-browser','/snap/bin/chromium']) if (fs.existsSync(c)) return c; }
+function findChrome(){ for (const c of [process.env.CHROME_PATH || '/usr/bin/chromium','/usr/bin/google-chrome-stable','/usr/bin/google-chrome','/usr/bin/chromium-browser','/snap/bin/chromium']) if (fs.existsSync(c)) return c; }
 (async () => {
   const browser = await chromium.launch({ executablePath: findChrome(), args: ['--no-sandbox'] });
   const ctx = await browser.newContext({
@@ -39,11 +39,9 @@ function findChrome(){ for (const c of ['/usr/bin/google-chrome-stable','/usr/bi
   let ui = { reachedRoutines: false, miaBadge: false, crearBtn: false };
   try {
     await page.reload({ waitUntil: 'load' }); await page.waitForTimeout(1800);
-    // FAB (+) — bottom-right round button
-    await page.evaluate(() => { const b = [...document.querySelectorAll('button')].reverse().find(x => { const s=getComputedStyle(x); return s.borderRadius && parseInt(s.borderRadius)>=20 && x.offsetParent && x.getBoundingClientRect().bottom > window.innerHeight-160; }); if (b) b.click(); });
-    await page.waitForTimeout(500);
-    await page.evaluate(() => { const b = [...document.querySelectorAll('*')].find(x => x.offsetParent && /rutina/i.test(x.textContent) && x.textContent.length < 30); if (b) (b.closest('button')||b).click(); });
-    await page.waitForTimeout(700);
+    await page.getByRole('button', { name: 'Añadir', exact: true }).click();
+    await page.getByRole('button', { name: 'Nueva rutina', exact: true }).click();
+    await page.waitForSelector('[data-screen-label=Routines]');
     ui = await page.evaluate(() => {
       const txt = document.body.innerText;
       return { reachedRoutines: /Tus rutinas|Mis rutinas|Crear rutina/i.test(txt), miaBadge: /MÍA|MIA/i.test(txt), crearBtn: /Crear rutina/i.test(txt) };
@@ -57,4 +55,5 @@ function findChrome(){ for (const c of ['/usr/bin/google-chrome-stable','/usr/bi
   console.log('errors:', errors.length ? errors.join(' | ') : '(none)');
   console.log(storePass ? 'ROUTINES STORE PASS ✅' : 'ROUTINES CHECK ⚠️');
   await browser.close();
+  process.exitCode = storePass && ui.reachedRoutines && ui.crearBtn && ui.miaBadge ? 0 : 1;
 })().catch(e => { console.error('FAILED:', e.message); process.exit(1); });

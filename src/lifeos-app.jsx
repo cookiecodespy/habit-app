@@ -220,12 +220,12 @@ function PrototypeFrame({ t, setTweak }) {
           else if (kind === 'habit') setOverlay('habit');
           else if (kind === 'routine') setOverlay('routines');
           else if (kind === 'inbox') setOverlay('inbox');
-          else if (kind === 'voice') setTab('ai');
+          else if (kind === 'voice') { setOverlay(null); setTab('ai'); }
         }}/>
       )}
 
-      {/* Hide the + when today is empty — the empty state shows its own hero CTA. */}
-      {tab === 'timeline' && !overlay && (LOStore.tasksForDate(loDateStr()) || []).some(t => t.kind !== 'break') &&
+      {/* Keep routines and quick capture reachable even on an empty day. */}
+      {tab === 'timeline' && !overlay &&
         <FAB theme={theme} onClick={() => setOverlay('quickadd')}/>}
       {!overlay && <TabBar theme={theme} current={tab} onChange={setTab}/>}
       <ToastStack theme={theme}/>
@@ -450,7 +450,7 @@ function TabletApp({ t, setTweak }) {
           </div>
           <div style={{ minWidth: 0 }}>
             <div style={{ fontSize: 13.5, fontWeight: 600, color: theme.text, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.name.split(' ')[0]}</div>
-            <div style={{ fontSize: 11, color: theme.text3 }}>Hola, ¡buen día!</div>
+            <div style={{ fontSize: 11, color: theme.text3 }}>{greetingFor()}</div>
           </div>
         </div>
 
@@ -618,8 +618,27 @@ function TabletApp({ t, setTweak }) {
         )}
 
         {/* FAB only on timeline */}
-        {tab === 'timeline' && !overlay && <FAB theme={theme} onClick={() => setOverlay('create')}/>}
+        {tab === 'timeline' && !overlay && <FAB theme={theme} onClick={() => setOverlay('quickadd')}/>}
 
+      {overlay === 'routines' && (
+        <Sheet theme={theme} onClose={() => setOverlay(null)}>
+          <RoutinesScreen theme={theme} onBack={() => setOverlay(null)} onApply={(routine) => {
+            const n = LOStore.applyRoutine(routine);
+            toast(`Rutina agendada · ${n} ${n === 1 ? 'tarea' : 'tareas'}`, { tone: 'success', icon: 'check' });
+            setOverlay(null);
+          }}/>
+        </Sheet>
+      )}
+
+      {overlay === 'quickadd' && (
+        <QuickAddMenu theme={theme} onClose={() => setOverlay(null)} onSelect={(kind) => {
+          if (kind === 'task') setOverlay('create');
+          else if (kind === 'habit') setOverlay('habit');
+          else if (kind === 'routine') setOverlay('routines');
+          else if (kind === 'inbox') setOverlay('inbox');
+          else if (kind === 'voice') { setOverlay(null); setTab('ai'); }
+        }}/>
+      )}
         {/* Overlays — full-screen over everything */}
         {overlay === 'inbox' && (
           <Sheet theme={theme} onClose={() => setOverlay(null)}>

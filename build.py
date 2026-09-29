@@ -34,7 +34,7 @@ CSP = ("default-src 'self' blob: data:; "
        "object-src 'none'; base-uri 'self'")
 
 def enc(b):
-    return base64.b64encode(gzip.compress(b, 9)).decode('ascii')
+    return base64.b64encode(gzip.compress(b, 9, mtime=0)).decode('ascii')
 
 def transpile_file(path):
     r = subprocess.run(['node', 'transpile.js', path], capture_output=True, text=True)
