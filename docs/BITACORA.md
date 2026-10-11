@@ -31,6 +31,7 @@ algunos corrompían datos, otros hacían que la app dijera cosas que no eran cie
 - *Colores.* El selector ofrecía 12 colores de los que solo 6 eran distintos; un color
   desconocido en datos importados podía dejar la pantalla en blanco.
 - *Iconos sugeridos.* "estudiar", "comprar" o "entrenar" nunca recibían su icono.
+- *Búsqueda.* Tocar un resultado cerraba la búsqueda sin abrir la tarea.
 
 **Qué cambió**
 
@@ -59,10 +60,11 @@ algunos corrompían datos, otros hacían que la app dijera cosas que no eran cie
 
 **Cómo se verificó**
 
-- 58 pruebas de lógica (36 nuevas: series, deshacer, planner, hábitos). Los 594 resultados de
+- 60 pruebas de lógica (38 nuevas: series, deshacer, planner, hábitos). Los 594 resultados de
   referencia se regeneraron y cada diferencia se revisó: todas son correcciones deliberadas.
-- 27 pruebas de navegador por tamaño de pantalla (6 nuevas: navegar días, editar y eliminar
-  series, deshacer, planner, enfoque), en teléfono y escritorio.
+- 28 pruebas de navegador por tamaño de pantalla (7 nuevas: navegar días, editar y eliminar
+  series, abrir una serie desde la búsqueda, deshacer, planner, enfoque), en teléfono y
+  escritorio.
 - La prueba de actualización sigue pasando: el formato de los datos guardados no cambió y la
   versión nueva no reescribe nada al arrancar. La única clave nueva es
   `lifeos.lastBackupAt`.
