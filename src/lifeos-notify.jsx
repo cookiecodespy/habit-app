@@ -35,9 +35,9 @@ function useToasts() {
 function ToastStack({ theme }) {
   const [items, dismiss] = useToasts();
   return (
-    <div style={{
+    <div aria-live="polite" style={{
       position: 'absolute', left: 0, right: 0,
-      top: 'calc(env(safe-area-inset-top, 0px) + 70px)',
+      top: 'calc(env(safe-area-inset-top, 0px) + 16px)',
       zIndex: 200,
       display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
       pointerEvents: 'none',
@@ -45,7 +45,7 @@ function ToastStack({ theme }) {
       {items.map(t => (
         <div key={t.id} role="status" className="lo-slide-in" style={{
           background: t.tone === 'success'
-            ? `linear-gradient(135deg, ${LIFE_PALETTE.mint.from}, ${LIFE_PALETTE.mint.to})`
+            ? `linear-gradient(135deg, #1FA98F, #147A68)`
             : t.tone === 'error'
             ? `linear-gradient(135deg, ${LIFE_PALETTE.coral.from}, ${LIFE_PALETTE.coral.to})`
             : theme.surfaceHi,
@@ -166,7 +166,7 @@ function NotifSettingsRow({ theme }) {
       fontFamily: 'inherit',
     }}>
       <SettingsIconBadge name="bell" color="coral" size={32}/>
-      <span style={{ flex: 1, fontSize: 14.5, color: theme.text, letterSpacing: -0.1 }}>Notificaciones<small style={{ display: 'block', fontWeight: 400, fontSize: 11, marginTop: 3 }}>Recordatorios con la app abierta</small></span>
+      <span style={{ flex: 1, fontSize: 14.5, color: theme.text, letterSpacing: -0.1 }}>Notificaciones<small style={{ display: 'block', fontWeight: 400, fontSize: 11.5, marginTop: 3, color: theme.text3 }}>Avisan 10 min antes de una tarea con recordatorio, mientras LifeOS está abierta</small></span>
       <span style={{ fontSize: 13, color: perm === 'granted' ? LIFE_PALETTE.mint.to : theme.text2 }}>{label}</span>
     </button>
   );

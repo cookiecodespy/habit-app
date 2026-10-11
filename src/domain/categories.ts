@@ -37,24 +37,26 @@ export function loGuessCategory(text: string | null | undefined): CategoryId | n
   return null;
 }
 
-// Icon + colour guessed from the task wording.
+// Icon + colour guessed from the task wording (matched on the accent-free title). Each
+// alternative is the start of a word, so "estudi" also covers "estudiar" and "estudio"; short
+// words that are not stems end in \b so "call" does not match "calle".
 const LO_ICON_RULES: Array<[RegExp, string, string]> = [
-  [/\b(gym|gimnasio|entren|ejercicio|pesas|crossfit|deporte|workout|correr|running|trotar)\b/, '💪', 'coral'],
-  [/\b(yoga|estir|medita|respira|mindful)\b/, '🧘', 'lavender'],
-  [/\b(camin|paseo|pasear|caminata)\b/, '🏃', 'lime'],
-  [/\b(estudi|leer|lectura|libro|clase|tarea|examen|prueba|universidad|repasar|ingl[eé]s)\b/, '📚', 'plum'],
-  [/\b(reuni[oó]n|meeting|junta|zoom|call|llamada|videollamada|sync|standup|entrevista)\b/, '📊', 'sky'],
-  [/\b(llamar|telefon|tel[eé]fono)\b/, '📞', 'teal'],
-  [/\b(almuerzo|almorzar|comer|comida|cena|cenar|desayun|brunch|restaurant)\b/, '🍽️', 'sun'],
-  [/\b(caf[eé]|coffee|espresso)\b/, '☕', 'ember'],
-  [/\b(compr|super|mercado|tienda|mall)\b/, '🛒', 'coral'],
-  [/\b(dormir|sue[nñ]o|acostar|noche|descansar)\b/, '😴', 'lavender'],
-  [/\b(trabaj|deep work|foco|proyecto|c[oó]digo|programar|dise[nñ]ar|oficina)\b/, '💼', 'slate'],
-  [/\b(ducha|ba[nñ]o|ducharme)\b/, '🚿', 'sky'],
-  [/\b(doctor|dentista|m[eé]dico|cita|salud|pastilla|remedio|medicamento)\b/, '💊', 'rose'],
-  [/\b(bici|bicicleta|andar)\b/, '🚴', 'mint'],
-  [/\b(journal|diario|escribir|anotar|nota)\b/, '✏️', 'rose'],
-  [/\b(planear|planificar|organizar|revisar|review)\b/, '✨', 'lavender'],
+  [/\b(?:gym\b|gimnasio|entren|ejercicio|pesas|crossfit|deporte|workout|correr\b|running|trot)/, '💪', 'coral'],
+  [/\b(?:yoga|estir|medit|respira|mindful)/, '🧘', 'lavender'],
+  [/\b(?:camin|pase(?:o|ar))/, '🏃', 'lime'],
+  [/\b(?:estudi|leer\b|lectura|libro|clase|tarea|examen|prueba|universidad|repas|ingles)/, '📚', 'plum'],
+  [/\b(?:reunion|meeting|junta\b|zoom|call\b|llamada|videollamada|sync\b|standup|entrevista)/, '📊', 'sky'],
+  [/\b(?:llamar|telefon)/, '📞', 'teal'],
+  [/\b(?:almuerzo|almorzar|comer\b|comida|cena|desayun|brunch|restaurant)/, '🍽️', 'sun'],
+  [/\b(?:cafe\b|coffee|espresso)/, '☕', 'ember'],
+  [/\b(?:compr|super\b|supermercado|mercado|tienda|mall\b)/, '🛒', 'coral'],
+  [/\b(?:dormir|sueno|acostar|noche|descans|siesta)/, '😴', 'lavender'],
+  [/\b(?:trabaj|deep work|foco\b|proyecto|codigo|program|disen|oficina)/, '💼', 'slate'],
+  [/\b(?:ducha|bano\b|duchar)/, '🚿', 'sky'],
+  [/\b(?:doctor|dentista|medic|cita\b|salud|pastilla|remedio)/, '💊', 'rose'],
+  [/\b(?:bici|andar\b)/, '🚴', 'mint'],
+  [/\b(?:journal|diario|escrib|anotar|nota\b)/, '✏️', 'rose'],
+  [/\b(?:plane|planific|organiz|revis|review)/, '✨', 'lavender'],
 ];
 
 export function loGuessIconColor(title: string): { icon: string; color: string } {

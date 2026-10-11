@@ -14,8 +14,8 @@
      "date": "2026-09-29",
      "targetDate": "2026-09-29",
      "start": "09:00",
-     "durationMin": 30,
      "end": "09:30",
+     "durationMin": 30,
      "subtasks": [],
      "note": "",
      "reminder": false,
@@ -193,7 +193,7 @@
     "returns": {
      "id": "x4",
      "title": "Duración cero",
-     "durationMin": 0,
+     "durationMin": 30,
      "kind": "task",
      "icon": "star",
      "color": "mint",
@@ -202,7 +202,7 @@
      "date": "2026-09-29",
      "targetDate": "2026-09-29",
      "start": "09:00",
-     "end": "09:00",
+     "end": "09:30",
      "subtasks": [],
      "note": "",
      "reminder": false,
@@ -906,8 +906,8 @@
      "priority": "medium",
      "targetDate": "2026-09-29",
      "start": "09:00",
-     "durationMin": 30,
      "end": "09:30",
+     "durationMin": 30,
      "subtasks": [],
      "note": "",
      "reminder": false,
@@ -1021,8 +1021,8 @@
       "priority": "medium",
       "targetDate": "2026-09-29",
       "start": "09:00",
-      "durationMin": 30,
       "end": "09:30",
+      "durationMin": 30,
       "subtasks": [],
       "note": "",
       "reminder": false,
@@ -1285,8 +1285,8 @@
      "status": "todo",
      "priority": "medium",
      "targetDate": "2026-09-28",
-     "durationMin": 30,
      "end": "06:30",
+     "durationMin": 30,
      "subtasks": [],
      "note": "",
      "reminder": false,
@@ -1315,8 +1315,8 @@
      "status": "todo",
      "priority": "medium",
      "targetDate": "2026-09-28",
-     "durationMin": 30,
      "end": "09:30",
+     "durationMin": 30,
      "subtasks": [],
      "note": "",
      "reminder": false,
@@ -1345,8 +1345,8 @@
      "status": "todo",
      "priority": "medium",
      "targetDate": "2026-09-30",
-     "durationMin": 30,
      "end": "18:30",
+     "durationMin": 30,
      "subtasks": [],
      "note": "",
      "reminder": false,
@@ -1380,8 +1380,8 @@
      "status": "todo",
      "priority": "medium",
      "targetDate": "2026-09-28",
-     "durationMin": 30,
      "end": "20:30",
+     "durationMin": 30,
      "subtasks": [],
      "note": "",
      "reminder": false,
@@ -1413,8 +1413,8 @@
       "status": "todo",
       "priority": "medium",
       "targetDate": "2026-09-28",
-      "durationMin": 30,
       "end": "06:30",
+      "durationMin": 30,
       "subtasks": [],
       "note": "",
       "reminder": false,
@@ -1439,8 +1439,8 @@
       "status": "todo",
       "priority": "medium",
       "targetDate": "2026-09-28",
-      "durationMin": 30,
       "end": "09:30",
+      "durationMin": 30,
       "subtasks": [],
       "note": "",
       "reminder": false,
@@ -1465,8 +1465,8 @@
       "status": "todo",
       "priority": "medium",
       "targetDate": "2026-09-28",
-      "durationMin": 30,
       "end": "20:30",
+      "durationMin": 30,
       "subtasks": [],
       "note": "",
       "reminder": false,
@@ -1496,8 +1496,8 @@
       "status": "todo",
       "priority": "medium",
       "targetDate": "2026-10-03",
-      "durationMin": 30,
       "end": "06:30",
+      "durationMin": 30,
       "subtasks": [],
       "note": "",
       "reminder": false,
@@ -1527,8 +1527,8 @@
       "status": "todo",
       "priority": "medium",
       "targetDate": "2026-10-07",
-      "durationMin": 30,
       "end": "06:30",
+      "durationMin": 30,
       "subtasks": [],
       "note": "",
       "reminder": false,
@@ -1553,8 +1553,8 @@
       "status": "todo",
       "priority": "medium",
       "targetDate": "2026-10-07",
-      "durationMin": 30,
       "end": "09:30",
+      "durationMin": 30,
       "subtasks": [],
       "note": "",
       "reminder": false,
@@ -1579,8 +1579,8 @@
       "status": "todo",
       "priority": "medium",
       "targetDate": "2026-10-07",
-      "durationMin": 30,
       "end": "18:30",
+      "durationMin": 30,
       "subtasks": [],
       "note": "",
       "reminder": false,
@@ -1610,8 +1610,8 @@
       "status": "todo",
       "priority": "medium",
       "targetDate": "2026-10-12",
-      "durationMin": 30,
       "end": "06:30",
+      "durationMin": 30,
       "subtasks": [],
       "note": "",
       "reminder": false,
@@ -1636,8 +1636,8 @@
       "status": "todo",
       "priority": "medium",
       "targetDate": "2026-10-12",
-      "durationMin": 30,
       "end": "09:30",
+      "durationMin": 30,
       "subtasks": [],
       "note": "",
       "reminder": false,
@@ -1675,8 +1675,8 @@
       "status": "todo",
       "priority": "medium",
       "targetDate": "2026-09-28",
-      "durationMin": 30,
       "end": "06:30",
+      "durationMin": 30,
       "subtasks": [],
       "note": "",
       "reminder": false,
@@ -1702,8 +1702,8 @@
       "status": "todo",
       "priority": "medium",
       "targetDate": "2026-09-28",
-      "durationMin": 30,
       "end": "09:30",
+      "durationMin": 30,
       "subtasks": [],
       "note": "",
       "reminder": false,
@@ -1729,8 +1729,8 @@
       "status": "todo",
       "priority": "medium",
       "targetDate": "2026-09-30",
-      "durationMin": 30,
       "end": "18:30",
+      "durationMin": 30,
       "subtasks": [],
       "note": "",
       "reminder": false,
@@ -1761,8 +1761,8 @@
       "status": "todo",
       "priority": "medium",
       "targetDate": "2026-09-28",
-      "durationMin": 30,
       "end": "20:30",
+      "durationMin": 30,
       "subtasks": [],
       "note": "",
       "reminder": false,
@@ -1786,8 +1786,8 @@
       "status": "done",
       "priority": "medium",
       "targetDate": "2026-09-29",
-      "durationMin": 30,
       "end": "06:30",
+      "durationMin": 30,
       "subtasks": [],
       "note": "",
       "reminder": false,
@@ -1826,8 +1826,8 @@
       "status": "todo",
       "priority": "medium",
       "targetDate": "2026-09-28",
-      "durationMin": 30,
       "end": "06:30",
+      "durationMin": 30,
       "subtasks": [],
       "note": "",
       "reminder": false,
@@ -1853,8 +1853,8 @@
       "status": "todo",
       "priority": "medium",
       "targetDate": "2026-09-28",
-      "durationMin": 30,
       "end": "09:30",
+      "durationMin": 30,
       "subtasks": [],
       "note": "",
       "reminder": false,
@@ -1880,8 +1880,8 @@
       "status": "todo",
       "priority": "medium",
       "targetDate": "2026-09-30",
-      "durationMin": 30,
       "end": "18:30",
+      "durationMin": 30,
       "subtasks": [],
       "note": "",
       "reminder": false,
@@ -1912,8 +1912,8 @@
       "status": "todo",
       "priority": "medium",
       "targetDate": "2026-09-28",
-      "durationMin": 30,
       "end": "20:30",
+      "durationMin": 30,
       "subtasks": [],
       "note": "",
       "reminder": false,
@@ -1941,8 +1941,8 @@
      "status": "todo",
      "priority": "medium",
      "targetDate": "2026-10-01",
-     "durationMin": 30,
      "end": "08:00",
+     "durationMin": 30,
      "subtasks": [],
      "note": "",
      "reminder": false,
@@ -1972,8 +1972,8 @@
       "status": "todo",
       "priority": "medium",
       "targetDate": "2026-09-30",
-      "durationMin": 30,
       "end": "09:30",
+      "durationMin": 30,
       "subtasks": [],
       "note": "",
       "reminder": false,
@@ -1998,8 +1998,8 @@
       "status": "todo",
       "priority": "medium",
       "targetDate": "2026-09-30",
-      "durationMin": 30,
       "end": "18:30",
+      "durationMin": 30,
       "subtasks": [],
       "note": "",
       "reminder": false,
@@ -2029,8 +2029,8 @@
       "status": "todo",
       "priority": "medium",
       "targetDate": "2026-10-01",
-      "durationMin": 30,
       "end": "06:30",
+      "durationMin": 30,
       "subtasks": [],
       "note": "",
       "reminder": false,
@@ -2055,8 +2055,8 @@
       "status": "todo",
       "priority": "medium",
       "targetDate": "2026-10-01",
-      "durationMin": 30,
       "end": "08:00",
+      "durationMin": 30,
       "subtasks": [],
       "note": "",
       "reminder": false,
@@ -2082,8 +2082,8 @@
       "status": "todo",
       "priority": "medium",
       "targetDate": "2026-10-01",
-      "durationMin": 30,
       "end": "09:30",
+      "durationMin": 30,
       "subtasks": [],
       "note": "",
       "reminder": false,
@@ -2108,8 +2108,8 @@
       "status": "todo",
       "priority": "medium",
       "targetDate": "2026-10-01",
-      "durationMin": 30,
       "end": "20:30",
+      "durationMin": 30,
       "subtasks": [],
       "note": "",
       "reminder": false,
@@ -2145,8 +2145,8 @@
       "status": "todo",
       "priority": "medium",
       "targetDate": "2026-10-02",
-      "durationMin": 30,
       "end": "06:30",
+      "durationMin": 30,
       "subtasks": [],
       "note": "",
       "reminder": false,
@@ -2176,8 +2176,8 @@
       "status": "todo",
       "priority": "medium",
       "targetDate": "2026-10-05",
-      "durationMin": 30,
       "end": "06:30",
+      "durationMin": 30,
       "subtasks": [],
       "note": "",
       "reminder": false,
@@ -2202,8 +2202,8 @@
       "status": "todo",
       "priority": "medium",
       "targetDate": "2026-10-05",
-      "durationMin": 30,
       "end": "09:30",
+      "durationMin": 30,
       "subtasks": [],
       "note": "",
       "reminder": false,
@@ -2228,8 +2228,8 @@
       "status": "todo",
       "priority": "medium",
       "targetDate": "2026-10-05",
-      "durationMin": 30,
       "end": "20:30",
+      "durationMin": 30,
       "subtasks": [],
       "note": "",
       "reminder": false,
@@ -2258,8 +2258,8 @@
      "status": "todo",
      "priority": "medium",
      "targetDate": "2026-10-07",
-     "durationMin": 30,
      "end": "18:30",
+     "durationMin": 30,
      "subtasks": [
       {
        "id": "p1",
@@ -2301,8 +2301,8 @@
       "status": "todo",
       "priority": "medium",
       "targetDate": "2026-10-07",
-      "durationMin": 30,
       "end": "06:30",
+      "durationMin": 30,
       "subtasks": [],
       "note": "",
       "reminder": false,
@@ -2327,8 +2327,8 @@
       "status": "todo",
       "priority": "medium",
       "targetDate": "2026-10-07",
-      "durationMin": 30,
       "end": "09:30",
+      "durationMin": 30,
       "subtasks": [],
       "note": "",
       "reminder": false,
@@ -2353,8 +2353,8 @@
       "status": "done",
       "priority": "medium",
       "targetDate": "2026-10-07",
-      "durationMin": 30,
       "end": "18:30",
+      "durationMin": 30,
       "subtasks": [
        {
         "id": "p1",
@@ -2403,8 +2403,8 @@
       "status": "todo",
       "priority": "medium",
       "targetDate": "2026-09-28",
-      "durationMin": 30,
       "end": "09:30",
+      "durationMin": 30,
       "subtasks": [],
       "note": "",
       "reminder": false,
@@ -2430,8 +2430,8 @@
       "status": "todo",
       "priority": "medium",
       "targetDate": "2026-09-30",
-      "durationMin": 30,
       "end": "18:30",
+      "durationMin": 30,
       "subtasks": [],
       "note": "",
       "reminder": false,
@@ -2462,8 +2462,8 @@
       "status": "todo",
       "priority": "medium",
       "targetDate": "2026-09-28",
-      "durationMin": 30,
       "end": "20:30",
+      "durationMin": 30,
       "subtasks": [],
       "note": "",
       "reminder": false,
@@ -2487,8 +2487,8 @@
       "status": "todo",
       "priority": "medium",
       "targetDate": "2026-10-02",
-      "durationMin": 30,
       "end": "09:30",
+      "durationMin": 30,
       "subtasks": [],
       "note": "",
       "reminder": false,
@@ -2515,8 +2515,8 @@
       "status": "done",
       "priority": "medium",
       "targetDate": "2026-10-07",
-      "durationMin": 30,
       "end": "18:30",
+      "durationMin": 30,
       "subtasks": [
        {
         "id": "p1",
@@ -2571,8 +2571,8 @@
      "status": "todo",
      "priority": "medium",
      "targetDate": "2026-09-28",
-     "durationMin": 30,
      "end": "09:30",
+     "durationMin": 30,
      "subtasks": [],
      "note": "",
      "reminder": false,
@@ -2598,8 +2598,8 @@
      "status": "todo",
      "priority": "medium",
      "targetDate": "2026-09-30",
-     "durationMin": 30,
      "end": "18:30",
+     "durationMin": 30,
      "subtasks": [],
      "note": "",
      "reminder": false,
@@ -2630,8 +2630,8 @@
      "status": "todo",
      "priority": "medium",
      "targetDate": "2026-09-28",
-     "durationMin": 30,
      "end": "20:30",
+     "durationMin": 30,
      "subtasks": [],
      "note": "",
      "reminder": false,
@@ -2655,8 +2655,8 @@
      "status": "todo",
      "priority": "medium",
      "targetDate": "2026-10-02",
-     "durationMin": 30,
      "end": "09:30",
+     "durationMin": 30,
      "subtasks": [],
      "note": "",
      "reminder": false,
@@ -2683,8 +2683,8 @@
      "status": "done",
      "priority": "medium",
      "targetDate": "2026-10-07",
-     "durationMin": 30,
      "end": "18:30",
+     "durationMin": 30,
      "subtasks": [
       {
        "id": "p1",
@@ -3390,8 +3390,8 @@
     "fn": "habitStats",
     "returns": {
      "streak": 3,
-     "rate30": 13,
-     "rate7": 57,
+     "rate30": 80,
+     "rate7": 80,
      "scheduledToday": true
     }
    },
@@ -3399,8 +3399,8 @@
     "fn": "habitStats",
     "returns": {
      "streak": 3,
-     "rate30": 14,
-     "rate7": 60,
+     "rate30": 100,
+     "rate7": 100,
      "scheduledToday": true
     }
    },
@@ -3408,8 +3408,8 @@
     "fn": "habitStats",
     "returns": {
      "streak": 1,
-     "rate30": 8,
-     "rate7": 33,
+     "rate30": 100,
+     "rate7": 100,
      "scheduledToday": false
     }
    },
@@ -3588,8 +3588,8 @@
      "priority": "medium",
      "date": "2026-09-29",
      "targetDate": "2026-09-29",
-     "durationMin": 30,
      "end": "11:30",
+     "durationMin": 30,
      "subtasks": [],
      "note": "",
      "reminder": false,
@@ -3659,8 +3659,8 @@
        "priority": "medium",
        "date": "2026-09-29",
        "targetDate": "2026-09-29",
-       "durationMin": 30,
        "end": "11:30",
+       "durationMin": 30,
        "subtasks": [],
        "note": "",
        "reminder": false,
@@ -3785,8 +3785,8 @@
       "priority": "medium",
       "date": "2026-09-29",
       "targetDate": "2026-09-29",
-      "durationMin": 30,
       "end": "11:30",
+      "durationMin": 30,
       "subtasks": [],
       "note": "",
       "reminder": false,
@@ -3823,8 +3823,8 @@
       "priority": "medium",
       "date": "2026-09-29",
       "targetDate": "2026-09-29",
-      "durationMin": 30,
       "end": "11:30",
+      "durationMin": 30,
       "subtasks": [],
       "note": "",
       "reminder": false,
@@ -3872,8 +3872,8 @@
       "date": "2026-09-29",
       "targetDate": "2026-09-29",
       "start": "09:00",
-      "durationMin": 30,
       "end": "09:30",
+      "durationMin": 30,
       "subtasks": [],
       "note": "",
       "reminder": false,
@@ -3938,8 +3938,8 @@
        "priority": "medium",
        "date": "2026-09-29",
        "targetDate": "2026-09-29",
-       "durationMin": 30,
        "end": "11:30",
+       "durationMin": 30,
        "subtasks": [],
        "note": "",
        "reminder": false,
@@ -4048,8 +4048,8 @@
      "priority": "medium",
      "date": "2026-09-29",
      "targetDate": "2026-09-29",
-     "durationMin": 30,
      "end": "11:30",
+     "durationMin": 30,
      "subtasks": [],
      "note": "",
      "reminder": false,
@@ -4111,8 +4111,8 @@
      "priority": "medium",
      "date": "2026-09-29",
      "targetDate": "2026-09-29",
-     "durationMin": 30,
      "end": "11:30",
+     "durationMin": 30,
      "subtasks": [],
      "note": "",
      "reminder": false,
@@ -4139,8 +4139,8 @@
      "priority": "medium",
      "date": "2026-09-29",
      "targetDate": "2026-09-29",
-     "durationMin": 30,
      "end": "15:30",
+     "durationMin": 30,
      "subtasks": [],
      "note": "",
      "reminder": false,
@@ -4170,8 +4170,8 @@
      "priority": "medium",
      "date": "2026-09-29",
      "targetDate": "2026-09-29",
-     "durationMin": 30,
      "end": "20:30",
+     "durationMin": 30,
      "subtasks": [],
      "note": "",
      "reminder": false,
@@ -4191,7 +4191,7 @@
       "query": "gym"
      },
      "result": {
-      "reply": "¡Hecho! Marqué \"Gym\" como completada. 🎉"
+      "reply": "Hecho. Marqué \"Gym\" como completada."
      }
     }
    },
@@ -4203,7 +4203,7 @@
       "query": "gym"
      },
      "result": {
-      "reply": "¡Hecho! Marqué \"Gym\" como completada. 🎉"
+      "reply": "\"Gym\" ya estaba completada."
      }
     }
    },
@@ -4213,10 +4213,37 @@
      "parsed": {
       "intent": "move",
       "query": "gym",
-      "start": "18:00"
+      "start": "18:00",
+      "date": null
      },
      "result": {
-      "reply": "Moví \"Gym\" a las 6:00 PM."
+      "reply": "Moví \"Gym\" a las 6:00 PM.",
+      "task": {
+       "title": "Gym",
+       "start": "18:00",
+       "durationMin": 60,
+       "updatedAt": 1790686800000,
+       "id": "t#1",
+       "kind": "task",
+       "icon": "star",
+       "color": "mint",
+       "status": "done",
+       "priority": "medium",
+       "date": "2026-09-29",
+       "targetDate": "2026-09-29",
+       "end": "19:00",
+       "subtasks": [],
+       "note": "",
+       "reminder": false,
+       "alarm": false,
+       "recur": null,
+       "deadline": null,
+       "allDay": false,
+       "category": null,
+       "isHabit": false,
+       "createdAt": 1790686800000,
+       "completedAt": 1790686800000
+      }
      }
     }
    },
@@ -4226,7 +4253,8 @@
      "parsed": {
       "intent": "move",
       "query": "reunión",
-      "start": "16:00"
+      "start": "16:00",
+      "date": null
      },
      "result": {
       "reply": "Hay varias parecidas. Dime cuál mover con su nombre exacto."
@@ -4239,10 +4267,11 @@
      "parsed": {
       "intent": "move",
       "query": "yoga",
-      "start": "16:00"
+      "start": "16:00",
+      "date": null
      },
      "result": {
-      "reply": "Dime qué tarea mover y a qué hora — ej: \"mueve gym a las 6pm\"."
+      "reply": "No encontré esa tarea en los próximos días."
      }
     }
    },
@@ -4252,10 +4281,11 @@
      "parsed": {
       "intent": "move",
       "query": "gym",
-      "start": null
+      "start": null,
+      "date": null
      },
      "result": {
-      "reply": "Dime qué tarea mover y a qué hora — ej: \"mueve gym a las 6pm\"."
+      "reply": "Dime qué tarea mover y a qué hora o día. Por ejemplo: \"mueve gym a las 6pm\"."
      }
     }
    },
@@ -4279,7 +4309,13 @@
       "query": "reunión con ana"
      },
      "result": {
-      "reply": "Eliminé \"Reunión con Ana\"."
+      "reply": "Eliminé \"Reunión con Ana\".",
+      "undo": {
+       "lifeos.tasks.v2": "[{\"title\":\"Gym\",\"start\":\"18:00\",\"durationMin\":60,\"updatedAt\":1790686800000,\"id\":\"t#1\",\"kind\":\"task\",\"icon\":\"star\",\"color\":\"mint\",\"status\":\"done\",\"priority\":\"medium\",\"date\":\"2026-09-29\",\"targetDate\":\"2026-09-29\",\"end\":\"19:00\",\"subtasks\":[],\"note\":\"\",\"reminder\":false,\"alarm\":false,\"recur\":null,\"deadline\":null,\"allDay\":false,\"category\":null,\"isHabit\":false,\"createdAt\":1790686800000,\"completedAt\":1790686800000},{\"title\":\"Reunión con Ana\",\"start\":\"11:00\",\"updatedAt\":1790686800000,\"id\":\"t#2\",\"kind\":\"task\",\"icon\":\"star\",\"color\":\"mint\",\"status\":\"todo\",\"priority\":\"medium\",\"date\":\"2026-09-29\",\"targetDate\":\"2026-09-29\",\"end\":\"11:30\",\"durationMin\":30,\"subtasks\":[],\"note\":\"\",\"reminder\":false,\"alarm\":false,\"recur\":null,\"deadline\":null,\"allDay\":false,\"category\":null,\"isHabit\":false,\"createdAt\":1790686800000},{\"title\":\"Reunión con Pedro\",\"start\":\"15:00\",\"updatedAt\":1790686800000,\"id\":\"t#3\",\"kind\":\"task\",\"icon\":\"star\",\"color\":\"mint\",\"status\":\"todo\",\"priority\":\"medium\",\"date\":\"2026-09-29\",\"targetDate\":\"2026-09-29\",\"end\":\"15:30\",\"durationMin\":30,\"subtasks\":[],\"note\":\"\",\"reminder\":false,\"alarm\":false,\"recur\":null,\"deadline\":null,\"allDay\":false,\"category\":null,\"isHabit\":false,\"createdAt\":1790686800000},{\"title\":\"Llamar a mamá\",\"start\":\"20:00\",\"recur\":{\"freq\":\"daily\"},\"updatedAt\":1790686800000,\"id\":\"t#4\",\"kind\":\"task\",\"icon\":\"star\",\"color\":\"mint\",\"status\":\"todo\",\"priority\":\"medium\",\"date\":\"2026-09-29\",\"targetDate\":\"2026-09-29\",\"end\":\"20:30\",\"durationMin\":30,\"subtasks\":[],\"note\":\"\",\"reminder\":false,\"alarm\":false,\"deadline\":null,\"allDay\":false,\"category\":null,\"isHabit\":false,\"createdAt\":1790686800000}]",
+       "lifeos.habits.v1": null,
+       "lifeos.inbox.v1": null,
+       "lifeos.routines.v1": null
+      }
      }
     }
    },
@@ -4303,7 +4339,7 @@
       "query": "llamar a mamá"
      },
      "result": {
-      "reply": "¡Hecho! Marqué \"Llamar a mamá\" como completada. 🎉"
+      "reply": "Hecho. Marqué \"Llamar a mamá\" como completada."
      }
     }
    },
@@ -4330,7 +4366,7 @@
       }
      },
      "result": {
-      "reply": "Listo ✅ Agendé \"Dentista\" mañana a las 9:00 AM. La puedes ver en tu timeline.",
+      "reply": "Listo. Agendé \"Dentista\" mañana a las 9:00 AM (45 min).",
       "task": {
        "title": "Dentista",
        "date": "2026-09-30",
@@ -4370,8 +4406,8 @@
        "start": "10:00",
        "durationMin": 30,
        "recur": null,
-       "icon": "✨",
-       "color": "mint",
+       "icon": "🛒",
+       "color": "coral",
        "reminder": false
       },
       "meta": {
@@ -4382,15 +4418,15 @@
       }
      },
      "result": {
-      "reply": "Listo ✅ Agendé \"Comprar pan\" hoy a las 10:00 AM. La puedes ver en tu timeline.",
+      "reply": "Listo. Agendé \"Comprar pan\" hoy a las 10:00 AM (30 min).",
       "task": {
        "title": "Comprar pan",
        "date": "2026-09-29",
        "start": "10:00",
        "durationMin": 30,
        "recur": null,
-       "icon": "✨",
-       "color": "mint",
+       "icon": "🛒",
+       "color": "coral",
        "reminder": false,
        "updatedAt": 1790686800000,
        "id": "t#6",
@@ -4436,7 +4472,7 @@
       }
      },
      "result": {
-      "reply": "Listo ✅ Agendé \"Tomar agua\" cada día. La puedes ver en tu timeline.",
+      "reply": "Listo. Agendé \"Tomar agua\" cada día, a las 10:00 AM (30 min).",
       "task": {
        "title": "Tomar agua",
        "date": "2026-09-29",
@@ -4474,7 +4510,7 @@
       "intent": "create",
       "task": {
        "title": "Yoga",
-       "date": "2026-10-05",
+       "date": "2026-09-29",
        "start": "07:00",
        "durationMin": 30,
        "recur": {
@@ -4488,17 +4524,17 @@
        "reminder": true
       },
       "meta": {
-       "hadDate": true,
+       "hadDate": false,
        "hadTime": true,
-       "dayLabel": "lunes",
+       "dayLabel": null,
        "timeLabel": "07:00"
       }
      },
      "result": {
-      "reply": "Listo ✅ Agendé \"Yoga\" cada semana. La puedes ver en tu timeline.",
+      "reply": "Listo. Agendé \"Yoga\" cada lunes, a las 7:00 AM (30 min).",
       "task": {
        "title": "Yoga",
-       "date": "2026-10-05",
+       "date": "2026-09-29",
        "start": "07:00",
        "durationMin": 30,
        "recur": {
@@ -4515,7 +4551,7 @@
        "kind": "task",
        "status": "todo",
        "priority": "medium",
-       "targetDate": "2026-10-05",
+       "targetDate": "2026-09-29",
        "end": "07:30",
        "subtasks": [],
        "note": "",
@@ -4554,7 +4590,7 @@
       }
      },
      "result": {
-      "reply": "Listo ✅ Agendé \"Gym\" entre semana. La puedes ver en tu timeline.",
+      "reply": "Listo. Agendé \"Gym\" de lunes a viernes, a las 6:00 AM (30 min).",
       "task": {
        "title": "Gym",
        "date": "2026-09-29",
@@ -4591,7 +4627,9 @@
      "parsed": {
       "intent": "help"
      },
-     "result": null
+     "result": {
+      "reply": "Entiendo frases cortas. Para agendar: \"gym mañana 7am 1h\", \"dentista el viernes a las 4\", \"leer cada día 10pm\". También: \"¿qué tengo mañana?\", \"completa gym\", \"mueve gym a las 6pm\" y \"borra gym\"."
+     }
     }
    },
    {
@@ -4601,7 +4639,9 @@
       "intent": "unknown",
       "raw": "agéndame"
      },
-     "result": null
+     "result": {
+      "reply": "No entendí eso. Entiendo frases cortas. Para agendar: \"gym mañana 7am 1h\", \"dentista el viernes a las 4\", \"leer cada día 10pm\". También: \"¿qué tengo mañana?\", \"completa gym\", \"mueve gym a las 6pm\" y \"borra gym\"."
+     }
     }
    },
    {
@@ -4639,8 +4679,8 @@
       "start": "10:00",
       "durationMin": 30,
       "recur": null,
-      "icon": "✨",
-      "color": "mint",
+      "icon": "🛒",
+      "color": "coral",
       "reminder": false,
       "updatedAt": 1790686800000,
       "id": "t#6",
@@ -4696,8 +4736,8 @@
       "priority": "medium",
       "date": "2026-09-29",
       "targetDate": "2026-09-29",
-      "durationMin": 30,
       "end": "15:30",
+      "durationMin": 30,
       "subtasks": [],
       "note": "",
       "reminder": false,
@@ -4748,8 +4788,8 @@
       "priority": "medium",
       "date": "2026-09-29",
       "targetDate": "2026-09-29",
-      "durationMin": 30,
       "end": "20:30",
+      "durationMin": 30,
       "subtasks": [],
       "note": "",
       "reminder": false,
@@ -4857,8 +4897,8 @@
       "priority": "medium",
       "date": "2026-09-30",
       "targetDate": "2026-09-30",
-      "durationMin": 30,
       "end": "20:30",
+      "durationMin": 30,
       "subtasks": [],
       "note": "",
       "reminder": false,
@@ -4952,8 +4992,8 @@
      "priority": "medium",
      "date": "2026-09-29",
      "targetDate": "2026-09-29",
-     "durationMin": 30,
      "end": "15:30",
+     "durationMin": 30,
      "subtasks": [],
      "note": "",
      "reminder": false,
@@ -4980,8 +5020,8 @@
      "priority": "medium",
      "date": "2026-09-29",
      "targetDate": "2026-09-29",
-     "durationMin": 30,
      "end": "20:30",
+     "durationMin": 30,
      "subtasks": [],
      "note": "",
      "reminder": false,
@@ -5005,8 +5045,8 @@
      "priority": "medium",
      "date": "2026-09-29",
      "targetDate": "2026-09-29",
-     "durationMin": 30,
      "end": "20:30",
+     "durationMin": 30,
      "subtasks": [],
      "note": "",
      "reminder": false,
@@ -5050,8 +5090,8 @@
      "start": "10:00",
      "durationMin": 30,
      "recur": null,
-     "icon": "✨",
-     "color": "mint",
+     "icon": "🛒",
+     "color": "coral",
      "reminder": false,
      "updatedAt": 1790686800000,
      "id": "t#6",
@@ -5098,7 +5138,7 @@
     },
     {
      "title": "Yoga",
-     "date": "2026-10-05",
+     "date": "2026-09-29",
      "start": "07:00",
      "durationMin": 30,
      "recur": {
@@ -5115,7 +5155,7 @@
      "kind": "task",
      "status": "todo",
      "priority": "medium",
-     "targetDate": "2026-10-05",
+     "targetDate": "2026-09-29",
      "end": "07:30",
      "subtasks": [],
      "note": "",
@@ -5181,7 +5221,7 @@
       }
      },
      "result": {
-      "reply": "Listo ✅ Agendé \"Leer\" hoy a las 12:00 AM. La puedes ver en tu timeline.",
+      "reply": "Listo. Agendé \"Leer\" hoy a las 12:00 AM (30 min).",
       "task": {
        "title": "Leer",
        "date": "2026-10-10",
@@ -5233,7 +5273,7 @@
       }
      },
      "result": {
-      "reply": "Listo ✅ Agendé \"Dormir\" mañana a las 9:00 AM. La puedes ver en tu timeline.",
+      "reply": "Listo. Agendé \"Dormir\" mañana a las 9:00 AM (30 min).",
       "task": {
        "title": "Dormir",
        "date": "2026-10-11",
@@ -5474,8 +5514,8 @@
    {
     "fn": "loGuessIconColor",
     "returns": {
-     "icon": "✨",
-     "color": "mint"
+     "icon": "🛒",
+     "color": "coral"
     }
    },
    {

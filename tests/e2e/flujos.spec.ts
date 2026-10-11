@@ -106,8 +106,8 @@ test('aplicar una rutina agenda todas sus tareas sin solaparlas', async ({ page 
 
 test('el planner entiende una frase y agenda la tarea', async ({ page }) => {
   await openApp(page);
-  await goTo(page, 'IA');
-  const input = page.getByPlaceholder('Pregúntame lo que sea…');
+  await goTo(page, 'Planner');
+  const input = page.getByPlaceholder('Escribe una frase…');
   await input.fill('gym mañana 7am 1h');
   await input.press('Enter');
   await expect(page.getByText(/Agendé "Gym" mañana a las 7:00 AM/)).toBeVisible();
@@ -162,8 +162,8 @@ test('exportar un respaldo, borrar todo e importarlo devuelve los mismos datos',
   expect(backup.habits).toEqual(data[KEYS.habits]);
 
   // Wipe the device.
-  page.once('dialog', (dialog) => dialog.accept());
   await page.getByRole('button', { name: 'Borrar todos mis datos' }).click();
+  await page.getByRole('button', { name: 'Borrar todo', exact: true }).click();
   await expect(page.getByPlaceholder('Tu nombre')).toBeVisible();
   expect(await stored(page, KEYS.tasks)).toBeNull();
 
@@ -172,10 +172,13 @@ test('exportar un respaldo, borrar todo e importarlo devuelve los mismos datos',
   await page.getByRole('button', { name: /Empezar/ }).click();
   await appReady(page);
   await goTo(page, 'Ajustes');
-  page.once('dialog', (dialog) => dialog.accept());
+  // The app reloads itself shortly after importing: wait for that reload, not for the
+  // load that already happened.
+  const reloaded = page.waitForEvent('load');
   await page.locator('input[type=file]').setInputFiles(file);
+  await page.getByRole('button', { name: 'Reemplazar mis datos' }).click();
   await expect(page.getByText(/Importado: 3 tareas, 1 hábitos/)).toBeVisible();
-  await page.waitForLoadState('load');
+  await reloaded;
   await appReady(page);
 
   const restored = await stored<Row[]>(page, KEYS.tasks);
@@ -194,8 +197,8 @@ test('un respaldo dañado se rechaza sin tocar los datos', async ({ page }, test
   const { writeFileSync } = await import('node:fs');
   const file = testInfo.outputPath('malo.json');
   writeFileSync(file, JSON.stringify({ app: 'lifeos', tasks: [{ id: 'x', title: 'Mala', date: '2026-02-30' }] }));
-  page.once('dialog', (dialog) => dialog.accept());
   await page.locator('input[type=file]').setInputFiles(file);
+  await page.getByRole('button', { name: 'Reemplazar mis datos' }).click();
   await expect(page.getByText(/Respaldo inválido: revisa tasks/)).toBeVisible();
   expect((await stored<Row[]>(page, KEYS.tasks)).map((t) => t.id)).toEqual(['keep']);
 });

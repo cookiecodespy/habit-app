@@ -45,8 +45,27 @@ body {
   overscroll-behavior: none;
 }
 html, body, input, button, textarea, select { font-family: var(--font-ui); }
+button { -webkit-tap-highlight-color: transparent; color: inherit; }
+button:disabled { cursor: default; }
 *::-webkit-scrollbar { display: none; }
 * { scrollbar-width: none; }
+
+/* With a mouse there is no swipe to discover that something scrolls: show a quiet scrollbar. */
+@media (hover: hover) and (pointer: fine) {
+  * { scrollbar-width: thin; scrollbar-color: rgba(128,128,140,0.32) transparent; }
+  *::-webkit-scrollbar { display: block; width: 8px; height: 8px; }
+  *::-webkit-scrollbar-thumb { background: rgba(128,128,140,0.32); border-radius: 4px; }
+  *::-webkit-scrollbar-track { background: transparent; }
+}
+
+/* Keyboard focus is always visible; a tap or click never leaves a ring behind. */
+:focus { outline: none; }
+:focus-visible { outline: 2px solid var(--lo-focus, #F0463A); outline-offset: 2px; border-radius: 8px; }
+input:focus-visible, textarea:focus-visible { outline-offset: 0; }
+[role="dialog"]:focus-visible { outline: none; }
+
+/* Placeholder of the fields written on a coloured hero */
+.lo-on-color::placeholder { color: rgba(255,255,255,0.62); }
 
 #root {
   width: 100%;
@@ -121,6 +140,24 @@ body::after {
   to   { transform: scale(1)    translateY(0);   opacity: 1; }
 }
 
+@keyframes lo-sheet-down { to { transform: translateY(100%); } }
+@keyframes lo-fade-out   { to { opacity: 0; } }
+@keyframes lo-dialog-in  { from { transform: translateY(10px) scale(0.96); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes lo-dialog-out { to { transform: translateY(6px) scale(0.97); opacity: 0; } }
+
+/* The tick of a completed task: lands with a small overshoot */
+@keyframes lo-check-in {
+  0%   { transform: scale(0.4); opacity: 0; }
+  60%  { transform: scale(1.18); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
+/* Day complete: one soft ripple around the ring */
+@keyframes lo-ring-done {
+  0%   { box-shadow: 0 0 0 0 var(--pulse-c, rgba(224,36,27,0.4)); }
+  100% { box-shadow: 0 0 0 14px rgba(0,0,0,0); }
+}
+
 /* ─── utility classes ───────────────────────────────────────── */
 .lo-sheet-enter { animation: lo-sheet-up 0.42s var(--ease-out-quart); }
 .lo-fade        { animation: lo-fade-in 0.3s var(--ease-smooth); }
@@ -130,6 +167,16 @@ body::after {
 .lo-pulse       { animation: lo-pulse 2.0s var(--ease-smooth) infinite; }
 .lo-breath      { animation: lo-breath 2.6s var(--ease-smooth) infinite; }
 .lo-detail      { animation: lo-detail-expand 0.42s var(--ease-out-quart); }
+.lo-check-in    { animation: lo-check-in 0.34s var(--ease-out-back); }
+.lo-ring-done   { animation: lo-ring-done 0.9s var(--ease-out-quart) 0.25s 1; }
+
+/* Sheets (phones) and dialogs (wide screens): enter, and leave the way they came */
+.lo-backdrop            { animation: lo-fade-in 0.22s var(--ease-smooth); }
+.lo-backdrop-out        { animation: lo-fade-out 0.19s var(--ease-smooth) forwards; }
+.lo-sheet               { animation: lo-sheet-up 0.36s var(--ease-out-quart); }
+.lo-sheet.is-closing    { animation: lo-sheet-down 0.19s cubic-bezier(0.4, 0, 1, 1) forwards; }
+.lo-dialog              { animation: lo-dialog-in 0.26s var(--ease-out-quart); }
+.lo-dialog.is-closing   { animation: lo-dialog-out 0.17s var(--ease-smooth) forwards; }
 
 /* Staggered children — use --i: <index> as inline style */
 .lo-stagger > * {
@@ -150,8 +197,14 @@ body::after {
 .lo-lift {
   transition: transform 0.2s var(--ease-out-quart), box-shadow 0.2s;
 }
-.lo-lift:hover {
-  transform: translateY(-1px);
+
+/* Hover feedback, only where there is a real pointer (touch screens fake :hover on tap) */
+@media (hover: hover) and (pointer: fine) {
+  .lo-lift:hover { transform: translateY(-1px); }
+  .lo-card { transition: transform 0.15s var(--ease-smooth), filter 0.15s, box-shadow 0.2s; }
+  .lo-card:hover { filter: brightness(1.07); }
+  .lo-icon-btn:hover, .lo-row-btn:hover, .lo-nav-btn:hover, .lo-day-cell:hover { background-color: rgba(128,128,140,0.14) !important; }
+  .lo-nav-btn, .lo-row-btn, .lo-icon-btn { transition: background-color 0.15s; }
 }
 
 /* Shimmer placeholder (used in empty/loading states) */

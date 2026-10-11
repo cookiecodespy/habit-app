@@ -15,20 +15,27 @@ escribes se queda en tu dispositivo.
 
 ## Qué hace
 
-- **Hoy** — línea de tiempo del día por mañana, tarde y noche; completar con un toque; pasos
-  (checklist) con progreso; tareas de todo el día; fechas límite con cuenta regresiva.
+- **Hoy** — línea de tiempo del día por mañana, tarde y noche, con marcador de "ahora";
+  completar con un toque; pasos (checklist) con progreso; tareas de todo el día; fechas límite
+  con cuenta regresiva. La tira de la semana lleva a cualquier otro día.
 - **Agenda** — mes y semana, con filtros por tema (vida, trabajo, universidad).
-- **Tareas repetidas** — cada día, entre semana o semanal. Cada día se completa, se mueve o se
-  borra por separado sin romper la serie.
+- **Tareas repetidas** — cada día, de lunes a viernes o los días que elijas. Cada día se
+  completa, se mueve o se borra por separado, y cualquier cambio se puede aplicar a ese día o
+  a toda la serie.
 - **Hábitos** — frecuencia diaria, entre semana o días específicos; calendario mensual y mapa
   de consistencia.
 - **Bandeja** — anota un pendiente sin pensar cuándo; agéndalo después con un toque.
 - **Rutinas** — packs de tareas reutilizables (Pomodoro, mañana ideal, las tuyas) que se
   agendan de una vez en los huecos libres.
 - **Planner por frases** — crea, completa, mueve o borra tareas escribiendo o dictando en
-  español. Es un intérprete de reglas que corre en el dispositivo, no un modelo de lenguaje.
+  español, y responde "¿qué tengo mañana?". Es un intérprete de reglas que corre en el
+  dispositivo, no un modelo de lenguaje: si no entiende, lo dice.
+- **Deshacer** — lo que eliminas se puede recuperar durante unos segundos.
 - **Modo enfoque** — temporizador a pantalla completa para la tarea en curso.
-- **Tus datos** — exporta e importa un respaldo en JSON cuando quieras.
+- **Tus datos** — exporta e importa un respaldo en JSON cuando quieras; Ajustes recuerda
+  cuándo fue el último.
+
+Con teclado: `N` nueva tarea, `/` buscar, `T` volver a hoy, `Esc` cerrar.
 
 ## Privacidad
 
@@ -72,7 +79,8 @@ npm run preview      # sirve dist/ igual que producción (cabeceras incluidas)
 ```
 
 Las pruebas de navegador usan los navegadores de Playwright (`npx playwright install chromium`).
-Para usar uno del sistema: `CHROME_PATH=/usr/bin/chromium npm run test:e2e`.
+Para usar uno del sistema: `CHROME_PATH=/usr/bin/chromium npm run test:e2e` (en Windows sirve
+la ruta de Edge o Chrome). En un equipo modesto, `-- --workers=2` evita esperas agotadas.
 
 ## Publicación
 

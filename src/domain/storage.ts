@@ -9,6 +9,8 @@ export const LO_KEYS = {
 } as const;
 
 export const USER_KEY = 'lifeos.user';
+/** When the last backup file was downloaded (epoch ms). Not part of a backup. */
+export const LAST_BACKUP_KEY = 'lifeos.lastBackupAt';
 
 export interface StorageLike {
   getItem(key: string): string | null;
@@ -59,6 +61,16 @@ export function loRead<T>(key: string, fallback: T): T {
   } catch {
     return fallback;
   }
+}
+
+/**
+ * A stored collection. Anything that is not a list of records with an id (a damaged or
+ * hand-edited value) reads as empty or is skipped, so one bad entry cannot crash a screen.
+ */
+export function loReadList<T extends { id: string }>(key: string): T[] {
+  const value = loRead<unknown>(key, []);
+  if (!Array.isArray(value)) return [];
+  return value.filter((x): x is T => !!x && typeof x === 'object' && typeof (x as { id?: unknown }).id === 'string');
 }
 
 /** Persist a value. A refused write warns the user, throws, and never announces a change. */

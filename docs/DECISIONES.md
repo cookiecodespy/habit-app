@@ -17,7 +17,20 @@ Decisiones de producto y de ingeniería que conviene no volver a discutir sin un
 - **Teléfono y escritorio por igual.** Una columna en teléfono; barra lateral y tablero en
   pantallas anchas. Mismo código.
 - **El planner por frases es honesto.** Es un intérprete de reglas: no debe decir que hizo
-  algo que no hizo ni presentarse como un modelo de lenguaje.
+  algo que no hizo ni presentarse como un modelo de lenguaje. Por eso se llama "Planner" y no
+  "IA", y cuando no entiende responde que no entendió, con ejemplos.
+- **Un infinitivo es una tarea.** "Mover muebles" o "cancelar la suscripción" se agendan;
+  solo son una orden si nombran una tarea que existe ("mover gym") o van en imperativo
+  ("mueve gym", "borra gym").
+- **"A las 4" es la tarde.** Una hora de 1 a 5 sin más pistas se agenda por la tarde; la
+  respuesta siempre dice la hora exacta para que un error se vea de inmediato.
+- **Deshacer antes que confirmar.** Lo que se puede revertir no pregunta: se hace y ofrece
+  "Deshacer". Solo preguntan las acciones sin vuelta atrás (borrar todo, reemplazar datos) y
+  las que necesitan una elección (cuánto de una serie eliminar).
+- **Un día de una serie nunca se repite por sí mismo.** La repetición pertenece a la serie;
+  editar un día deja ese día como excepción.
+- **Constancia sin castigo.** La constancia de un hábito cuenta desde que empezó, y el día de
+  hoy no resta hasta que termina.
 - **La bandeja es la lista de recordatorios.** Pendientes sin formulario, separados de las
   tareas con hora; se potencia la bandeja existente en vez de crear otra cosa.
 - **Español neutro, de tú.**
