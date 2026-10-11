@@ -3,13 +3,17 @@
 // could be added later without touching the screens.
 
 import { now, nowMs } from './clock';
-import { type DateStr, loDateStr, loHHMMtoMin, loMinToHHMM } from './dates';
-import { LO_KEYS, USER_KEY, loRead, loWrite, notifyStoreChange, storage } from './storage';
+import { type DateStr, loAddDays, loDateStr, loHHMMtoMin, loMinToHHMM } from './dates';
+import { LAST_BACKUP_KEY, LO_KEYS, USER_KEY, loRead, loReadList, loReadRaw, loWrite, notifyStoreChange, storage } from './storage';
 import {
   loAllTasks, loIsOccurrenceId, loIsPristineOccurrence, loMaterializeOccurrence, loMutableTasks,
-  loNormalizeTask, loTasksForDate, loUid, loUpcomingDeadlines,
+  loNormalizeTask, loSeriesIdOf, loSeriesOf, loSplitOccurrenceId, loTaskById, loTasksForDate, loUid,
+  loUpcomingDeadlines,
 } from './tasks';
-import type { Backup, Habit, InboxItem, Routine, RoutineStep, Task, TaskInput, UserProfile } from './types';
+import type { Backup, Habit, InboxItem, Recur, Routine, RoutineStep, Task, TaskInput, UserProfile } from './types';
+
+/** The newest backup format this version can read. */
+const BACKUP_VERSION = 2;
 
 type Collection = keyof typeof LO_KEYS;
 type Row = Record<string, unknown>;
@@ -57,6 +61,12 @@ function validRecord(x: unknown, type: Collection): boolean {
   return true;
 }
 
+/** The raw stored collections at one moment, to put back with LOStore.restore (undo). */
+export type StoreSnapshot = Record<string, string | null>;
+
+/** Fields of a series that also apply to the days already stored for it. */
+const SERIES_FIELDS = ['title', 'icon', 'color', 'priority', 'category', 'note', 'start', 'durationMin', 'allDay', 'reminder'] as const;
+
 export interface RoutineLike {
   id?: string;
   tasks?: RoutineStep[] | null;
@@ -80,9 +90,71 @@ export const LOStore = {
     // given day actually persists. Mark it _edited so clean-up never discards the change.
     loMaterializeOccurrence(list, id);
     const isOcc = loIsOccurrenceId(id);
-    const next = list.map((t) => (t.id === id ? loNormalizeTask({ ...t, ...patch, id, updatedAt: nowMs(), _edited: isOcc ? true : t._edited }) : t));
+    // One day of a series never repeats on its own: the repetition belongs to the series
+    // (see updateSeries). Storing it here would turn the day into a second, nested series.
+    const change = isOcc ? { ...patch, recur: null } : patch;
+    const next = list.map((t) => (t.id === id ? loNormalizeTask({ ...t, ...change, id, updatedAt: nowMs(), _edited: isOcc ? true : t._edited }) : t));
     LOStore.saveTasks(next);
     return next.find((t) => t.id === id);
+  },
+  /** A stored task or a day of a series, by id. */
+  getTask(id: string): Task | null { return loTaskById(id); },
+  /** The series a task belongs to, or null when it does not repeat. */
+  seriesOf(task: Pick<Task, 'id' | 'recur' | '_from'>): Task | null { return loSeriesOf(task); },
+  /**
+   * Change every day of a series. Days stored only because they were completed follow the
+   * change; days edited by hand keep what was edited. `recur: null` is ignored here — use
+   * endSeries, which keeps the days already lived.
+   */
+  updateSeries(seriesId: string, patch: TaskInput): Task | undefined {
+    const list = loMutableTasks();
+    const series = list.find((t) => t.id === seriesId);
+    if (!series || !series.recur) return undefined;
+    const change: TaskInput = { ...patch };
+    if ('recur' in change && !change.recur) delete change.recur;
+    delete change.date; delete change.targetDate; delete change.status; delete change.subtasks;
+    const shared: Record<string, unknown> = {};
+    for (const key of SERIES_FIELDS) if (key in change) shared[key] = change[key];
+    // A new start or length: let the end time be derived again.
+    const retime = 'start' in shared || 'durationMin' in shared ? { end: undefined } : {};
+    const next = list.map((t) => {
+      if (t.id === seriesId) return loNormalizeTask({ ...t, ...change, ...retime, id: seriesId, updatedAt: nowMs() });
+      if (t._from === seriesId && !t._edited && !t._deleted) return loNormalizeTask({ ...t, ...shared, ...retime, updatedAt: nowMs() });
+      return t;
+    });
+    LOStore.saveTasks(next);
+    return next.find((t) => t.id === seriesId);
+  },
+  /**
+   * Stop a series after `lastDate` (inclusive): later days disappear, earlier ones stay as
+   * they were. Ending it before its first day removes it altogether.
+   */
+  endSeries(seriesId: string, lastDate: DateStr): void {
+    const list = loMutableTasks();
+    const series = list.find((t) => t.id === seriesId);
+    if (!series || !series.recur) return;
+    if (lastDate < series.date) { LOStore.removeTask(seriesId); return; }
+    const isLater = (t: Task): boolean => {
+      const split = loSplitOccurrenceId(t.id);
+      return t._from === seriesId && !!split && split[1] > lastDate;
+    };
+    const next = list.filter((t) => !isLater(t))
+      .map((t) => (t.id === seriesId ? loNormalizeTask({ ...t, recur: { ...(t.recur as Recur), until: lastDate }, updatedAt: nowMs() }) : t));
+    LOStore.saveTasks(next);
+  },
+  /** Remove one day of a series, that day and the following ones, or the whole series. */
+  removeFromSeries(id: string, scope: 'day' | 'following' | 'all'): void {
+    const task = loTaskById(id);
+    const seriesId = task ? loSeriesIdOf(task) : null;
+    if (!task || !seriesId) { LOStore.removeTask(id); return; }
+    if (scope === 'all') LOStore.removeTask(seriesId);
+    else if (scope === 'following') LOStore.endSeries(seriesId, loAddDays(loSplitOccurrenceId(task.id)?.[1] ?? task.date, -1));
+    else LOStore.removeTask(id);
+  },
+  /** Mark a task done (or open again) without toggling: asking twice changes nothing. */
+  setTaskDone(id: string, done: boolean): void {
+    const task = loTaskById(id);
+    if (task && (task.status === 'done') !== done) LOStore.toggleTask(id);
   },
   removeTask(id: string): void {
     const list = loMutableTasks();
@@ -98,8 +170,9 @@ export const LOStore = {
     const list = loMutableTasks();
     const existing = list.find((t) => t.id === id);
     // Recurring occurrence not yet materialized → create a per-day done copy.
-    if (!existing && id.includes('@')) {
-      const [baseId, date] = id.split('@');
+    const split = existing ? null : loSplitOccurrenceId(id);
+    if (split) {
+      const [baseId, date] = split;
       const base = list.find((t) => t.id === baseId);
       if (base) {
         list.push(loNormalizeTask({ ...base, id, date, recur: null, _from: baseId, status: 'done', completedAt: nowMs(), updatedAt: nowMs() }));
@@ -136,7 +209,7 @@ export const LOStore = {
   upcomingDeadlines(limit = 3): Task[] { return loUpcomingDeadlines(limit); },
 
   // -- habits --
-  allHabits(): Habit[] { return loRead<Habit[]>(LO_KEYS.habits, []); },
+  allHabits(): Habit[] { return loReadList<Habit>(LO_KEYS.habits); },
   saveHabits(list: Habit[]): Habit[] { loWrite(LO_KEYS.habits, list); return list; },
   addHabit(partial: Partial<Habit>): Habit {
     const list = LOStore.allHabits();
@@ -165,16 +238,18 @@ export const LOStore = {
   removeHabit(id: string): void { LOStore.saveHabits(LOStore.allHabits().filter((h) => h.id !== id)); },
 
   // -- inbox (quick capture, schedule later) --
-  allInbox(): InboxItem[] { return loRead<InboxItem[]>(LO_KEYS.inbox, []); },
+  allInbox(): InboxItem[] { return loReadList<InboxItem>(LO_KEYS.inbox); },
   addInbox(text: string): void {
+    const clean = String(text).trim();
+    if (!clean) return;
     const list = LOStore.allInbox();
-    list.unshift({ id: loUid('i'), text: String(text).trim(), createdAt: nowMs(), updatedAt: nowMs() });
+    list.unshift({ id: loUid('i'), text: clean, createdAt: nowMs(), updatedAt: nowMs() });
     loWrite(LO_KEYS.inbox, list);
   },
   removeInbox(id: string): void { loWrite(LO_KEYS.inbox, LOStore.allInbox().filter((i) => i.id !== id)); },
 
   // -- custom routines (user-made reusable task packs; defaults live in the UI) --
-  customRoutines(): Routine[] { return loRead<Routine[]>(LO_KEYS.routines, []); },
+  customRoutines(): Routine[] { return loReadList<Routine>(LO_KEYS.routines).filter((r) => Array.isArray(r.tasks)); },
   addRoutine(partial: Partial<Routine>): Routine {
     const list = LOStore.customRoutines();
     const routine: Routine = {
@@ -192,10 +267,40 @@ export const LOStore = {
   },
   removeRoutine(id: string): void { loWrite(LO_KEYS.routines, LOStore.customRoutines().filter((r) => r.id !== id)); },
 
+  // -- undo: capture the collections before a destructive change, put them back after --
+  snapshot(): StoreSnapshot {
+    return Object.fromEntries(Object.values(LO_KEYS).map((key) => [key, loReadRaw(key)]));
+  },
+  restore(snapshot: StoreSnapshot): void {
+    const store = storage();
+    for (const key of Object.values(LO_KEYS)) {
+      if (!(key in snapshot)) continue;
+      const raw = snapshot[key];
+      if (raw == null) store.removeItem(key); else store.setItem(key, raw);
+    }
+    notifyStoreChange();
+  },
+
+  /** How much of the browser's storage the data takes, in bytes (2 per character). */
+  storageUsage(): { bytes: number; tasks: number } {
+    let chars = 0;
+    for (const key of [...Object.values(LO_KEYS), USER_KEY]) chars += key.length + (loReadRaw(key) || '').length;
+    return { bytes: chars * 2, tasks: loAllTasks().length };
+  },
+  lastBackupAt(): number | null {
+    const at = Number(loReadRaw(LAST_BACKUP_KEY));
+    return Number.isFinite(at) && at > 0 ? at : null;
+  },
+  /** Remember that a backup file was just downloaded. */
+  markBackup(): void {
+    try { storage().setItem(LAST_BACKUP_KEY, String(nowMs())); } catch { /* best effort */ }
+    notifyStoreChange(LAST_BACKUP_KEY);
+  },
+
   // -- data sovereignty: export / import the whole dataset as JSON --
   exportAll(): Backup {
     return {
-      app: 'lifeos', version: 2, exportedAt: now().toISOString(),
+      app: 'lifeos', version: BACKUP_VERSION, exportedAt: now().toISOString(),
       tasks: loRead<unknown[]>(LO_KEYS.tasks, []),
       habits: LOStore.allHabits(),
       inbox: LOStore.allInbox(),
@@ -206,6 +311,9 @@ export const LOStore = {
   importAll(data: unknown, { merge = false }: { merge?: boolean } = {}): { tasks: number; habits: number; inbox: number } {
     if (!isObject(data) || data.app !== 'lifeos' || !Array.isArray(data.tasks)) {
       throw new Error('Archivo inválido: no es un respaldo de LifeOS.');
+    }
+    if (typeof data.version === 'number' && data.version > BACKUP_VERSION) {
+      throw new Error('Este respaldo es de una versión más nueva de LifeOS. Actualiza la app antes de importarlo.');
     }
     // Validate every collection before touching existing data.
     const pending: Record<string, unknown> = {};

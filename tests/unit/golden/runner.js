@@ -29,8 +29,7 @@ function helpers(api) {
   return {
     say(text) {
       const parsed = api.loParseCommand(text);
-      const acts = ['create', 'delete', 'complete', 'move'].includes(parsed.intent);
-      return { parsed, result: acts ? api.loExecuteCommand(parsed) : null };
+      return { parsed, result: api.loExecuteCommand(parsed) };
     },
     habitStats(id) {
       const habit = api.LOStore.allHabits().find((h) => h.id === id);

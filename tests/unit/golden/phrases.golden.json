@@ -140,7 +140,7 @@
     "intent": "create",
     "task": {
      "title": "Reunión con cliente Acme",
-     "date": "2026-09-30",
+     "date": "2026-09-29",
      "start": "10:00",
      "durationMin": 30,
      "recur": {
@@ -154,9 +154,9 @@
      "reminder": true
     },
     "meta": {
-     "hadDate": true,
+     "hadDate": false,
      "hadTime": true,
-     "dayLabel": "miercoles",
+     "dayLabel": null,
      "timeLabel": "10:00"
     }
    }
@@ -167,7 +167,7 @@
     "intent": "create",
     "task": {
      "title": "Reunion",
-     "date": "2026-09-30",
+     "date": "2026-09-29",
      "start": "10:00",
      "durationMin": 30,
      "recur": {
@@ -181,9 +181,9 @@
      "reminder": true
     },
     "meta": {
-     "hadDate": true,
+     "hadDate": false,
      "hadTime": true,
-     "dayLabel": "miercoles",
+     "dayLabel": null,
      "timeLabel": "10:00"
     }
    }
@@ -195,7 +195,7 @@
     "task": {
      "title": "Dentista",
      "date": "2026-09-29",
-     "start": "04:00",
+     "start": "16:00",
      "durationMin": 30,
      "recur": null,
      "icon": "💊",
@@ -206,7 +206,7 @@
      "hadDate": true,
      "hadTime": true,
      "dayLabel": "hoy",
-     "timeLabel": "04:00"
+     "timeLabel": "16:00"
     }
    }
   },
@@ -303,7 +303,7 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Cumpleaños Ana",
+     "title": "Cumpleaños de Ana",
      "date": "2026-12-03",
      "start": null,
      "durationMin": 30,
@@ -326,7 +326,7 @@
     "intent": "create",
     "task": {
      "title": "Viaje",
-     "date": "2026-01-15",
+     "date": "2027-01-15",
      "start": "06:00",
      "durationMin": 30,
      "recur": null,
@@ -345,23 +345,9 @@
   {
    "text": "dentista el 31 de febrero",
    "parsed": {
-    "intent": "create",
-    "task": {
-     "title": "Dentista",
-     "date": "2026-03-03",
-     "start": null,
-     "durationMin": 30,
-     "recur": null,
-     "icon": "💊",
-     "color": "rose",
-     "reminder": false
-    },
-    "meta": {
-     "hadDate": true,
-     "hadTime": false,
-     "dayLabel": "el 31 de febrero",
-     "timeLabel": null
-    }
+    "intent": "unknown",
+    "raw": "dentista el 31 de febrero",
+    "reason": "date"
    }
   },
   {
@@ -369,20 +355,20 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Comprar pan tarde",
+     "title": "Comprar pan",
      "date": "2026-09-29",
-     "start": null,
+     "start": "15:00",
      "durationMin": 30,
      "recur": null,
-     "icon": "✨",
-     "color": "mint",
+     "icon": "🛒",
+     "color": "coral",
      "reminder": false
     },
     "meta": {
      "hadDate": true,
-     "hadTime": false,
+     "hadTime": true,
      "dayLabel": "hoy",
-     "timeLabel": null
+     "timeLabel": "15:00"
     }
    }
   },
@@ -391,9 +377,9 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Correr mañana",
+     "title": "Correr",
      "date": "2026-09-29",
-     "start": null,
+     "start": "09:00",
      "durationMin": 30,
      "recur": null,
      "icon": "💪",
@@ -402,9 +388,9 @@
     },
     "meta": {
      "hadDate": true,
-     "hadTime": false,
-     "dayLabel": "esta manana",
-     "timeLabel": null
+     "hadTime": true,
+     "dayLabel": "hoy",
+     "timeLabel": "09:00"
     }
    }
   },
@@ -413,7 +399,7 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Leer noche",
+     "title": "Leer",
      "date": "2026-09-29",
      "start": "22:00",
      "durationMin": 30,
@@ -479,7 +465,7 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Sábado asado con amigos",
+     "title": "Asado con amigos",
      "date": "2026-10-03",
      "start": "13:30",
      "durationMin": 30,
@@ -523,9 +509,9 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Cena con Ana noche",
+     "title": "Cena con Ana",
      "date": "2026-09-29",
-     "start": "08:00",
+     "start": "20:00",
      "durationMin": 30,
      "recur": null,
      "icon": "🍽️",
@@ -536,7 +522,7 @@
      "hadDate": false,
      "hadTime": true,
      "dayLabel": null,
-     "timeLabel": "08:00"
+     "timeLabel": "20:00"
     }
    }
   },
@@ -545,20 +531,20 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Desayuno y media",
+     "title": "Desayuno",
      "date": "2026-09-29",
-     "start": "07:00",
+     "start": "07:30",
      "durationMin": 30,
      "recur": null,
-     "icon": "✨",
-     "color": "mint",
+     "icon": "🍽️",
+     "color": "sun",
      "reminder": false
     },
     "meta": {
      "hadDate": false,
      "hadTime": true,
      "dayLabel": null,
-     "timeLabel": "07:00"
+     "timeLabel": "07:30"
     }
    }
   },
@@ -567,9 +553,9 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Clase y cuarto",
+     "title": "Clase",
      "date": "2026-09-29",
-     "start": "08:00",
+     "start": "08:15",
      "durationMin": 30,
      "recur": null,
      "icon": "📚",
@@ -580,7 +566,7 @@
      "hadDate": false,
      "hadTime": true,
      "dayLabel": null,
-     "timeLabel": "08:00"
+     "timeLabel": "08:15"
     }
    }
   },
@@ -592,7 +578,7 @@
      "title": "Reunión",
      "date": "2026-09-29",
      "start": "19:00",
-     "durationMin": 1140,
+     "durationMin": 30,
      "recur": null,
      "icon": "📊",
      "color": "sky",
@@ -704,8 +690,8 @@
      "start": "15:45",
      "durationMin": 20,
      "recur": null,
-     "icon": "✨",
-     "color": "mint",
+     "icon": "😴",
+     "color": "lavender",
      "reminder": false
     },
     "meta": {
@@ -770,8 +756,8 @@
      "start": null,
      "durationMin": 120,
      "recur": null,
-     "icon": "✨",
-     "color": "mint",
+     "icon": "📚",
+     "color": "plum",
      "reminder": false
     },
     "meta": {
@@ -792,8 +778,8 @@
      "start": null,
      "durationMin": 90,
      "recur": null,
-     "icon": "✨",
-     "color": "mint",
+     "icon": "📚",
+     "color": "plum",
      "reminder": false
     },
     "meta": {
@@ -814,8 +800,8 @@
      "start": null,
      "durationMin": 30,
      "recur": null,
-     "icon": "✨",
-     "color": "mint",
+     "icon": "🧘",
+     "color": "lavender",
      "reminder": false
     },
     "meta": {
@@ -858,8 +844,8 @@
      "start": "08:00",
      "durationMin": 20,
      "recur": null,
-     "icon": "✨",
-     "color": "mint",
+     "icon": "🏃",
+     "color": "lime",
      "reminder": false
     },
     "meta": {
@@ -897,20 +883,20 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Estudiar en",
+     "title": "Estudiar",
      "date": "2026-09-29",
-     "start": null,
-     "durationMin": 120,
+     "start": "12:00",
+     "durationMin": 30,
      "recur": null,
-     "icon": "✨",
-     "color": "mint",
+     "icon": "📚",
+     "color": "plum",
      "reminder": false
     },
     "meta": {
-     "hadDate": false,
-     "hadTime": false,
-     "dayLabel": null,
-     "timeLabel": null
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "en 2 horas",
+     "timeLabel": "12:00"
     }
    }
   },
@@ -965,8 +951,8 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Gym a viernes",
-     "date": "2026-10-05",
+     "title": "Gym",
+     "date": "2026-09-29",
      "start": "07:00",
      "durationMin": 30,
      "recur": {
@@ -977,9 +963,9 @@
      "reminder": true
     },
     "meta": {
-     "hadDate": true,
+     "hadDate": false,
      "hadTime": true,
-     "dayLabel": "lunes",
+     "dayLabel": null,
      "timeLabel": "07:00"
     }
    }
@@ -989,7 +975,7 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Tomar agua días",
+     "title": "Tomar agua",
      "date": "2026-09-29",
      "start": "09:00",
      "durationMin": 30,
@@ -1014,7 +1000,7 @@
     "intent": "create",
     "task": {
      "title": "Yoga",
-     "date": "2026-10-05",
+     "date": "2026-09-29",
      "start": "07:00",
      "durationMin": 30,
      "recur": {
@@ -1028,9 +1014,9 @@
      "reminder": true
     },
     "meta": {
-     "hadDate": true,
+     "hadDate": false,
      "hadTime": true,
-     "dayLabel": "lunes",
+     "dayLabel": null,
      "timeLabel": "07:00"
     }
    }
@@ -1040,19 +1026,26 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Yoga , miércoles y viernes",
-     "date": "2026-10-05",
+     "title": "Yoga",
+     "date": "2026-09-29",
      "start": "07:00",
      "durationMin": 30,
-     "recur": null,
+     "recur": {
+      "freq": "weekly",
+      "days": [
+       1,
+       3,
+       5
+      ]
+     },
      "icon": "🧘",
      "color": "lavender",
-     "reminder": false
+     "reminder": true
     },
     "meta": {
-     "hadDate": true,
+     "hadDate": false,
      "hadTime": true,
-     "dayLabel": "lunes",
+     "dayLabel": null,
      "timeLabel": "07:00"
     }
    }
@@ -1062,8 +1055,8 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Planificar semana",
-     "date": "2026-10-04",
+     "title": "Planificar la semana",
+     "date": "2026-09-29",
      "start": "20:00",
      "durationMin": 30,
      "recur": {
@@ -1077,9 +1070,9 @@
      "reminder": true
     },
     "meta": {
-     "hadDate": true,
+     "hadDate": false,
      "hadTime": true,
-     "dayLabel": "domingo",
+     "dayLabel": null,
      "timeLabel": "20:00"
     }
    }
@@ -1089,7 +1082,7 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Revisar correo diariamente",
+     "title": "Revisar correo",
      "date": "2026-09-29",
      "start": "09:00",
      "durationMin": 30,
@@ -1113,7 +1106,7 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Limpieza sábado",
+     "title": "Limpieza",
      "date": "2026-10-03",
      "start": "11:00",
      "durationMin": 30,
@@ -1137,7 +1130,7 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Tomar pastilla a diario",
+     "title": "Tomar pastilla",
      "date": "2026-09-29",
      "start": "08:00",
      "durationMin": 30,
@@ -1188,8 +1181,8 @@
      "start": null,
      "durationMin": 30,
      "recur": null,
-     "icon": "✨",
-     "color": "mint",
+     "icon": "🛒",
+     "color": "coral",
      "reminder": false
     },
     "meta": {
@@ -1227,7 +1220,7 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Estudiar prueba",
+     "title": "Estudiar para la prueba",
      "date": "2026-10-01",
      "start": "16:00",
      "durationMin": 30,
@@ -1254,8 +1247,8 @@
      "start": "18:00",
      "durationMin": 30,
      "recur": null,
-     "icon": "✨",
-     "color": "mint",
+     "icon": "🛒",
+     "color": "coral",
      "reminder": false
     },
     "meta": {
@@ -1293,7 +1286,7 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Alarma reunión",
+     "title": "Alarma para la reunión",
      "date": "2026-10-02",
      "start": "09:00",
      "durationMin": 30,
@@ -1337,13 +1330,13 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Tarea lavar ropa",
+     "title": "Lavar ropa",
      "date": "2026-09-29",
      "start": null,
      "durationMin": 30,
      "recur": null,
-     "icon": "📚",
-     "color": "plum",
+     "icon": "✨",
+     "color": "mint",
      "reminder": false
     },
     "meta": {
@@ -1386,8 +1379,8 @@
      "start": null,
      "durationMin": 30,
      "recur": null,
-     "icon": "✨",
-     "color": "mint",
+     "icon": "🛒",
+     "color": "coral",
      "reminder": false
     },
     "meta": {
@@ -1408,89 +1401,29 @@
   {
    "text": "¿qué tengo hoy?",
    "parsed": {
-    "intent": "create",
-    "task": {
-     "title": "¿qué tengo ?",
-     "date": "2026-09-29",
-     "start": null,
-     "durationMin": 30,
-     "recur": null,
-     "icon": "✨",
-     "color": "mint",
-     "reminder": false
-    },
-    "meta": {
-     "hadDate": true,
-     "hadTime": false,
-     "dayLabel": "hoy",
-     "timeLabel": null
-    }
+    "intent": "agenda",
+    "date": "2026-09-29"
    }
   },
   {
    "text": "qué tengo mañana",
    "parsed": {
-    "intent": "create",
-    "task": {
-     "title": "Qué tengo",
-     "date": "2026-09-30",
-     "start": null,
-     "durationMin": 30,
-     "recur": null,
-     "icon": "✨",
-     "color": "mint",
-     "reminder": false
-    },
-    "meta": {
-     "hadDate": true,
-     "hadTime": false,
-     "dayLabel": "mañana",
-     "timeLabel": null
-    }
+    "intent": "agenda",
+    "date": "2026-09-30"
    }
   },
   {
    "text": "hola",
    "parsed": {
-    "intent": "create",
-    "task": {
-     "title": "Hola",
-     "date": "2026-09-29",
-     "start": null,
-     "durationMin": 30,
-     "recur": null,
-     "icon": "✨",
-     "color": "mint",
-     "reminder": false
-    },
-    "meta": {
-     "hadDate": false,
-     "hadTime": false,
-     "dayLabel": null,
-     "timeLabel": null
-    }
+    "intent": "chat",
+    "kind": "greeting"
    }
   },
   {
    "text": "gracias",
    "parsed": {
-    "intent": "create",
-    "task": {
-     "title": "Gracias",
-     "date": "2026-09-29",
-     "start": null,
-     "durationMin": 30,
-     "recur": null,
-     "icon": "✨",
-     "color": "mint",
-     "reminder": false
-    },
-    "meta": {
-     "hadDate": false,
-     "hadTime": false,
-     "dayLabel": null,
-     "timeLabel": null
-    }
+    "intent": "chat",
+    "kind": "thanks"
    }
   },
   {
@@ -1553,14 +1486,29 @@
    "text": "cancela mi reunión de miércoles",
    "parsed": {
     "intent": "delete",
-    "query": "reunión miércoles"
+    "query": "reunión de miércoles"
    }
   },
   {
    "text": "cancelar la suscripción de netflix mañana",
    "parsed": {
-    "intent": "delete",
-    "query": "suscripción netflix mañana"
+    "intent": "create",
+    "task": {
+     "title": "Cancelar la suscripción de netflix",
+     "date": "2026-09-30",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "mañana",
+     "timeLabel": null
+    }
    }
   },
   {
@@ -1595,7 +1543,7 @@
    "text": "listo el informe",
    "parsed": {
     "intent": "complete",
-    "query": "listo informe"
+    "query": "informe"
    }
   },
   {
@@ -1603,23 +1551,39 @@
    "parsed": {
     "intent": "move",
     "query": "gym",
-    "start": "18:00"
+    "start": "18:00",
+    "date": null
    }
   },
   {
    "text": "mover reunión a las 15:30",
    "parsed": {
-    "intent": "move",
-    "query": "reunión",
-    "start": "15:30"
+    "intent": "create",
+    "task": {
+     "title": "Mover reunión",
+     "date": "2026-09-29",
+     "start": "15:30",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "📊",
+     "color": "sky",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "15:30"
+    }
    }
   },
   {
    "text": "posterga el dentista a las 5",
    "parsed": {
     "intent": "move",
-    "query": "el dentista",
-    "start": "05:00"
+    "query": "dentista",
+    "start": "17:00",
+    "date": null
    }
   },
   {
@@ -1627,23 +1591,39 @@
    "parsed": {
     "intent": "move",
     "query": "gym",
-    "start": null
+    "start": null,
+    "date": null
    }
   },
   {
    "text": "mueve gym a mañana",
    "parsed": {
     "intent": "move",
-    "query": "gym a mañana",
-    "start": null
+    "query": "gym",
+    "start": null,
+    "date": "2026-09-30"
    }
   },
   {
    "text": "pasa a buscar a Ana a las 5pm",
    "parsed": {
-    "intent": "move",
-    "query": "a buscar a Ana",
-    "start": "17:00"
+    "intent": "create",
+    "task": {
+     "title": "Pasa a buscar a Ana",
+     "date": "2026-09-29",
+     "start": "17:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "17:00"
+    }
    }
   },
   {
@@ -1651,7 +1631,8 @@
    "parsed": {
     "intent": "move",
     "query": "gym",
-    "start": "08:00"
+    "start": "08:00",
+    "date": null
    }
   },
   {
@@ -1669,7 +1650,23 @@
   {
    "text": "ver cómo va el proyecto mañana 10am",
    "parsed": {
-    "intent": "help"
+    "intent": "create",
+    "task": {
+     "title": "Ver cómo va el proyecto",
+     "date": "2026-09-30",
+     "start": "10:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "💼",
+     "color": "slate",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "mañana",
+     "timeLabel": "10:00"
+    }
    }
   },
   {
@@ -1705,7 +1702,7 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Reunión: equipo diseño,",
+     "title": "Reunión: equipo de diseño",
      "date": "2026-09-30",
      "start": "10:00",
      "durationMin": 30,
@@ -1749,7 +1746,7 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Ir al médico miércoles",
+     "title": "Ir al médico",
      "date": "2026-09-30",
      "start": "09:00",
      "durationMin": 30,
@@ -1769,23 +1766,8 @@
   {
    "text": "sábado",
    "parsed": {
-    "intent": "create",
-    "task": {
-     "title": "Sábado",
-     "date": "2026-10-03",
-     "start": null,
-     "durationMin": 30,
-     "recur": null,
-     "icon": "✨",
-     "color": "mint",
-     "reminder": false
-    },
-    "meta": {
-     "hadDate": true,
-     "hadTime": false,
-     "dayLabel": "sabado",
-     "timeLabel": null
-    }
+    "intent": "unknown",
+    "raw": "sábado"
    }
   },
   {
@@ -1793,13 +1775,13 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Estudio mercado sábado",
+     "title": "Estudio de mercado",
      "date": "2026-10-03",
      "start": "10:00",
      "durationMin": 180,
      "recur": null,
-     "icon": "🛒",
-     "color": "coral",
+     "icon": "📚",
+     "color": "plum",
      "reminder": false
     },
     "meta": {
@@ -1952,7 +1934,7 @@
     "intent": "create",
     "task": {
      "title": "Reunión con cliente Acme",
-     "date": "2026-10-14",
+     "date": "2026-10-10",
      "start": "10:00",
      "durationMin": 30,
      "recur": {
@@ -1966,9 +1948,9 @@
      "reminder": true
     },
     "meta": {
-     "hadDate": true,
+     "hadDate": false,
      "hadTime": true,
-     "dayLabel": "miercoles",
+     "dayLabel": null,
      "timeLabel": "10:00"
     }
    }
@@ -1979,7 +1961,7 @@
     "intent": "create",
     "task": {
      "title": "Reunion",
-     "date": "2026-10-14",
+     "date": "2026-10-10",
      "start": "10:00",
      "durationMin": 30,
      "recur": {
@@ -1993,9 +1975,9 @@
      "reminder": true
     },
     "meta": {
-     "hadDate": true,
+     "hadDate": false,
      "hadTime": true,
-     "dayLabel": "miercoles",
+     "dayLabel": null,
      "timeLabel": "10:00"
     }
    }
@@ -2007,7 +1989,7 @@
     "task": {
      "title": "Dentista",
      "date": "2026-10-10",
-     "start": "04:00",
+     "start": "16:00",
      "durationMin": 30,
      "recur": null,
      "icon": "💊",
@@ -2018,7 +2000,7 @@
      "hadDate": true,
      "hadTime": true,
      "dayLabel": "hoy",
-     "timeLabel": "04:00"
+     "timeLabel": "16:00"
     }
    }
   },
@@ -2115,7 +2097,7 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Cumpleaños Ana",
+     "title": "Cumpleaños de Ana",
      "date": "2026-12-03",
      "start": null,
      "durationMin": 30,
@@ -2138,7 +2120,7 @@
     "intent": "create",
     "task": {
      "title": "Viaje",
-     "date": "2026-01-15",
+     "date": "2027-01-15",
      "start": "06:00",
      "durationMin": 30,
      "recur": null,
@@ -2157,23 +2139,9 @@
   {
    "text": "dentista el 31 de febrero",
    "parsed": {
-    "intent": "create",
-    "task": {
-     "title": "Dentista",
-     "date": "2026-03-03",
-     "start": null,
-     "durationMin": 30,
-     "recur": null,
-     "icon": "💊",
-     "color": "rose",
-     "reminder": false
-    },
-    "meta": {
-     "hadDate": true,
-     "hadTime": false,
-     "dayLabel": "el 31 de febrero",
-     "timeLabel": null
-    }
+    "intent": "unknown",
+    "raw": "dentista el 31 de febrero",
+    "reason": "date"
    }
   },
   {
@@ -2181,20 +2149,20 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Comprar pan tarde",
+     "title": "Comprar pan",
      "date": "2026-10-10",
-     "start": null,
+     "start": "15:00",
      "durationMin": 30,
      "recur": null,
-     "icon": "✨",
-     "color": "mint",
+     "icon": "🛒",
+     "color": "coral",
      "reminder": false
     },
     "meta": {
      "hadDate": true,
-     "hadTime": false,
+     "hadTime": true,
      "dayLabel": "hoy",
-     "timeLabel": null
+     "timeLabel": "15:00"
     }
    }
   },
@@ -2203,9 +2171,9 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Correr mañana",
+     "title": "Correr",
      "date": "2026-10-10",
-     "start": null,
+     "start": "09:00",
      "durationMin": 30,
      "recur": null,
      "icon": "💪",
@@ -2214,9 +2182,9 @@
     },
     "meta": {
      "hadDate": true,
-     "hadTime": false,
-     "dayLabel": "esta manana",
-     "timeLabel": null
+     "hadTime": true,
+     "dayLabel": "hoy",
+     "timeLabel": "09:00"
     }
    }
   },
@@ -2225,7 +2193,7 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Leer noche",
+     "title": "Leer",
      "date": "2026-10-10",
      "start": "22:00",
      "durationMin": 30,
@@ -2291,7 +2259,7 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Sábado asado con amigos",
+     "title": "Asado con amigos",
      "date": "2026-10-17",
      "start": "13:30",
      "durationMin": 30,
@@ -2335,9 +2303,9 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Cena con Ana noche",
+     "title": "Cena con Ana",
      "date": "2026-10-10",
-     "start": "08:00",
+     "start": "20:00",
      "durationMin": 30,
      "recur": null,
      "icon": "🍽️",
@@ -2348,7 +2316,7 @@
      "hadDate": false,
      "hadTime": true,
      "dayLabel": null,
-     "timeLabel": "08:00"
+     "timeLabel": "20:00"
     }
    }
   },
@@ -2357,20 +2325,20 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Desayuno y media",
+     "title": "Desayuno",
      "date": "2026-10-10",
-     "start": "07:00",
+     "start": "07:30",
      "durationMin": 30,
      "recur": null,
-     "icon": "✨",
-     "color": "mint",
+     "icon": "🍽️",
+     "color": "sun",
      "reminder": false
     },
     "meta": {
      "hadDate": false,
      "hadTime": true,
      "dayLabel": null,
-     "timeLabel": "07:00"
+     "timeLabel": "07:30"
     }
    }
   },
@@ -2379,9 +2347,9 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Clase y cuarto",
+     "title": "Clase",
      "date": "2026-10-10",
-     "start": "08:00",
+     "start": "08:15",
      "durationMin": 30,
      "recur": null,
      "icon": "📚",
@@ -2392,7 +2360,7 @@
      "hadDate": false,
      "hadTime": true,
      "dayLabel": null,
-     "timeLabel": "08:00"
+     "timeLabel": "08:15"
     }
    }
   },
@@ -2404,7 +2372,7 @@
      "title": "Reunión",
      "date": "2026-10-10",
      "start": "19:00",
-     "durationMin": 1140,
+     "durationMin": 30,
      "recur": null,
      "icon": "📊",
      "color": "sky",
@@ -2516,8 +2484,8 @@
      "start": "15:45",
      "durationMin": 20,
      "recur": null,
-     "icon": "✨",
-     "color": "mint",
+     "icon": "😴",
+     "color": "lavender",
      "reminder": false
     },
     "meta": {
@@ -2582,8 +2550,8 @@
      "start": null,
      "durationMin": 120,
      "recur": null,
-     "icon": "✨",
-     "color": "mint",
+     "icon": "📚",
+     "color": "plum",
      "reminder": false
     },
     "meta": {
@@ -2604,8 +2572,8 @@
      "start": null,
      "durationMin": 90,
      "recur": null,
-     "icon": "✨",
-     "color": "mint",
+     "icon": "📚",
+     "color": "plum",
      "reminder": false
     },
     "meta": {
@@ -2626,8 +2594,8 @@
      "start": null,
      "durationMin": 30,
      "recur": null,
-     "icon": "✨",
-     "color": "mint",
+     "icon": "🧘",
+     "color": "lavender",
      "reminder": false
     },
     "meta": {
@@ -2670,8 +2638,8 @@
      "start": "08:00",
      "durationMin": 20,
      "recur": null,
-     "icon": "✨",
-     "color": "mint",
+     "icon": "🏃",
+     "color": "lime",
      "reminder": false
     },
     "meta": {
@@ -2709,20 +2677,20 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Estudiar en",
-     "date": "2026-10-10",
-     "start": null,
-     "durationMin": 120,
+     "title": "Estudiar",
+     "date": "2026-10-11",
+     "start": "01:40",
+     "durationMin": 30,
      "recur": null,
-     "icon": "✨",
-     "color": "mint",
+     "icon": "📚",
+     "color": "plum",
      "reminder": false
     },
     "meta": {
-     "hadDate": false,
-     "hadTime": false,
-     "dayLabel": null,
-     "timeLabel": null
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "en 2 horas",
+     "timeLabel": "01:40"
     }
    }
   },
@@ -2777,8 +2745,8 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Gym a viernes",
-     "date": "2026-10-12",
+     "title": "Gym",
+     "date": "2026-10-10",
      "start": "07:00",
      "durationMin": 30,
      "recur": {
@@ -2789,9 +2757,9 @@
      "reminder": true
     },
     "meta": {
-     "hadDate": true,
+     "hadDate": false,
      "hadTime": true,
-     "dayLabel": "lunes",
+     "dayLabel": null,
      "timeLabel": "07:00"
     }
    }
@@ -2801,7 +2769,7 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Tomar agua días",
+     "title": "Tomar agua",
      "date": "2026-10-10",
      "start": "09:00",
      "durationMin": 30,
@@ -2826,7 +2794,7 @@
     "intent": "create",
     "task": {
      "title": "Yoga",
-     "date": "2026-10-12",
+     "date": "2026-10-10",
      "start": "07:00",
      "durationMin": 30,
      "recur": {
@@ -2840,9 +2808,9 @@
      "reminder": true
     },
     "meta": {
-     "hadDate": true,
+     "hadDate": false,
      "hadTime": true,
-     "dayLabel": "lunes",
+     "dayLabel": null,
      "timeLabel": "07:00"
     }
    }
@@ -2852,19 +2820,26 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Yoga , miércoles y viernes",
-     "date": "2026-10-12",
+     "title": "Yoga",
+     "date": "2026-10-10",
      "start": "07:00",
      "durationMin": 30,
-     "recur": null,
+     "recur": {
+      "freq": "weekly",
+      "days": [
+       1,
+       3,
+       5
+      ]
+     },
      "icon": "🧘",
      "color": "lavender",
-     "reminder": false
+     "reminder": true
     },
     "meta": {
-     "hadDate": true,
+     "hadDate": false,
      "hadTime": true,
-     "dayLabel": "lunes",
+     "dayLabel": null,
      "timeLabel": "07:00"
     }
    }
@@ -2874,8 +2849,8 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Planificar semana",
-     "date": "2026-10-11",
+     "title": "Planificar la semana",
+     "date": "2026-10-10",
      "start": "20:00",
      "durationMin": 30,
      "recur": {
@@ -2889,9 +2864,9 @@
      "reminder": true
     },
     "meta": {
-     "hadDate": true,
+     "hadDate": false,
      "hadTime": true,
-     "dayLabel": "domingo",
+     "dayLabel": null,
      "timeLabel": "20:00"
     }
    }
@@ -2901,7 +2876,7 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Revisar correo diariamente",
+     "title": "Revisar correo",
      "date": "2026-10-10",
      "start": "09:00",
      "durationMin": 30,
@@ -2925,7 +2900,7 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Limpieza sábado",
+     "title": "Limpieza",
      "date": "2026-10-17",
      "start": "11:00",
      "durationMin": 30,
@@ -2949,7 +2924,7 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Tomar pastilla a diario",
+     "title": "Tomar pastilla",
      "date": "2026-10-10",
      "start": "08:00",
      "durationMin": 30,
@@ -3000,8 +2975,8 @@
      "start": null,
      "durationMin": 30,
      "recur": null,
-     "icon": "✨",
-     "color": "mint",
+     "icon": "🛒",
+     "color": "coral",
      "reminder": false
     },
     "meta": {
@@ -3039,7 +3014,7 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Estudiar prueba",
+     "title": "Estudiar para la prueba",
      "date": "2026-10-15",
      "start": "16:00",
      "durationMin": 30,
@@ -3066,8 +3041,8 @@
      "start": "18:00",
      "durationMin": 30,
      "recur": null,
-     "icon": "✨",
-     "color": "mint",
+     "icon": "🛒",
+     "color": "coral",
      "reminder": false
     },
     "meta": {
@@ -3105,7 +3080,7 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Alarma reunión",
+     "title": "Alarma para la reunión",
      "date": "2026-10-16",
      "start": "09:00",
      "durationMin": 30,
@@ -3149,13 +3124,13 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Tarea lavar ropa",
+     "title": "Lavar ropa",
      "date": "2026-10-10",
      "start": null,
      "durationMin": 30,
      "recur": null,
-     "icon": "📚",
-     "color": "plum",
+     "icon": "✨",
+     "color": "mint",
      "reminder": false
     },
     "meta": {
@@ -3198,8 +3173,8 @@
      "start": null,
      "durationMin": 30,
      "recur": null,
-     "icon": "✨",
-     "color": "mint",
+     "icon": "🛒",
+     "color": "coral",
      "reminder": false
     },
     "meta": {
@@ -3220,89 +3195,29 @@
   {
    "text": "¿qué tengo hoy?",
    "parsed": {
-    "intent": "create",
-    "task": {
-     "title": "¿qué tengo ?",
-     "date": "2026-10-10",
-     "start": null,
-     "durationMin": 30,
-     "recur": null,
-     "icon": "✨",
-     "color": "mint",
-     "reminder": false
-    },
-    "meta": {
-     "hadDate": true,
-     "hadTime": false,
-     "dayLabel": "hoy",
-     "timeLabel": null
-    }
+    "intent": "agenda",
+    "date": "2026-10-10"
    }
   },
   {
    "text": "qué tengo mañana",
    "parsed": {
-    "intent": "create",
-    "task": {
-     "title": "Qué tengo",
-     "date": "2026-10-11",
-     "start": null,
-     "durationMin": 30,
-     "recur": null,
-     "icon": "✨",
-     "color": "mint",
-     "reminder": false
-    },
-    "meta": {
-     "hadDate": true,
-     "hadTime": false,
-     "dayLabel": "mañana",
-     "timeLabel": null
-    }
+    "intent": "agenda",
+    "date": "2026-10-11"
    }
   },
   {
    "text": "hola",
    "parsed": {
-    "intent": "create",
-    "task": {
-     "title": "Hola",
-     "date": "2026-10-10",
-     "start": null,
-     "durationMin": 30,
-     "recur": null,
-     "icon": "✨",
-     "color": "mint",
-     "reminder": false
-    },
-    "meta": {
-     "hadDate": false,
-     "hadTime": false,
-     "dayLabel": null,
-     "timeLabel": null
-    }
+    "intent": "chat",
+    "kind": "greeting"
    }
   },
   {
    "text": "gracias",
    "parsed": {
-    "intent": "create",
-    "task": {
-     "title": "Gracias",
-     "date": "2026-10-10",
-     "start": null,
-     "durationMin": 30,
-     "recur": null,
-     "icon": "✨",
-     "color": "mint",
-     "reminder": false
-    },
-    "meta": {
-     "hadDate": false,
-     "hadTime": false,
-     "dayLabel": null,
-     "timeLabel": null
-    }
+    "intent": "chat",
+    "kind": "thanks"
    }
   },
   {
@@ -3365,14 +3280,29 @@
    "text": "cancela mi reunión de miércoles",
    "parsed": {
     "intent": "delete",
-    "query": "reunión miércoles"
+    "query": "reunión de miércoles"
    }
   },
   {
    "text": "cancelar la suscripción de netflix mañana",
    "parsed": {
-    "intent": "delete",
-    "query": "suscripción netflix mañana"
+    "intent": "create",
+    "task": {
+     "title": "Cancelar la suscripción de netflix",
+     "date": "2026-10-11",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "mañana",
+     "timeLabel": null
+    }
    }
   },
   {
@@ -3407,7 +3337,7 @@
    "text": "listo el informe",
    "parsed": {
     "intent": "complete",
-    "query": "listo informe"
+    "query": "informe"
    }
   },
   {
@@ -3415,23 +3345,39 @@
    "parsed": {
     "intent": "move",
     "query": "gym",
-    "start": "18:00"
+    "start": "18:00",
+    "date": null
    }
   },
   {
    "text": "mover reunión a las 15:30",
    "parsed": {
-    "intent": "move",
-    "query": "reunión",
-    "start": "15:30"
+    "intent": "create",
+    "task": {
+     "title": "Mover reunión",
+     "date": "2026-10-10",
+     "start": "15:30",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "📊",
+     "color": "sky",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "15:30"
+    }
    }
   },
   {
    "text": "posterga el dentista a las 5",
    "parsed": {
     "intent": "move",
-    "query": "el dentista",
-    "start": "05:00"
+    "query": "dentista",
+    "start": "17:00",
+    "date": null
    }
   },
   {
@@ -3439,23 +3385,39 @@
    "parsed": {
     "intent": "move",
     "query": "gym",
-    "start": null
+    "start": null,
+    "date": null
    }
   },
   {
    "text": "mueve gym a mañana",
    "parsed": {
     "intent": "move",
-    "query": "gym a mañana",
-    "start": null
+    "query": "gym",
+    "start": null,
+    "date": "2026-10-11"
    }
   },
   {
    "text": "pasa a buscar a Ana a las 5pm",
    "parsed": {
-    "intent": "move",
-    "query": "a buscar a Ana",
-    "start": "17:00"
+    "intent": "create",
+    "task": {
+     "title": "Pasa a buscar a Ana",
+     "date": "2026-10-10",
+     "start": "17:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "17:00"
+    }
    }
   },
   {
@@ -3463,7 +3425,8 @@
    "parsed": {
     "intent": "move",
     "query": "gym",
-    "start": "08:00"
+    "start": "08:00",
+    "date": null
    }
   },
   {
@@ -3481,7 +3444,23 @@
   {
    "text": "ver cómo va el proyecto mañana 10am",
    "parsed": {
-    "intent": "help"
+    "intent": "create",
+    "task": {
+     "title": "Ver cómo va el proyecto",
+     "date": "2026-10-11",
+     "start": "10:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "💼",
+     "color": "slate",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "mañana",
+     "timeLabel": "10:00"
+    }
    }
   },
   {
@@ -3517,7 +3496,7 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Reunión: equipo diseño,",
+     "title": "Reunión: equipo de diseño",
      "date": "2026-10-11",
      "start": "10:00",
      "durationMin": 30,
@@ -3561,7 +3540,7 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Ir al médico miércoles",
+     "title": "Ir al médico",
      "date": "2026-10-14",
      "start": "09:00",
      "durationMin": 30,
@@ -3581,23 +3560,8 @@
   {
    "text": "sábado",
    "parsed": {
-    "intent": "create",
-    "task": {
-     "title": "Sábado",
-     "date": "2026-10-17",
-     "start": null,
-     "durationMin": 30,
-     "recur": null,
-     "icon": "✨",
-     "color": "mint",
-     "reminder": false
-    },
-    "meta": {
-     "hadDate": true,
-     "hadTime": false,
-     "dayLabel": "sabado",
-     "timeLabel": null
-    }
+    "intent": "unknown",
+    "raw": "sábado"
    }
   },
   {
@@ -3605,13 +3569,13 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Estudio mercado sábado",
+     "title": "Estudio de mercado",
      "date": "2026-10-17",
      "start": "10:00",
      "durationMin": 180,
      "recur": null,
-     "icon": "🛒",
-     "color": "coral",
+     "icon": "📚",
+     "color": "plum",
      "reminder": false
     },
     "meta": {
@@ -3764,7 +3728,7 @@
     "intent": "create",
     "task": {
      "title": "Reunión con cliente Acme",
-     "date": "2027-01-06",
+     "date": "2026-12-31",
      "start": "10:00",
      "durationMin": 30,
      "recur": {
@@ -3778,9 +3742,9 @@
      "reminder": true
     },
     "meta": {
-     "hadDate": true,
+     "hadDate": false,
      "hadTime": true,
-     "dayLabel": "miercoles",
+     "dayLabel": null,
      "timeLabel": "10:00"
     }
    }
@@ -3791,7 +3755,7 @@
     "intent": "create",
     "task": {
      "title": "Reunion",
-     "date": "2027-01-06",
+     "date": "2026-12-31",
      "start": "10:00",
      "durationMin": 30,
      "recur": {
@@ -3805,9 +3769,9 @@
      "reminder": true
     },
     "meta": {
-     "hadDate": true,
+     "hadDate": false,
      "hadTime": true,
-     "dayLabel": "miercoles",
+     "dayLabel": null,
      "timeLabel": "10:00"
     }
    }
@@ -3819,7 +3783,7 @@
     "task": {
      "title": "Dentista",
      "date": "2026-12-31",
-     "start": "04:00",
+     "start": "16:00",
      "durationMin": 30,
      "recur": null,
      "icon": "💊",
@@ -3830,7 +3794,7 @@
      "hadDate": true,
      "hadTime": true,
      "dayLabel": "hoy",
-     "timeLabel": "04:00"
+     "timeLabel": "16:00"
     }
    }
   },
@@ -3927,8 +3891,8 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Cumpleaños Ana",
-     "date": "2026-12-03",
+     "title": "Cumpleaños de Ana",
+     "date": "2027-12-03",
      "start": null,
      "durationMin": 30,
      "recur": null,
@@ -3950,7 +3914,7 @@
     "intent": "create",
     "task": {
      "title": "Viaje",
-     "date": "2026-01-15",
+     "date": "2027-01-15",
      "start": "06:00",
      "durationMin": 30,
      "recur": null,
@@ -3969,23 +3933,9 @@
   {
    "text": "dentista el 31 de febrero",
    "parsed": {
-    "intent": "create",
-    "task": {
-     "title": "Dentista",
-     "date": "2026-03-03",
-     "start": null,
-     "durationMin": 30,
-     "recur": null,
-     "icon": "💊",
-     "color": "rose",
-     "reminder": false
-    },
-    "meta": {
-     "hadDate": true,
-     "hadTime": false,
-     "dayLabel": "el 31 de febrero",
-     "timeLabel": null
-    }
+    "intent": "unknown",
+    "raw": "dentista el 31 de febrero",
+    "reason": "date"
    }
   },
   {
@@ -3993,20 +3943,20 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Comprar pan tarde",
+     "title": "Comprar pan",
      "date": "2026-12-31",
-     "start": null,
+     "start": "15:00",
      "durationMin": 30,
      "recur": null,
-     "icon": "✨",
-     "color": "mint",
+     "icon": "🛒",
+     "color": "coral",
      "reminder": false
     },
     "meta": {
      "hadDate": true,
-     "hadTime": false,
+     "hadTime": true,
      "dayLabel": "hoy",
-     "timeLabel": null
+     "timeLabel": "15:00"
     }
    }
   },
@@ -4015,9 +3965,9 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Correr mañana",
+     "title": "Correr",
      "date": "2026-12-31",
-     "start": null,
+     "start": "09:00",
      "durationMin": 30,
      "recur": null,
      "icon": "💪",
@@ -4026,9 +3976,9 @@
     },
     "meta": {
      "hadDate": true,
-     "hadTime": false,
-     "dayLabel": "esta manana",
-     "timeLabel": null
+     "hadTime": true,
+     "dayLabel": "hoy",
+     "timeLabel": "09:00"
     }
    }
   },
@@ -4037,7 +3987,7 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Leer noche",
+     "title": "Leer",
      "date": "2026-12-31",
      "start": "22:00",
      "durationMin": 30,
@@ -4103,7 +4053,7 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Sábado asado con amigos",
+     "title": "Asado con amigos",
      "date": "2027-01-02",
      "start": "13:30",
      "durationMin": 30,
@@ -4147,9 +4097,9 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Cena con Ana noche",
+     "title": "Cena con Ana",
      "date": "2026-12-31",
-     "start": "08:00",
+     "start": "20:00",
      "durationMin": 30,
      "recur": null,
      "icon": "🍽️",
@@ -4160,7 +4110,7 @@
      "hadDate": false,
      "hadTime": true,
      "dayLabel": null,
-     "timeLabel": "08:00"
+     "timeLabel": "20:00"
     }
    }
   },
@@ -4169,20 +4119,20 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Desayuno y media",
+     "title": "Desayuno",
      "date": "2026-12-31",
-     "start": "07:00",
+     "start": "07:30",
      "durationMin": 30,
      "recur": null,
-     "icon": "✨",
-     "color": "mint",
+     "icon": "🍽️",
+     "color": "sun",
      "reminder": false
     },
     "meta": {
      "hadDate": false,
      "hadTime": true,
      "dayLabel": null,
-     "timeLabel": "07:00"
+     "timeLabel": "07:30"
     }
    }
   },
@@ -4191,9 +4141,9 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Clase y cuarto",
+     "title": "Clase",
      "date": "2026-12-31",
-     "start": "08:00",
+     "start": "08:15",
      "durationMin": 30,
      "recur": null,
      "icon": "📚",
@@ -4204,7 +4154,7 @@
      "hadDate": false,
      "hadTime": true,
      "dayLabel": null,
-     "timeLabel": "08:00"
+     "timeLabel": "08:15"
     }
    }
   },
@@ -4216,7 +4166,7 @@
      "title": "Reunión",
      "date": "2026-12-31",
      "start": "19:00",
-     "durationMin": 1140,
+     "durationMin": 30,
      "recur": null,
      "icon": "📊",
      "color": "sky",
@@ -4328,8 +4278,8 @@
      "start": "15:45",
      "durationMin": 20,
      "recur": null,
-     "icon": "✨",
-     "color": "mint",
+     "icon": "😴",
+     "color": "lavender",
      "reminder": false
     },
     "meta": {
@@ -4394,8 +4344,8 @@
      "start": null,
      "durationMin": 120,
      "recur": null,
-     "icon": "✨",
-     "color": "mint",
+     "icon": "📚",
+     "color": "plum",
      "reminder": false
     },
     "meta": {
@@ -4416,8 +4366,8 @@
      "start": null,
      "durationMin": 90,
      "recur": null,
-     "icon": "✨",
-     "color": "mint",
+     "icon": "📚",
+     "color": "plum",
      "reminder": false
     },
     "meta": {
@@ -4438,8 +4388,8 @@
      "start": null,
      "durationMin": 30,
      "recur": null,
-     "icon": "✨",
-     "color": "mint",
+     "icon": "🧘",
+     "color": "lavender",
      "reminder": false
     },
     "meta": {
@@ -4482,8 +4432,8 @@
      "start": "08:00",
      "durationMin": 20,
      "recur": null,
-     "icon": "✨",
-     "color": "mint",
+     "icon": "🏃",
+     "color": "lime",
      "reminder": false
     },
     "meta": {
@@ -4521,20 +4471,20 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Estudiar en",
+     "title": "Estudiar",
      "date": "2026-12-31",
-     "start": null,
-     "durationMin": 120,
+     "start": "10:15",
+     "durationMin": 30,
      "recur": null,
-     "icon": "✨",
-     "color": "mint",
+     "icon": "📚",
+     "color": "plum",
      "reminder": false
     },
     "meta": {
-     "hadDate": false,
-     "hadTime": false,
-     "dayLabel": null,
-     "timeLabel": null
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "en 2 horas",
+     "timeLabel": "10:15"
     }
    }
   },
@@ -4589,8 +4539,8 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Gym a viernes",
-     "date": "2027-01-04",
+     "title": "Gym",
+     "date": "2026-12-31",
      "start": "07:00",
      "durationMin": 30,
      "recur": {
@@ -4601,9 +4551,9 @@
      "reminder": true
     },
     "meta": {
-     "hadDate": true,
+     "hadDate": false,
      "hadTime": true,
-     "dayLabel": "lunes",
+     "dayLabel": null,
      "timeLabel": "07:00"
     }
    }
@@ -4613,7 +4563,7 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Tomar agua días",
+     "title": "Tomar agua",
      "date": "2026-12-31",
      "start": "09:00",
      "durationMin": 30,
@@ -4638,7 +4588,7 @@
     "intent": "create",
     "task": {
      "title": "Yoga",
-     "date": "2027-01-04",
+     "date": "2026-12-31",
      "start": "07:00",
      "durationMin": 30,
      "recur": {
@@ -4652,9 +4602,9 @@
      "reminder": true
     },
     "meta": {
-     "hadDate": true,
+     "hadDate": false,
      "hadTime": true,
-     "dayLabel": "lunes",
+     "dayLabel": null,
      "timeLabel": "07:00"
     }
    }
@@ -4664,19 +4614,26 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Yoga , miércoles y viernes",
-     "date": "2027-01-04",
+     "title": "Yoga",
+     "date": "2026-12-31",
      "start": "07:00",
      "durationMin": 30,
-     "recur": null,
+     "recur": {
+      "freq": "weekly",
+      "days": [
+       1,
+       3,
+       5
+      ]
+     },
      "icon": "🧘",
      "color": "lavender",
-     "reminder": false
+     "reminder": true
     },
     "meta": {
-     "hadDate": true,
+     "hadDate": false,
      "hadTime": true,
-     "dayLabel": "lunes",
+     "dayLabel": null,
      "timeLabel": "07:00"
     }
    }
@@ -4686,8 +4643,8 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Planificar semana",
-     "date": "2027-01-03",
+     "title": "Planificar la semana",
+     "date": "2026-12-31",
      "start": "20:00",
      "durationMin": 30,
      "recur": {
@@ -4701,9 +4658,9 @@
      "reminder": true
     },
     "meta": {
-     "hadDate": true,
+     "hadDate": false,
      "hadTime": true,
-     "dayLabel": "domingo",
+     "dayLabel": null,
      "timeLabel": "20:00"
     }
    }
@@ -4713,7 +4670,7 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Revisar correo diariamente",
+     "title": "Revisar correo",
      "date": "2026-12-31",
      "start": "09:00",
      "durationMin": 30,
@@ -4737,7 +4694,7 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Limpieza sábado",
+     "title": "Limpieza",
      "date": "2027-01-02",
      "start": "11:00",
      "durationMin": 30,
@@ -4761,7 +4718,7 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Tomar pastilla a diario",
+     "title": "Tomar pastilla",
      "date": "2026-12-31",
      "start": "08:00",
      "durationMin": 30,
@@ -4812,8 +4769,8 @@
      "start": null,
      "durationMin": 30,
      "recur": null,
-     "icon": "✨",
-     "color": "mint",
+     "icon": "🛒",
+     "color": "coral",
      "reminder": false
     },
     "meta": {
@@ -4851,7 +4808,7 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Estudiar prueba",
+     "title": "Estudiar para la prueba",
      "date": "2027-01-07",
      "start": "16:00",
      "durationMin": 30,
@@ -4878,8 +4835,8 @@
      "start": "18:00",
      "durationMin": 30,
      "recur": null,
-     "icon": "✨",
-     "color": "mint",
+     "icon": "🛒",
+     "color": "coral",
      "reminder": false
     },
     "meta": {
@@ -4917,7 +4874,7 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Alarma reunión",
+     "title": "Alarma para la reunión",
      "date": "2027-01-01",
      "start": "09:00",
      "durationMin": 30,
@@ -4961,13 +4918,13 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Tarea lavar ropa",
+     "title": "Lavar ropa",
      "date": "2026-12-31",
      "start": null,
      "durationMin": 30,
      "recur": null,
-     "icon": "📚",
-     "color": "plum",
+     "icon": "✨",
+     "color": "mint",
      "reminder": false
     },
     "meta": {
@@ -5010,8 +4967,8 @@
      "start": null,
      "durationMin": 30,
      "recur": null,
-     "icon": "✨",
-     "color": "mint",
+     "icon": "🛒",
+     "color": "coral",
      "reminder": false
     },
     "meta": {
@@ -5032,89 +4989,29 @@
   {
    "text": "¿qué tengo hoy?",
    "parsed": {
-    "intent": "create",
-    "task": {
-     "title": "¿qué tengo ?",
-     "date": "2026-12-31",
-     "start": null,
-     "durationMin": 30,
-     "recur": null,
-     "icon": "✨",
-     "color": "mint",
-     "reminder": false
-    },
-    "meta": {
-     "hadDate": true,
-     "hadTime": false,
-     "dayLabel": "hoy",
-     "timeLabel": null
-    }
+    "intent": "agenda",
+    "date": "2026-12-31"
    }
   },
   {
    "text": "qué tengo mañana",
    "parsed": {
-    "intent": "create",
-    "task": {
-     "title": "Qué tengo",
-     "date": "2027-01-01",
-     "start": null,
-     "durationMin": 30,
-     "recur": null,
-     "icon": "✨",
-     "color": "mint",
-     "reminder": false
-    },
-    "meta": {
-     "hadDate": true,
-     "hadTime": false,
-     "dayLabel": "mañana",
-     "timeLabel": null
-    }
+    "intent": "agenda",
+    "date": "2027-01-01"
    }
   },
   {
    "text": "hola",
    "parsed": {
-    "intent": "create",
-    "task": {
-     "title": "Hola",
-     "date": "2026-12-31",
-     "start": null,
-     "durationMin": 30,
-     "recur": null,
-     "icon": "✨",
-     "color": "mint",
-     "reminder": false
-    },
-    "meta": {
-     "hadDate": false,
-     "hadTime": false,
-     "dayLabel": null,
-     "timeLabel": null
-    }
+    "intent": "chat",
+    "kind": "greeting"
    }
   },
   {
    "text": "gracias",
    "parsed": {
-    "intent": "create",
-    "task": {
-     "title": "Gracias",
-     "date": "2026-12-31",
-     "start": null,
-     "durationMin": 30,
-     "recur": null,
-     "icon": "✨",
-     "color": "mint",
-     "reminder": false
-    },
-    "meta": {
-     "hadDate": false,
-     "hadTime": false,
-     "dayLabel": null,
-     "timeLabel": null
-    }
+    "intent": "chat",
+    "kind": "thanks"
    }
   },
   {
@@ -5177,14 +5074,29 @@
    "text": "cancela mi reunión de miércoles",
    "parsed": {
     "intent": "delete",
-    "query": "reunión miércoles"
+    "query": "reunión de miércoles"
    }
   },
   {
    "text": "cancelar la suscripción de netflix mañana",
    "parsed": {
-    "intent": "delete",
-    "query": "suscripción netflix mañana"
+    "intent": "create",
+    "task": {
+     "title": "Cancelar la suscripción de netflix",
+     "date": "2027-01-01",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "mañana",
+     "timeLabel": null
+    }
    }
   },
   {
@@ -5219,7 +5131,7 @@
    "text": "listo el informe",
    "parsed": {
     "intent": "complete",
-    "query": "listo informe"
+    "query": "informe"
    }
   },
   {
@@ -5227,23 +5139,39 @@
    "parsed": {
     "intent": "move",
     "query": "gym",
-    "start": "18:00"
+    "start": "18:00",
+    "date": null
    }
   },
   {
    "text": "mover reunión a las 15:30",
    "parsed": {
-    "intent": "move",
-    "query": "reunión",
-    "start": "15:30"
+    "intent": "create",
+    "task": {
+     "title": "Mover reunión",
+     "date": "2026-12-31",
+     "start": "15:30",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "📊",
+     "color": "sky",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "15:30"
+    }
    }
   },
   {
    "text": "posterga el dentista a las 5",
    "parsed": {
     "intent": "move",
-    "query": "el dentista",
-    "start": "05:00"
+    "query": "dentista",
+    "start": "17:00",
+    "date": null
    }
   },
   {
@@ -5251,23 +5179,39 @@
    "parsed": {
     "intent": "move",
     "query": "gym",
-    "start": null
+    "start": null,
+    "date": null
    }
   },
   {
    "text": "mueve gym a mañana",
    "parsed": {
     "intent": "move",
-    "query": "gym a mañana",
-    "start": null
+    "query": "gym",
+    "start": null,
+    "date": "2027-01-01"
    }
   },
   {
    "text": "pasa a buscar a Ana a las 5pm",
    "parsed": {
-    "intent": "move",
-    "query": "a buscar a Ana",
-    "start": "17:00"
+    "intent": "create",
+    "task": {
+     "title": "Pasa a buscar a Ana",
+     "date": "2026-12-31",
+     "start": "17:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "17:00"
+    }
    }
   },
   {
@@ -5275,7 +5219,8 @@
    "parsed": {
     "intent": "move",
     "query": "gym",
-    "start": "08:00"
+    "start": "08:00",
+    "date": null
    }
   },
   {
@@ -5293,7 +5238,23 @@
   {
    "text": "ver cómo va el proyecto mañana 10am",
    "parsed": {
-    "intent": "help"
+    "intent": "create",
+    "task": {
+     "title": "Ver cómo va el proyecto",
+     "date": "2027-01-01",
+     "start": "10:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "💼",
+     "color": "slate",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "mañana",
+     "timeLabel": "10:00"
+    }
    }
   },
   {
@@ -5329,7 +5290,7 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Reunión: equipo diseño,",
+     "title": "Reunión: equipo de diseño",
      "date": "2027-01-01",
      "start": "10:00",
      "durationMin": 30,
@@ -5373,7 +5334,7 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Ir al médico miércoles",
+     "title": "Ir al médico",
      "date": "2027-01-06",
      "start": "09:00",
      "durationMin": 30,
@@ -5393,23 +5354,8 @@
   {
    "text": "sábado",
    "parsed": {
-    "intent": "create",
-    "task": {
-     "title": "Sábado",
-     "date": "2027-01-02",
-     "start": null,
-     "durationMin": 30,
-     "recur": null,
-     "icon": "✨",
-     "color": "mint",
-     "reminder": false
-    },
-    "meta": {
-     "hadDate": true,
-     "hadTime": false,
-     "dayLabel": "sabado",
-     "timeLabel": null
-    }
+    "intent": "unknown",
+    "raw": "sábado"
    }
   },
   {
@@ -5417,13 +5363,13 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Estudio mercado sábado",
+     "title": "Estudio de mercado",
      "date": "2027-01-02",
      "start": "10:00",
      "durationMin": 180,
      "recur": null,
-     "icon": "🛒",
-     "color": "coral",
+     "icon": "📚",
+     "color": "plum",
      "reminder": false
     },
     "meta": {
@@ -5576,7 +5522,7 @@
     "intent": "create",
     "task": {
      "title": "Reunión con cliente Acme",
-     "date": "2026-10-07",
+     "date": "2026-10-04",
      "start": "10:00",
      "durationMin": 30,
      "recur": {
@@ -5590,9 +5536,9 @@
      "reminder": true
     },
     "meta": {
-     "hadDate": true,
+     "hadDate": false,
      "hadTime": true,
-     "dayLabel": "miercoles",
+     "dayLabel": null,
      "timeLabel": "10:00"
     }
    }
@@ -5603,7 +5549,7 @@
     "intent": "create",
     "task": {
      "title": "Reunion",
-     "date": "2026-10-07",
+     "date": "2026-10-04",
      "start": "10:00",
      "durationMin": 30,
      "recur": {
@@ -5617,9 +5563,9 @@
      "reminder": true
     },
     "meta": {
-     "hadDate": true,
+     "hadDate": false,
      "hadTime": true,
-     "dayLabel": "miercoles",
+     "dayLabel": null,
      "timeLabel": "10:00"
     }
    }
@@ -5631,7 +5577,7 @@
     "task": {
      "title": "Dentista",
      "date": "2026-10-04",
-     "start": "04:00",
+     "start": "16:00",
      "durationMin": 30,
      "recur": null,
      "icon": "💊",
@@ -5642,7 +5588,7 @@
      "hadDate": true,
      "hadTime": true,
      "dayLabel": "hoy",
-     "timeLabel": "04:00"
+     "timeLabel": "16:00"
     }
    }
   },
@@ -5739,7 +5685,7 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Cumpleaños Ana",
+     "title": "Cumpleaños de Ana",
      "date": "2026-12-03",
      "start": null,
      "durationMin": 30,
@@ -5762,7 +5708,7 @@
     "intent": "create",
     "task": {
      "title": "Viaje",
-     "date": "2026-01-15",
+     "date": "2027-01-15",
      "start": "06:00",
      "durationMin": 30,
      "recur": null,
@@ -5781,23 +5727,9 @@
   {
    "text": "dentista el 31 de febrero",
    "parsed": {
-    "intent": "create",
-    "task": {
-     "title": "Dentista",
-     "date": "2026-03-03",
-     "start": null,
-     "durationMin": 30,
-     "recur": null,
-     "icon": "💊",
-     "color": "rose",
-     "reminder": false
-    },
-    "meta": {
-     "hadDate": true,
-     "hadTime": false,
-     "dayLabel": "el 31 de febrero",
-     "timeLabel": null
-    }
+    "intent": "unknown",
+    "raw": "dentista el 31 de febrero",
+    "reason": "date"
    }
   },
   {
@@ -5805,20 +5737,20 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Comprar pan tarde",
+     "title": "Comprar pan",
      "date": "2026-10-04",
-     "start": null,
+     "start": "15:00",
      "durationMin": 30,
      "recur": null,
-     "icon": "✨",
-     "color": "mint",
+     "icon": "🛒",
+     "color": "coral",
      "reminder": false
     },
     "meta": {
      "hadDate": true,
-     "hadTime": false,
+     "hadTime": true,
      "dayLabel": "hoy",
-     "timeLabel": null
+     "timeLabel": "15:00"
     }
    }
   },
@@ -5827,9 +5759,9 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Correr mañana",
+     "title": "Correr",
      "date": "2026-10-04",
-     "start": null,
+     "start": "09:00",
      "durationMin": 30,
      "recur": null,
      "icon": "💪",
@@ -5838,9 +5770,9 @@
     },
     "meta": {
      "hadDate": true,
-     "hadTime": false,
-     "dayLabel": "esta manana",
-     "timeLabel": null
+     "hadTime": true,
+     "dayLabel": "hoy",
+     "timeLabel": "09:00"
     }
    }
   },
@@ -5849,7 +5781,7 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Leer noche",
+     "title": "Leer",
      "date": "2026-10-04",
      "start": "22:00",
      "durationMin": 30,
@@ -5915,7 +5847,7 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Sábado asado con amigos",
+     "title": "Asado con amigos",
      "date": "2026-10-10",
      "start": "13:30",
      "durationMin": 30,
@@ -5959,9 +5891,9 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Cena con Ana noche",
+     "title": "Cena con Ana",
      "date": "2026-10-04",
-     "start": "08:00",
+     "start": "20:00",
      "durationMin": 30,
      "recur": null,
      "icon": "🍽️",
@@ -5972,7 +5904,7 @@
      "hadDate": false,
      "hadTime": true,
      "dayLabel": null,
-     "timeLabel": "08:00"
+     "timeLabel": "20:00"
     }
    }
   },
@@ -5981,20 +5913,20 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Desayuno y media",
+     "title": "Desayuno",
      "date": "2026-10-04",
-     "start": "07:00",
+     "start": "07:30",
      "durationMin": 30,
      "recur": null,
-     "icon": "✨",
-     "color": "mint",
+     "icon": "🍽️",
+     "color": "sun",
      "reminder": false
     },
     "meta": {
      "hadDate": false,
      "hadTime": true,
      "dayLabel": null,
-     "timeLabel": "07:00"
+     "timeLabel": "07:30"
     }
    }
   },
@@ -6003,9 +5935,9 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Clase y cuarto",
+     "title": "Clase",
      "date": "2026-10-04",
-     "start": "08:00",
+     "start": "08:15",
      "durationMin": 30,
      "recur": null,
      "icon": "📚",
@@ -6016,7 +5948,7 @@
      "hadDate": false,
      "hadTime": true,
      "dayLabel": null,
-     "timeLabel": "08:00"
+     "timeLabel": "08:15"
     }
    }
   },
@@ -6028,7 +5960,7 @@
      "title": "Reunión",
      "date": "2026-10-04",
      "start": "19:00",
-     "durationMin": 1140,
+     "durationMin": 30,
      "recur": null,
      "icon": "📊",
      "color": "sky",
@@ -6140,8 +6072,8 @@
      "start": "15:45",
      "durationMin": 20,
      "recur": null,
-     "icon": "✨",
-     "color": "mint",
+     "icon": "😴",
+     "color": "lavender",
      "reminder": false
     },
     "meta": {
@@ -6206,8 +6138,8 @@
      "start": null,
      "durationMin": 120,
      "recur": null,
-     "icon": "✨",
-     "color": "mint",
+     "icon": "📚",
+     "color": "plum",
      "reminder": false
     },
     "meta": {
@@ -6228,8 +6160,8 @@
      "start": null,
      "durationMin": 90,
      "recur": null,
-     "icon": "✨",
-     "color": "mint",
+     "icon": "📚",
+     "color": "plum",
      "reminder": false
     },
     "meta": {
@@ -6250,8 +6182,8 @@
      "start": null,
      "durationMin": 30,
      "recur": null,
-     "icon": "✨",
-     "color": "mint",
+     "icon": "🧘",
+     "color": "lavender",
      "reminder": false
     },
     "meta": {
@@ -6294,8 +6226,8 @@
      "start": "08:00",
      "durationMin": 20,
      "recur": null,
-     "icon": "✨",
-     "color": "mint",
+     "icon": "🏃",
+     "color": "lime",
      "reminder": false
     },
     "meta": {
@@ -6333,20 +6265,20 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Estudiar en",
+     "title": "Estudiar",
      "date": "2026-10-04",
-     "start": null,
-     "durationMin": 120,
+     "start": "14:00",
+     "durationMin": 30,
      "recur": null,
-     "icon": "✨",
-     "color": "mint",
+     "icon": "📚",
+     "color": "plum",
      "reminder": false
     },
     "meta": {
-     "hadDate": false,
-     "hadTime": false,
-     "dayLabel": null,
-     "timeLabel": null
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "en 2 horas",
+     "timeLabel": "14:00"
     }
    }
   },
@@ -6401,8 +6333,8 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Gym a viernes",
-     "date": "2026-10-05",
+     "title": "Gym",
+     "date": "2026-10-04",
      "start": "07:00",
      "durationMin": 30,
      "recur": {
@@ -6413,9 +6345,9 @@
      "reminder": true
     },
     "meta": {
-     "hadDate": true,
+     "hadDate": false,
      "hadTime": true,
-     "dayLabel": "lunes",
+     "dayLabel": null,
      "timeLabel": "07:00"
     }
    }
@@ -6425,7 +6357,7 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Tomar agua días",
+     "title": "Tomar agua",
      "date": "2026-10-04",
      "start": "09:00",
      "durationMin": 30,
@@ -6450,7 +6382,7 @@
     "intent": "create",
     "task": {
      "title": "Yoga",
-     "date": "2026-10-05",
+     "date": "2026-10-04",
      "start": "07:00",
      "durationMin": 30,
      "recur": {
@@ -6464,9 +6396,9 @@
      "reminder": true
     },
     "meta": {
-     "hadDate": true,
+     "hadDate": false,
      "hadTime": true,
-     "dayLabel": "lunes",
+     "dayLabel": null,
      "timeLabel": "07:00"
     }
    }
@@ -6476,19 +6408,26 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Yoga , miércoles y viernes",
-     "date": "2026-10-05",
+     "title": "Yoga",
+     "date": "2026-10-04",
      "start": "07:00",
      "durationMin": 30,
-     "recur": null,
+     "recur": {
+      "freq": "weekly",
+      "days": [
+       1,
+       3,
+       5
+      ]
+     },
      "icon": "🧘",
      "color": "lavender",
-     "reminder": false
+     "reminder": true
     },
     "meta": {
-     "hadDate": true,
+     "hadDate": false,
      "hadTime": true,
-     "dayLabel": "lunes",
+     "dayLabel": null,
      "timeLabel": "07:00"
     }
    }
@@ -6498,8 +6437,8 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Planificar semana",
-     "date": "2026-10-11",
+     "title": "Planificar la semana",
+     "date": "2026-10-04",
      "start": "20:00",
      "durationMin": 30,
      "recur": {
@@ -6513,9 +6452,9 @@
      "reminder": true
     },
     "meta": {
-     "hadDate": true,
+     "hadDate": false,
      "hadTime": true,
-     "dayLabel": "domingo",
+     "dayLabel": null,
      "timeLabel": "20:00"
     }
    }
@@ -6525,7 +6464,7 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Revisar correo diariamente",
+     "title": "Revisar correo",
      "date": "2026-10-04",
      "start": "09:00",
      "durationMin": 30,
@@ -6549,7 +6488,7 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Limpieza sábado",
+     "title": "Limpieza",
      "date": "2026-10-10",
      "start": "11:00",
      "durationMin": 30,
@@ -6573,7 +6512,7 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Tomar pastilla a diario",
+     "title": "Tomar pastilla",
      "date": "2026-10-04",
      "start": "08:00",
      "durationMin": 30,
@@ -6624,8 +6563,8 @@
      "start": null,
      "durationMin": 30,
      "recur": null,
-     "icon": "✨",
-     "color": "mint",
+     "icon": "🛒",
+     "color": "coral",
      "reminder": false
     },
     "meta": {
@@ -6663,7 +6602,7 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Estudiar prueba",
+     "title": "Estudiar para la prueba",
      "date": "2026-10-08",
      "start": "16:00",
      "durationMin": 30,
@@ -6690,8 +6629,8 @@
      "start": "18:00",
      "durationMin": 30,
      "recur": null,
-     "icon": "✨",
-     "color": "mint",
+     "icon": "🛒",
+     "color": "coral",
      "reminder": false
     },
     "meta": {
@@ -6729,7 +6668,7 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Alarma reunión",
+     "title": "Alarma para la reunión",
      "date": "2026-10-09",
      "start": "09:00",
      "durationMin": 30,
@@ -6773,13 +6712,13 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Tarea lavar ropa",
+     "title": "Lavar ropa",
      "date": "2026-10-04",
      "start": null,
      "durationMin": 30,
      "recur": null,
-     "icon": "📚",
-     "color": "plum",
+     "icon": "✨",
+     "color": "mint",
      "reminder": false
     },
     "meta": {
@@ -6822,8 +6761,8 @@
      "start": null,
      "durationMin": 30,
      "recur": null,
-     "icon": "✨",
-     "color": "mint",
+     "icon": "🛒",
+     "color": "coral",
      "reminder": false
     },
     "meta": {
@@ -6844,89 +6783,29 @@
   {
    "text": "¿qué tengo hoy?",
    "parsed": {
-    "intent": "create",
-    "task": {
-     "title": "¿qué tengo ?",
-     "date": "2026-10-04",
-     "start": null,
-     "durationMin": 30,
-     "recur": null,
-     "icon": "✨",
-     "color": "mint",
-     "reminder": false
-    },
-    "meta": {
-     "hadDate": true,
-     "hadTime": false,
-     "dayLabel": "hoy",
-     "timeLabel": null
-    }
+    "intent": "agenda",
+    "date": "2026-10-04"
    }
   },
   {
    "text": "qué tengo mañana",
    "parsed": {
-    "intent": "create",
-    "task": {
-     "title": "Qué tengo",
-     "date": "2026-10-05",
-     "start": null,
-     "durationMin": 30,
-     "recur": null,
-     "icon": "✨",
-     "color": "mint",
-     "reminder": false
-    },
-    "meta": {
-     "hadDate": true,
-     "hadTime": false,
-     "dayLabel": "mañana",
-     "timeLabel": null
-    }
+    "intent": "agenda",
+    "date": "2026-10-05"
    }
   },
   {
    "text": "hola",
    "parsed": {
-    "intent": "create",
-    "task": {
-     "title": "Hola",
-     "date": "2026-10-04",
-     "start": null,
-     "durationMin": 30,
-     "recur": null,
-     "icon": "✨",
-     "color": "mint",
-     "reminder": false
-    },
-    "meta": {
-     "hadDate": false,
-     "hadTime": false,
-     "dayLabel": null,
-     "timeLabel": null
-    }
+    "intent": "chat",
+    "kind": "greeting"
    }
   },
   {
    "text": "gracias",
    "parsed": {
-    "intent": "create",
-    "task": {
-     "title": "Gracias",
-     "date": "2026-10-04",
-     "start": null,
-     "durationMin": 30,
-     "recur": null,
-     "icon": "✨",
-     "color": "mint",
-     "reminder": false
-    },
-    "meta": {
-     "hadDate": false,
-     "hadTime": false,
-     "dayLabel": null,
-     "timeLabel": null
-    }
+    "intent": "chat",
+    "kind": "thanks"
    }
   },
   {
@@ -6989,14 +6868,29 @@
    "text": "cancela mi reunión de miércoles",
    "parsed": {
     "intent": "delete",
-    "query": "reunión miércoles"
+    "query": "reunión de miércoles"
    }
   },
   {
    "text": "cancelar la suscripción de netflix mañana",
    "parsed": {
-    "intent": "delete",
-    "query": "suscripción netflix mañana"
+    "intent": "create",
+    "task": {
+     "title": "Cancelar la suscripción de netflix",
+     "date": "2026-10-05",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "mañana",
+     "timeLabel": null
+    }
    }
   },
   {
@@ -7031,7 +6925,7 @@
    "text": "listo el informe",
    "parsed": {
     "intent": "complete",
-    "query": "listo informe"
+    "query": "informe"
    }
   },
   {
@@ -7039,23 +6933,39 @@
    "parsed": {
     "intent": "move",
     "query": "gym",
-    "start": "18:00"
+    "start": "18:00",
+    "date": null
    }
   },
   {
    "text": "mover reunión a las 15:30",
    "parsed": {
-    "intent": "move",
-    "query": "reunión",
-    "start": "15:30"
+    "intent": "create",
+    "task": {
+     "title": "Mover reunión",
+     "date": "2026-10-04",
+     "start": "15:30",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "📊",
+     "color": "sky",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "15:30"
+    }
    }
   },
   {
    "text": "posterga el dentista a las 5",
    "parsed": {
     "intent": "move",
-    "query": "el dentista",
-    "start": "05:00"
+    "query": "dentista",
+    "start": "17:00",
+    "date": null
    }
   },
   {
@@ -7063,23 +6973,39 @@
    "parsed": {
     "intent": "move",
     "query": "gym",
-    "start": null
+    "start": null,
+    "date": null
    }
   },
   {
    "text": "mueve gym a mañana",
    "parsed": {
     "intent": "move",
-    "query": "gym a mañana",
-    "start": null
+    "query": "gym",
+    "start": null,
+    "date": "2026-10-05"
    }
   },
   {
    "text": "pasa a buscar a Ana a las 5pm",
    "parsed": {
-    "intent": "move",
-    "query": "a buscar a Ana",
-    "start": "17:00"
+    "intent": "create",
+    "task": {
+     "title": "Pasa a buscar a Ana",
+     "date": "2026-10-04",
+     "start": "17:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "17:00"
+    }
    }
   },
   {
@@ -7087,7 +7013,8 @@
    "parsed": {
     "intent": "move",
     "query": "gym",
-    "start": "08:00"
+    "start": "08:00",
+    "date": null
    }
   },
   {
@@ -7105,7 +7032,23 @@
   {
    "text": "ver cómo va el proyecto mañana 10am",
    "parsed": {
-    "intent": "help"
+    "intent": "create",
+    "task": {
+     "title": "Ver cómo va el proyecto",
+     "date": "2026-10-05",
+     "start": "10:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "💼",
+     "color": "slate",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "mañana",
+     "timeLabel": "10:00"
+    }
    }
   },
   {
@@ -7141,7 +7084,7 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Reunión: equipo diseño,",
+     "title": "Reunión: equipo de diseño",
      "date": "2026-10-05",
      "start": "10:00",
      "durationMin": 30,
@@ -7185,7 +7128,7 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Ir al médico miércoles",
+     "title": "Ir al médico",
      "date": "2026-10-07",
      "start": "09:00",
      "durationMin": 30,
@@ -7205,23 +7148,8 @@
   {
    "text": "sábado",
    "parsed": {
-    "intent": "create",
-    "task": {
-     "title": "Sábado",
-     "date": "2026-10-10",
-     "start": null,
-     "durationMin": 30,
-     "recur": null,
-     "icon": "✨",
-     "color": "mint",
-     "reminder": false
-    },
-    "meta": {
-     "hadDate": true,
-     "hadTime": false,
-     "dayLabel": "sabado",
-     "timeLabel": null
-    }
+    "intent": "unknown",
+    "raw": "sábado"
    }
   },
   {
@@ -7229,13 +7157,13 @@
    "parsed": {
     "intent": "create",
     "task": {
-     "title": "Estudio mercado sábado",
+     "title": "Estudio de mercado",
      "date": "2026-10-10",
      "start": "10:00",
      "durationMin": 180,
      "recur": null,
-     "icon": "🛒",
-     "color": "coral",
+     "icon": "📚",
+     "color": "plum",
      "reminder": false
     },
     "meta": {

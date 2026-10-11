@@ -3,7 +3,11 @@
 import { nowMs } from './clock';
 import { type DateStr, loDateStr, loDow, loHHMMtoMin, loMinToHHMM } from './dates';
 import { LO_KEYS, loReadRaw } from './storage';
-import type { Subtask, Task, TaskInput } from './types';
+import type { Priority, Subtask, Task, TaskInput, TaskStatus } from './types';
+
+const STATUSES: TaskStatus[] = ['todo', 'doing', 'done'];
+const PRIORITIES: Priority[] = ['low', 'medium', 'high'];
+const TIME_RE = /^([01]\d|2[0-3]):[0-5]\d$/;
 
 export function loUid(prefix = 't'): string {
   return prefix + nowMs().toString(36) + Math.random().toString(36).slice(2, 7);
@@ -17,11 +21,14 @@ export function loNormalizeTask(raw: TaskInput): Task {
   t.title = (t.title || '').trim();
   t.icon = t.icon || 'star';
   t.color = t.color || 'mint';
-  t.status = t.status || 'todo';
-  t.priority = t.priority || 'medium';
+  t.status = STATUSES.includes(t.status as TaskStatus) ? t.status : 'todo';
+  t.priority = PRIORITIES.includes(t.priority as Priority) ? t.priority : 'medium';
   t.date = t.date || t.targetDate || loDateStr();
   t.targetDate = t.date; // legacy alias kept in sync for old screens
-  t.start = t.start || '09:00';
+  // A damaged time or length would render as "NaN:NaN" and break sorting: fall back instead.
+  t.start = typeof t.start === 'string' && TIME_RE.test(t.start) ? t.start : '09:00';
+  if (typeof t.end !== 'string' || !TIME_RE.test(t.end)) t.end = undefined;
+  if (typeof t.durationMin === 'number' && !(t.durationMin > 0 && t.durationMin <= 1440)) t.durationMin = undefined;
   if (typeof t.durationMin !== 'number') {
     if (t.start && t.end) {
       let dur = loHHMMtoMin(t.end) - loHHMMtoMin(t.start);
@@ -61,16 +68,35 @@ export function loIsOccurrenceId(id: string): boolean {
   return String(id).includes('@');
 }
 
+/** "<series id>@<date>" → [series id, date]; null for a plain id. Splits at the last "@". */
+export function loSplitOccurrenceId(id: string): [string, DateStr] | null {
+  const text = String(id);
+  const at = text.lastIndexOf('@');
+  return at > 0 ? [text.slice(0, at), text.slice(at + 1)] : null;
+}
+
+/** The id of the series a record or id belongs to, or null when it is not part of one. */
+export function loSeriesIdOf(task: Pick<Task, 'id' | 'recur' | '_from'>): string | null {
+  if (task._from) return task._from;
+  const split = loSplitOccurrenceId(task.id);
+  if (split) return split[0];
+  return task.recur ? task.id : null;
+}
+
+function virtualOccurrence(series: Task, dateStr: DateStr): Task {
+  return loNormalizeTask({ ...series, id: `${series.id}@${dateStr}`, date: dateStr, recur: null, _from: series.id });
+}
+
 // Ensure a concrete record exists for an id. Occurrences of a recurring task are virtual
 // ("base@date") until something about that one day changes; materialize it so the edit persists.
 export function loMaterializeOccurrence(list: Task[], id: string): Task | null {
   let task = list.find((t) => t.id === id);
   if (task) return task;
-  if (loIsOccurrenceId(id)) {
-    const [baseId, date] = id.split('@');
-    const base = list.find((t) => t.id === baseId);
+  const split = loSplitOccurrenceId(id);
+  if (split) {
+    const base = list.find((t) => t.id === split[0]);
     if (base) {
-      task = loNormalizeTask({ ...base, id, date, recur: null, _from: baseId });
+      task = virtualOccurrence(base, split[1]);
       list.push(task);
       return task;
     }
@@ -115,7 +141,7 @@ interface TaskIndex {
   raw: string | null;
   all: readonly Task[];
   visible: readonly Task[];
-  ids: Set<string>;
+  byId: Map<string, Task>;
   byDate: Map<DateStr, Task[]>;
   series: Task[];
   days: Map<DateStr, readonly Task[]>;
@@ -160,7 +186,7 @@ function taskIndex(): TaskIndex {
   index = {
     raw, all, byDate, series,
     visible: all.filter((t) => !t._deleted),
-    ids: new Set(all.map((t) => t.id)),
+    byId: new Map(all.map((t) => [t.id, t])),
     days: new Map(),
   };
   return index;
@@ -197,12 +223,34 @@ export function loTasksForDate(dateStr: DateStr): Task[] {
   if (!day) {
     const direct = idx.byDate.get(dateStr) || [];
     const recurring = idx.series
-      .filter((t) => loRecurOccursOn(t, dateStr) && !idx.ids.has(`${t.id}@${dateStr}`))
-      .map((t) => freezeTask(loNormalizeTask({ ...t, id: `${t.id}@${dateStr}`, date: dateStr, recur: null, _from: t.id })));
+      .filter((t) => loRecurOccursOn(t, dateStr) && !idx.byId.has(`${t.id}@${dateStr}`))
+      .map((t) => freezeTask(virtualOccurrence(t, dateStr)));
     day = [...direct, ...recurring].sort((a, b) => loHHMMtoMin(a.start) - loHHMMtoMin(b.start));
     idx.days.set(dateStr, day);
   }
   return day.slice();
+}
+
+/**
+ * The task behind an id: a stored record, or the virtual occurrence "<series>@<date>" when
+ * the series really occurs that day. Deleted occurrences and unknown ids give null.
+ */
+export function loTaskById(id: string): Task | null {
+  const idx = taskIndex();
+  const stored = idx.byId.get(id);
+  if (stored) return stored._deleted ? null : stored;
+  const split = loSplitOccurrenceId(id);
+  if (!split) return null;
+  const series = idx.byId.get(split[0]);
+  if (!series || series._deleted || !loRecurOccursOn(series, split[1])) return null;
+  return loTasksForDate(split[1]).find((t) => t.id === id) ?? null;
+}
+
+/** The series a task belongs to (itself, when it is the series), or null. */
+export function loSeriesOf(task: Pick<Task, 'id' | 'recur' | '_from'>): Task | null {
+  const seriesId = loSeriesIdOf(task);
+  const series = seriesId ? taskIndex().byId.get(seriesId) : undefined;
+  return series && series.recur && !series._deleted ? series : null;
 }
 
 /** Open tasks with a hard due date today or later, nearest first. */
