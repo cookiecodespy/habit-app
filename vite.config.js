@@ -19,7 +19,7 @@ function appVersion() {
 
 // Writes dist/sw.js from src/sw.template.js with the list of files to keep for offline use.
 // The cache name is a hash of the build output, so every deploy installs a fresh worker.
-function serviceWorker() {
+function serviceWorker(version) {
   let outDir = 'dist';
   return {
     name: 'lifeos-service-worker',
@@ -43,16 +43,19 @@ function serviceWorker() {
         join(outDir, 'sw.js'),
         template
           .replace('__BUILD_ID__', hash.digest('hex').slice(0, 12))
+          .replace('__APP_VERSION__', version)
           .replace('__PRECACHE__', JSON.stringify(precache, null, 2)),
       );
     },
   };
 }
 
+const version = appVersion();
+
 export default defineConfig({
-  plugins: [react(), serviceWorker()],
+  plugins: [react(), serviceWorker(version)],
   define: {
-    __APP_VERSION__: JSON.stringify(appVersion()),
+    __APP_VERSION__: JSON.stringify(version),
   },
   build: {
     outDir: 'dist',

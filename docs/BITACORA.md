@@ -19,6 +19,7 @@ partir de sí mismo, sin módulos, sin verificación automática, y con promesas
 - *Sin conexión e instalable.* Service worker propio (red primero para la página, caché para
   los archivos con hash), manifest correcto, iconos enlazados y tipografías servidas desde el
   propio sitio (antes venían de Google Fonts).
+  Cuando se publica una versión nueva con la app abierta, aparece un aviso para actualizar.
 - *Seguridad.* Cabeceras HTTP con una política de contenido estricta (sin scripts en línea ni
   `eval`); solo se publica `dist/`, por lista blanca.
 - *Lógica en TypeScript.* Tareas, repetición, hábitos, respaldo y el intérprete de frases
@@ -46,8 +47,13 @@ partir de sí mismo, sin módulos, sin verificación automática, y con promesas
   (198 operaciones del store y 396 frases del planner): la versión nueva los reproduce todos.
 - Prueba de actualización: la página que estaba en producción crea datos variados y la versión
   nueva, en el mismo origen, los lee idénticos y no reescribe nada al arrancar.
-- 18 pruebas de navegador en teléfono y escritorio (arranque, cabeceras, flujos, respaldo,
-  sin conexión) y 22 pruebas de lógica. Integración continua en GitHub en cada cambio.
+- 21 pruebas de navegador en teléfono y escritorio (arranque, cabeceras, flujos, respaldo,
+  sin conexión, aviso de versión nueva, caída del servidor) y 22 pruebas de lógica. La
+  integración continua de GitHub las repite en cada cambio, también con el motor de Safari.
+- La rama se probó además en una vista previa servida por Cloudflare: mismo build, byte a
+  byte, que el generado en local.
+- Auditoría independiente de solo lectura antes de publicar: apto, con una observación
+  aplicada (ante un error del servidor, la app abre con la copia guardada).
 
 **Qué queda** (pasadas 2 y 3)
 

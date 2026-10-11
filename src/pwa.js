@@ -7,10 +7,18 @@ const UPDATE_CHECK_EVERY_MS = 30 * 60 * 1000;
 function registerServiceWorker({ onUpdateReady } = {}) {
   if (!import.meta.env.PROD || !('serviceWorker' in navigator)) return;
 
+  // A new worker took control. That is only news for the user if it belongs to a newer
+  // deploy than the code this page is running (the page itself always comes from the network
+  // first, so it is usually already current).
   let hadController = !!navigator.serviceWorker.controller;
   navigator.serviceWorker.addEventListener('controllerchange', () => {
-    if (hadController && onUpdateReady) onUpdateReady();
+    const wasUpdate = hadController;
     hadController = true;
+    const controller = navigator.serviceWorker.controller;
+    if (!wasUpdate || !onUpdateReady || !controller) return;
+    const channel = new MessageChannel();
+    channel.port1.onmessage = (event) => { if (event.data !== __APP_VERSION__) onUpdateReady(); };
+    controller.postMessage({ type: 'lifeos:version' }, [channel.port2]);
   });
 
   const start = async () => {

@@ -9,6 +9,7 @@
  * activate handler deletes every cache and calls self.registration.unregister().
  */
 const BUILD = '__BUILD_ID__';
+const APP_VERSION = '__APP_VERSION__';
 const CACHE = `lifeos-${BUILD}`;
 const PRECACHE = __PRECACHE__;
 const SHELL = '/';
@@ -30,23 +31,39 @@ self.addEventListener('activate', (event) => {
   })());
 });
 
-async function page(request) {
+// The page: network first, falling back to the saved copy when offline or when the network
+// takes too long. The request is passed to fetch() untouched — it is a navigation, and
+// browsers are strict about how those may be re-issued.
+async function page(event) {
+  const { request } = event;
   const cache = await caches.open(CACHE);
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), PAGE_TIMEOUT_MS);
-  try {
-    const response = await fetch(request, { signal: controller.signal });
-    if (response.ok) await cache.put(SHELL, response.clone());
+  const network = fetch(request).then((response) => {
+    // A redirect comes back as an opaque, non-ok response and is left for the browser to follow.
+    if (response.ok) cache.put(SHELL, response.clone()).catch(() => {});
     return response;
+  });
+  const tooSlow = new Promise((resolve) => { setTimeout(resolve, PAGE_TIMEOUT_MS, null); });
+  try {
+    const first = await Promise.race([network, tooSlow]);
+    const saved = await cache.match(SHELL);
+    if (first) {
+      // A server error page is worse than the working copy this device already has.
+      const usable = first.ok || first.type === 'opaqueredirect';
+      return usable || !saved ? first : saved;
+    }
+    if (saved) {
+      // Let the request finish in the background so the saved copy is refreshed when it arrives.
+      event.waitUntil(network.then(() => {}, () => {}));
+      return saved;
+    }
+    return await network;
   } catch {
-    const cached = await cache.match(SHELL);
-    if (cached) return cached;
+    const saved = await cache.match(SHELL);
+    if (saved) return saved;
     return new Response('LifeOS no pudo cargar y todavía no hay una copia guardada en este dispositivo.', {
       status: 503,
       headers: { 'Content-Type': 'text/plain; charset=utf-8' },
     });
-  } finally {
-    clearTimeout(timer);
   }
 }
 
@@ -78,9 +95,15 @@ self.addEventListener('fetch', (event) => {
   if (request.method !== 'GET') return;
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
-  if (request.mode === 'navigate') event.respondWith(page(request));
+  if (request.mode === 'navigate') event.respondWith(page(event));
   else if (url.pathname.startsWith('/assets/')) event.respondWith(immutable(request));
   else event.respondWith(refreshing(request));
+});
+
+// The page asks which version this worker belongs to, to tell a real update from the worker
+// simply taking control of a page that is already current.
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'lifeos:version' && event.ports[0]) event.ports[0].postMessage(APP_VERSION);
 });
 
 // Reminders are shown through the worker because phones only allow notifications that way.
