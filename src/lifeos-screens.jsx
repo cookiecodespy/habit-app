@@ -1,6 +1,23 @@
 // lifeos-screens.jsx — auxiliary screens (Month, Week, Create, Detail, Onboarding, AI, Settings, Inbox, Stats)
 
 // Reusable: bottom tab bar — solid background, pill indicator, safe-area aware
+
+import React from 'react';
+import { LO_CATEGORIES, LO_CAT_BY_ID, loGuessCategory } from './domain/categories';
+import {
+  MONTH_NAMES, buildMonth, fmt12, loDateStr, loDow, loHHMMtoMin, loMinToHHMM, minutesBetween,
+} from './domain/dates';
+import { loExecuteCommand, loParseCommand } from './domain/nlp';
+import { LO_KEYS, USER_KEY, notifyStoreChange } from './domain/storage';
+import { LOStore } from './domain/store';
+import { loUid } from './domain/tasks';
+import { EmptyState } from './lifeos-extras.jsx';
+import { EmojiPicker, LIFE_PALETTE, LifeIcon, LifeIconBox, TaskGlyph, UIIcon } from './lifeos-icons.jsx';
+import { NotifSettingsRow, toast } from './lifeos-notify.jsx';
+import { StatusRing } from './lifeos-timeline.jsx';
+import { avatarLetter } from './lifeos-user.jsx';
+import { useInbox } from './store-hooks.js';
+
 function TabBar({ theme, current, onChange }) {
   const tabs = [
     { id: 'timeline', icon: 'timeline', label: 'Hoy' },
@@ -107,26 +124,20 @@ function MonthScreen({ theme, onBack, embedded = false, onOpenTask, onAdd, userT
   const goPrev = () => setYyMm(({ y, m }) => m === 0 ? { y: y - 1, m: 11 } : { y, m: m - 1 });
   const goNext = () => setYyMm(({ y, m }) => m === 11 ? { y: y + 1, m: 0 } : { y, m: m + 1 });
 
-  const dotsFor = (day) => {
-    const dateStr = `${yyMm.y}-${String(yyMm.m + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-    return LOStore.tasksForDate(dateStr).filter(t => t.kind !== 'break').slice(0, 5).map(t => t.color);
-  };
-  const tasksForSelected = React.useMemo(() => {
-    const dateStr = `${yyMm.y}-${String(yyMm.m + 1).padStart(2, '0')}-${String(selected).padStart(2, '0')}`;
-    return LOStore.tasksForDate(dateStr);
-  }, [userTasks, yyMm.y, yyMm.m, selected]);
+  const dateOf = (day) => `${yyMm.y}-${String(yyMm.m + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+  const dotsFor = (day) => LOStore.tasksForDate(dateOf(day)).filter(t => t.kind !== 'break').slice(0, 5).map(t => t.color);
+  const tasksForSelected = LOStore.tasksForDate(dateOf(selected));
 
-  // Every day of the month that has tasks, grouped → the bank-style list.
-  const monthGroups = React.useMemo(() => {
+  // Every day of the month that has tasks, grouped → the bank-style list. Only needed in
+  // "Todo el mes"; the store caches each day, so this is cheap to recompute.
+  const monthGroups = [];
+  if (scope === 'month') {
     const daysInMonth = new Date(yyMm.y, yyMm.m + 1, 0).getDate();
-    const groups = [];
     for (let day = 1; day <= daysInMonth; day++) {
-      const dateStr = `${yyMm.y}-${String(yyMm.m + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-      const tasks = LOStore.tasksForDate(dateStr);
-      if (tasks.length) groups.push({ day, dateStr, tasks });
+      const tasks = LOStore.tasksForDate(dateOf(day));
+      if (tasks.length) monthGroups.push({ day, dateStr: dateOf(day), tasks });
     }
-    return groups;
-  }, [userTasks, yyMm.y, yyMm.m]);
+  }
 
   const dayList = tasksForSelected.filter(catMatch);
   const monthFiltered = monthGroups.map(g => ({ ...g, tasks: g.tasks.filter(catMatch) })).filter(g => g.tasks.length);
@@ -384,19 +395,17 @@ function WeekScreen({ theme, onOpenTask, userTasks = [] }) {
   }, [weekOffset]);
 
   const todayStr = loDateStr();
-  const week = React.useMemo(() => (
-    Array.from({ length: 7 }).map((_, i) => {
-      const d = new Date(monday);
-      d.setDate(monday.getDate() + i);
-      const dateStr = loDateStr(d);
-      return {
-        dateStr,
-        dayNum: d.getDate(),
-        isToday: dateStr === todayStr,
-        tasks: LOStore.tasksForDate(dateStr).filter(t => t.kind !== 'break' && !t.allDay),
-      };
-    })
-  ), [monday, todayStr, userTasks]);
+  const week = Array.from({ length: 7 }).map((_, i) => {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    const dateStr = loDateStr(d);
+    return {
+      dateStr,
+      dayNum: d.getDate(),
+      isToday: dateStr === todayStr,
+      tasks: LOStore.tasksForDate(dateStr).filter(t => t.kind !== 'break' && !t.allDay),
+    };
+  });
 
   const monthLabel = monday.toLocaleDateString('es-CL', { month: 'long' });
   const rangeLabel = `${monday.getDate()} – ${week[6].dayNum} ${monthLabel}`;
@@ -590,11 +599,6 @@ function CreateScreen({ theme, onBack, onSave }) {
     const [h, m] = startTime.split(':').map(Number);
     return h * 60 + m;
   }, [startTime]);
-  const endTime = React.useMemo(() => {
-    const total = (startMins + duration) % (24 * 60);
-    const h = Math.floor(total / 60), m = total % 60;
-    return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
-  }, [startMins, duration]);
   const endMins = startMins + duration;
 
   // 14-day scrollable date strip
@@ -1191,9 +1195,11 @@ function OptionRow({ theme, icon, tint, label, sub, on, onToggle, arrow }) {
   );
 }
 
+// A switch. `onChange` receives the NEW value (it used to receive the click event, which
+// made the "Modo oscuro" switch in Ajustes unable to turn dark mode off).
 function Toggle({ on, onChange, theme }) {
   return (
-    <button onClick={onChange} className="lo-press" style={{
+    <button role="switch" aria-checked={!!on} onClick={() => onChange && onChange(!on)} className="lo-press" style={{
       width: 44, height: 26, borderRadius: 13,
       background: on ? '#34C759' : theme.rail,
       border: 'none', padding: 0, cursor: 'pointer',
@@ -1220,12 +1226,6 @@ function SectionLabel({ children, theme, inline }) {
     padding: inline ? 0 : '0 6px',
   }}>{children}</div>;
 }
-function Row({ children, theme }) {
-  return <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '13px 14px', fontSize: 14.5, color: theme.text }}>{children}</div>;
-}
-function Pill({ children, theme, muted }) {
-  return <span style={{ fontSize: 13, color: muted ? theme.text2 : theme.accent, fontWeight: 500 }}>{children} <span style={{ opacity: 0.5 }}>›</span></span>;
-}
 function Divider({ theme }) { return <div style={{ height: 0.5, background: theme.border, marginLeft: 14 }}/>; }
 
 // ──────────────────────────────────────────────────────────────
@@ -1251,6 +1251,7 @@ function DetailScreen({ theme, task, onBack, onStartFocus, onComplete, onToggleS
   // Inline-editable title + note (B16) — drafts reset when a different task opens.
   const [titleDraft, setTitleDraft] = React.useState(t.title);
   const [noteDraft, setNoteDraft] = React.useState(t.note || t.subtitle || '');
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- only reset when another task opens, not on every edit
   React.useEffect(() => { setTitleDraft(t.title); setNoteDraft(t.note || t.subtitle || ''); }, [t.id]);
   const commitTitle = () => { const v = titleDraft.trim(); if (live && v && v !== t.title) onUpdate({ title: v }); else if (!v) setTitleDraft(t.title); };
   const commitNote = () => { if (live && noteDraft.trim() !== (t.note || t.subtitle || '')) onUpdate({ note: noteDraft.trim() }); };
@@ -1570,161 +1571,6 @@ function DetailScreen({ theme, task, onBack, onStartFocus, onComplete, onToggleS
 
 const detailRowBtn = { display: 'block', width: '100%', background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit' };
 
-// ──────────────────────────────────────────────────────────────
-// Onboarding — 3-page paged flow with paged indicator
-// ──────────────────────────────────────────────────────────────
-function OnboardingScreen({ theme, onBack }) {
-  const [page, setPage] = React.useState(0);
-  const pages = [
-    {
-      key: 'p1',
-      visual: <OnbVisualTimeline theme={theme}/>,
-      eyebrow: 'Bienvenido',
-      title: <>Tu día, <span style={{ color: theme.accent }}>visualizado.</span></>,
-      body: 'LifeOS convierte tus tareas en una timeline elegante para que el día fluya como debe.',
-    },
-    {
-      key: 'p2',
-      visual: <OnbVisualCapture theme={theme}/>,
-      eyebrow: 'Captura',
-      title: <>Añade cualquier cosa, <span style={{ color: theme.accent }}>agenda con un toque.</span></>,
-      body: 'Tira tareas al inbox y luego arrastra a la timeline cuando estés listo. Subtareas, recordatorios y repeticiones incluidos.',
-    },
-    {
-      key: 'p3',
-      visual: <OnbVisualAI theme={theme}/>,
-      eyebrow: 'IA Planner',
-      title: <>Deja que la IA <span style={{ color: theme.accent }}>arme el resto.</span></>,
-      body: 'Dícele qué quieres lograr. Encuentra el tiempo, sugiere descansos y reorganiza cuando la vida se mete.',
-    },
-  ];
-  const isLast = page === pages.length - 1;
-  return (
-    <div data-screen-label="Onboarding" style={{ padding: '0 24px 36px', display: 'flex', flexDirection: 'column', height: '100%' }}>
-      <div style={{ height: 44, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <span style={{ fontSize: 11, color: theme.text3, fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase' }}>{pages[page].eyebrow}</span>
-        <button onClick={onBack} className="lo-press" style={{ background: 'transparent', border: 'none', color: theme.text3, fontSize: 13, cursor: 'pointer', fontFamily: 'inherit' }}>Saltar</button>
-      </div>
-      <div key={pages[page].key} className="lo-fade" style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', gap: 28 }}>
-        <div className="lo-scale-in">{pages[page].visual}</div>
-        <div>
-          <h1 style={{ margin: 0, fontSize: 32, fontWeight: 700, color: theme.text, letterSpacing: -0.7, lineHeight: 1.1 }}>
-            {pages[page].title}
-          </h1>
-          <p style={{ margin: '14px auto 0', maxWidth: 300, fontSize: 14, color: theme.text2, lineHeight: 1.5 }}>
-            {pages[page].body}
-          </p>
-        </div>
-      </div>
-      {/* dots */}
-      <div style={{ display: 'flex', gap: 6, justifyContent: 'center', marginBottom: 18 }}>
-        {pages.map((p, i) => (
-          <div key={p.key} style={{
-            width: i === page ? 22 : 6, height: 6, borderRadius: 3,
-            background: i === page ? theme.accent : theme.rail,
-            transition: 'width .3s var(--ease-out-back)',
-          }}/>
-        ))}
-      </div>
-      {/* Buttons */}
-      <button onClick={() => isLast ? onBack() : setPage(page + 1)} className="lo-press" style={{
-        background: `linear-gradient(135deg, ${theme.accent}, ${theme.accent}DD)`,
-        color: '#fff', border: 'none',
-        height: 56, borderRadius: 18, fontSize: 16, fontWeight: 700, cursor: 'pointer',
-        letterSpacing: -0.2, fontFamily: 'inherit',
-        boxShadow: `0 10px 28px ${theme.accent}55`,
-        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-      }}>
-        {isLast ? 'Empezar' : 'Continuar'}
-        {!isLast && <UIIcon name="chevronR" size={18} color="#fff" strokeWidth={2.4}/>}
-      </button>
-      {!isLast && page > 0 && (
-        <button onClick={() => setPage(page - 1)} style={{
-          background: 'transparent', border: 'none',
-          color: theme.text3, fontSize: 13, marginTop: 12, cursor: 'pointer', fontFamily: 'inherit',
-        }}>Atrás</button>
-      )}
-      {isLast && (
-        <button onClick={onBack} style={{ background: 'transparent', border: 'none', color: theme.text3, fontSize: 13, marginTop: 12, cursor: 'pointer', fontFamily: 'inherit' }}>
-          Ya tengo una cuenta
-        </button>
-      )}
-    </div>
-  );
-}
-
-// Onboarding visuals — mini timeline preview
-function OnbVisualTimeline({ theme }) {
-  const items = [
-    { icon: '☀️', color: 'amber',  t: '7:00' },
-    { icon: '☕', color: 'ember', t: '7:30' },
-    { icon: '💼', color: 'slate', t: '9:00' },
-    { icon: '🍽️', color: 'sun', t: '12:30' },
-    { icon: '🏃', color: 'lime', t: '15:00' },
-  ];
-  return (
-    <div style={{ width: 240, padding: 14, background: theme.surface, borderRadius: 22, border: `0.5px solid ${theme.border}`, boxShadow: `0 20px 50px rgba(0,0,0,0.4)` }}>
-      {items.map((it, i) => (
-        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '6px 0', opacity: i < 2 ? 0.4 : 1 }}>
-          <span style={{ fontSize: 10.5, color: theme.text3, width: 32, textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>{it.t}</span>
-          <TaskGlyph icon={it.icon} color={it.color} size={28} shape="rounded"/>
-          <div style={{ flex: 1, height: 4, borderRadius: 2, background: LIFE_PALETTE[it.color].to + '55' }}/>
-        </div>
-      ))}
-    </div>
-  );
-}
-function OnbVisualCapture({ theme }) {
-  return (
-    <div style={{ position: 'relative', width: 240, height: 200 }}>
-      <div style={{ position: 'absolute', left: 0, top: 0, width: 160, padding: 12, background: theme.surface, borderRadius: 16, border: `0.5px solid ${theme.border}`, transform: 'rotate(-4deg)', boxShadow: `0 12px 30px rgba(0,0,0,0.3)` }}>
-        <div style={{ fontSize: 10, color: theme.text3, fontWeight: 700, letterSpacing: 0.6, textTransform: 'uppercase' }}>Inbox</div>
-        {['Llamar dentista', 'Leer capítulo 4', 'Comprar flores'].map((t, i) => (
-          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0' }}>
-            <div style={{ width: 12, height: 12, borderRadius: 6, border: `1.5px solid ${theme.rail}` }}/>
-            <span style={{ fontSize: 11, color: theme.text }}>{t}</span>
-          </div>
-        ))}
-      </div>
-      {/* arrow */}
-      <div style={{ position: 'absolute', right: 30, top: 80, color: theme.accent }}>
-        <svg width="36" height="20" viewBox="0 0 36 20" fill="none">
-          <path d="M2 10 H 32 M 24 3 L 32 10 L 24 17" stroke={theme.accent} strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-      </div>
-      {/* timeline pill */}
-      <div style={{ position: 'absolute', right: 0, bottom: 0, width: 140, padding: 10, background: `linear-gradient(135deg, ${LIFE_PALETTE.coral.from}22, ${LIFE_PALETTE.coral.to}11)`, borderRadius: 16, border: `0.5px solid ${LIFE_PALETTE.coral.to}55`, transform: 'rotate(6deg)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <TaskGlyph icon="📞" color="coral" size={34} shape="squircle"/>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 9.5, color: theme.text3, fontVariantNumeric: 'tabular-nums' }}>2:00 PM</div>
-            <div style={{ fontSize: 11, color: theme.text, fontWeight: 600 }}>Llamar dentista</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-function OnbVisualAI({ theme }) {
-  return (
-    <div style={{ width: 240, display: 'flex', flexDirection: 'column', gap: 8 }}>
-      <div style={{ alignSelf: 'flex-end', maxWidth: 200, background: `linear-gradient(135deg, ${theme.accent}, ${theme.accent}DD)`, color: '#fff', padding: '8px 12px', borderRadius: 14, borderBottomRightRadius: 4, fontSize: 11.5, boxShadow: `0 6px 16px ${theme.accent}55` }}>
-        Planea mañana para deep work
-      </div>
-      <div style={{ alignSelf: 'flex-start', maxWidth: 220, background: theme.surface, border: `0.5px solid ${theme.border}`, color: theme.text, padding: '8px 12px', borderRadius: 14, borderBottomLeftRadius: 4, fontSize: 11.5 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 4 }}>
-          <UIIcon name="sparkle" size={11} color={LIFE_PALETTE.lavender.to} strokeWidth={2}/>
-          <span style={{ fontWeight: 600 }}>Listo — bloqué 8–10 AM.</span>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: 6, background: theme.bg, borderRadius: 8, marginTop: 4 }}>
-          <TaskGlyph icon="💼" color="slate" size={24} shape="rounded"/>
-          <div style={{ fontSize: 10.5, color: theme.text }}>Deep Work · 2 hr</div>
-        </div>
-      </div>
-    </div>
-  );
-}
-function Dot({ active, theme }) { return <div style={{ width: active ? 22 : 6, height: 6, borderRadius: 3, background: active ? theme.accent : theme.rail, transition: 'width .2s' }}/>; }
 
 // ──────────────────────────────────────────────────────────────
 // AI Planner — premium chat with typing indicator + rich suggestions
@@ -1804,13 +1650,8 @@ function AIScreen({ theme, onBack, embedded }) {
           return;
         }
       }
-      // 2) Help / smalltalk → optional remote model, else the local knowledge base.
-      let reply = null;
-      if (typeof window !== 'undefined' && window.LOAI && window.LOAI.getSettings && window.LOAI.getSettings().enabled) {
-        const sys = 'Eres el asistente de LifeOS, un planner diario en español. Responde en 1-3 oraciones, tono amable.';
-        reply = await window.LOAI.chat(`${sys}\n\nUsuario: ${text}`).catch(() => null);
-      }
-      setMessages(m => [...m, { from: 'ai', text: reply || localReply(text) }]);
+      // 2) Help / smalltalk → the local knowledge base.
+      setMessages(m => [...m, { from: 'ai', text: localReply(text) }]);
     } catch {
       setMessages(m => [...m, { from: 'ai', text: localReply(text) }]);
     } finally {
@@ -2090,270 +1931,6 @@ function InboxScreen({ theme, onBack, onSchedule }) {
   );
 }
 
-// ──────────────────────────────────────────────────────────────
-// Stats — streak banner + heatmap + charts + insight
-// ──────────────────────────────────────────────────────────────
-function StatsScreen({ theme, onBack, embedded, userTasks = [] }) {
-  const today = new Date();
-  const todayStr = loDateStr(today);
-
-  // Real stats
-  const totalTasks = userTasks.length;
-  const doneTasks = userTasks.filter(t => t.status === 'done').length;
-  const completionPct = totalTasks > 0 ? Math.round(doneTasks / totalTasks * 100) : 0;
-
-  // This week's per-day task counts (Mon=0...Sun=6)
-  const weekStart = new Date(today);
-  weekStart.setDate(today.getDate() - ((today.getDay() + 6) % 7));
-  const bars = Array.from({ length: 7 }, (_, i) => {
-    const d = new Date(weekStart);
-    d.setDate(weekStart.getDate() + i);
-    return userTasks.filter(t => t.targetDate === loDateStr(d)).length;
-  });
-  const maxBar = Math.max(...bars, 1);
-  const todayDow = (today.getDay() + 6) % 7;
-
-  // Real streak: consecutive days (going backwards) with at least 1 done task
-  const completedDays = new Set(userTasks.filter(t => t.status === 'done' && t.targetDate).map(t => t.targetDate));
-  let streak = 0;
-  for (let i = 0; i < 366; i++) {
-    const d = new Date(today);
-    d.setDate(today.getDate() - i);
-    if (completedDays.has(loDateStr(d))) streak++;
-    else if (i > 0) break;
-  }
-
-  const weekTotal = bars.reduce((a, b) => a + b, 0);
-  const days = ['L','M','X','J','V','S','D'];
-  const MON3 = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-
-  // Real date ranges (no more hardcoded "Feb — May" / "12 – 18 May").
-  const heatStart = new Date(weekStart); heatStart.setDate(weekStart.getDate() - 11 * 7);
-  const heatRange = `${MON3[heatStart.getMonth()]} — ${MON3[today.getMonth()]}`;
-  const weekEnd = new Date(weekStart); weekEnd.setDate(weekStart.getDate() + 6);
-  const weekRange = weekStart.getMonth() === weekEnd.getMonth()
-    ? `${weekStart.getDate()} – ${weekEnd.getDate()} ${MON3[weekStart.getMonth()]}`
-    : `${weekStart.getDate()} ${MON3[weekStart.getMonth()]} – ${weekEnd.getDate()} ${MON3[weekEnd.getMonth()]}`;
-
-  // Real "where your time goes" — group by color, summing duration (B7).
-  const COLOR_ES = { coral:'Coral', amber:'Ámbar', rose:'Rosa', mint:'Menta', sky:'Cielo', lavender:'Lavanda', lime:'Lima', teal:'Verde', plum:'Ciruela', sun:'Sol', ember:'Fuego', slate:'Pizarra' };
-  const fmtHrs = (min) => min >= 60 ? `${(min / 60).toFixed(min % 60 ? 1 : 0)}h` : `${min}m`;
-  const catTotals = {};
-  userTasks.forEach(t => { const k = t.color || 'mint'; catTotals[k] = (catTotals[k] || 0) + (t.durationMin || 30); });
-  const catTotalMin = Object.values(catTotals).reduce((a, b) => a + b, 0) || 1;
-  const catRows = Object.entries(catTotals)
-    .map(([color, min]) => ({ color, min, pct: Math.round(min / catTotalMin * 100), hr: fmtHrs(min) }))
-    .sort((a, b) => b.min - a.min).slice(0, 5);
-
-  // Real insight — most productive weekday from completed tasks (B7).
-  const dowDone = [0,0,0,0,0,0,0]; // Mon..Sun
-  userTasks.filter(t => t.status === 'done' && t.targetDate).forEach(t => {
-    const [y, m, d] = t.targetDate.split('-').map(Number);
-    dowDone[(new Date(y, m - 1, d).getDay() + 6) % 7]++;
-  });
-  const dowDoneTotal = dowDone.reduce((a, b) => a + b, 0);
-  const bestDowIdx = dowDone.indexOf(Math.max(...dowDone));
-  const DOW_FULL = ['lunes','martes','miércoles','jueves','viernes','sábados','domingos'];
-  const bestDowPct = dowDoneTotal > 0 ? Math.round(dowDone[bestDowIdx] / dowDoneTotal * 100) : 0;
-
-  return (
-    <div data-screen-label="Stats">
-      <ScreenTopBar theme={theme} title="Stats" onBack={onBack} embedded={embedded}/>
-
-      <div style={{ padding: '0 16px 24px' }}>
-        <div className="lo-fade" style={{ padding: '0 4px 14px' }}>
-          <div style={{ fontSize: 12.5, color: theme.text3, fontWeight: 500 }}>Esta semana</div>
-          <h2 style={{ margin: '2px 0 0', fontSize: 30, fontWeight: 700, color: theme.text, letterSpacing: -0.7 }}>
-            Buen <span style={{ color: theme.accent }}>momentum</span>
-          </h2>
-        </div>
-
-        {/* Streak banner */}
-        <div className="lo-scale-in" style={{
-          background: streak > 0
-            ? `linear-gradient(135deg, ${LIFE_PALETTE.ember.from} 0%, ${LIFE_PALETTE.coral.to} 100%)`
-            : theme.surface,
-          borderRadius: 20, padding: 16,
-          display: 'flex', alignItems: 'center', gap: 14,
-          boxShadow: streak > 0 ? `0 12px 32px ${LIFE_PALETTE.coral.to}44` : `0 2px 8px rgba(0,0,0,0.12)`,
-          border: streak > 0 ? 'none' : `0.5px solid ${theme.border}`,
-        }}>
-          <div style={{ width: 56, height: 56, borderRadius: 28,
-            background: streak > 0 ? 'rgba(255,255,255,0.18)' : theme.accentSoft,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            backdropFilter: streak > 0 ? 'blur(10px)' : 'none' }}>
-            {streak > 0 ? (
-              <svg width="30" height="30" viewBox="0 0 24 24" fill="none">
-                <path d="M12 2 C 9 8 14 9 14 14 C 14 17 12 19 10 19 C 8 19 7 17 7 15 C 7 13 8 11 10 11 C 9 14 10 16 11 16 C 12 16 13 14 13 12 C 13 8 16 6 16 2 Z" fill="#fff"/>
-              </svg>
-            ) : (
-              <UIIcon name="sparkle" size={24} color={theme.accent} strokeWidth={2}/>
-            )}
-          </div>
-          <div style={{ flex: 1, color: streak > 0 ? '#fff' : theme.text }}>
-            <div style={{ fontSize: 11.5, fontWeight: 600, letterSpacing: 0.4, textTransform: 'uppercase', opacity: streak > 0 ? 0.85 : 1, color: streak > 0 ? '#fff' : theme.text3 }}>Racha actual</div>
-            <div className="lo-display" style={{ fontSize: 34, fontWeight: 600, letterSpacing: -0.8, lineHeight: 1, marginTop: 4, fontVariantNumeric: 'tabular-nums' }}>
-              {streak} <span style={{ fontSize: 15, fontWeight: 600, opacity: streak > 0 ? 0.85 : 1, fontFamily: 'var(--font-ui)' }}>{streak === 1 ? 'día' : 'días'}</span>
-            </div>
-            <div style={{ fontSize: 11.5, opacity: 0.85, marginTop: 4, color: streak > 0 ? '#fff' : theme.text2 }}>
-              {streak > 0 ? 'Completa algo hoy para mantenerla.' : 'Completa una tarea hoy para empezar.'}
-            </div>
-          </div>
-        </div>
-
-        {/* Stat cards */}
-        <div style={{ display: 'flex', gap: 10, marginTop: 12 }}>
-          <StatCard theme={theme} label="Hechas" value={String(doneTasks)} sub={totalTasks > 0 ? `${completionPct}% tasa` : 'Agrega tareas'} tone="mint"/>
-          <StatCard theme={theme} label="Esta sem." value={String(weekTotal)} sub={weekTotal === 1 ? 'tarea' : 'tareas'} tone="sky"/>
-          <StatCard theme={theme} label="Total" value={String(totalTasks)} sub={totalTasks > 0 ? `${doneTasks} completadas` : 'Sin tareas aún'} tone="lavender"/>
-        </div>
-
-        {/* Activity heatmap (12 weeks) */}
-        <div style={{ marginTop: 14, background: theme.surface, borderRadius: 20, padding: 16, border: `0.5px solid ${theme.border}` }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 14 }}>
-            <span style={{ fontSize: 12.5, color: theme.text, fontWeight: 600 }}>Actividad</span>
-            <span style={{ fontSize: 10.5, color: theme.text3 }}>{heatRange}</span>
-          </div>
-          <Heatmap theme={theme} accent={theme.accent} userTasks={userTasks}/>
-          <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 6, marginTop: 12, fontSize: 10, color: theme.text3 }}>
-            <span>Menos</span>
-            {[0, 0.25, 0.5, 0.75, 1].map((a, i) => (
-              <div key={i} style={{ width: 11, height: 11, borderRadius: 3,
-                background: i === 0 ? theme.rail : `color-mix(in srgb, ${theme.accent} ${a*100}%, transparent)` }}/>
-            ))}
-            <span>Más</span>
-          </div>
-        </div>
-
-        {/* Weekly bar chart */}
-        <div style={{ marginTop: 14, background: theme.surface, borderRadius: 20, padding: 16, border: `0.5px solid ${theme.border}` }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-            <span style={{ fontSize: 12.5, color: theme.text, fontWeight: 600 }}>Tareas por día</span>
-            <span style={{ fontSize: 10.5, color: theme.text3 }}>{weekRange}</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 8, height: 130, marginTop: 16 }}>
-            {bars.map((b, i) => {
-              const active = i === todayDow;
-              const pctH = maxBar > 0 ? Math.max((b / maxBar) * 100, b > 0 ? 8 : 0) : 0;
-              return (
-                <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
-                  <div style={{
-                    width: '100%', height: `${pctH}%`, minHeight: b > 0 ? 8 : 3,
-                    background: active
-                      ? `linear-gradient(180deg, ${theme.accent} 0%, ${theme.accent}AA 100%)`
-                      : b > 0
-                        ? `linear-gradient(180deg, ${theme.surfaceHi} 0%, ${theme.rail} 100%)`
-                        : theme.rail,
-                    borderRadius: 8,
-                    boxShadow: active ? `0 4px 12px ${theme.accent}44` : 'none',
-                    transition: 'all .4s var(--ease-out-quart)',
-                    opacity: b === 0 && !active ? 0.4 : 1,
-                  }}/>
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    <span style={{ fontSize: 11, color: active ? theme.text : theme.text3, fontWeight: active ? 700 : 500, fontVariantNumeric: 'tabular-nums' }}>{b}</span>
-                    <span style={{ fontSize: 9.5, color: active ? theme.accent : theme.text3, fontWeight: active ? 700 : 500 }}>{days[i]}</span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Category breakdown — real, grouped by color */}
-        <div style={{ marginTop: 14, background: theme.surface, borderRadius: 20, padding: 16, border: `0.5px solid ${theme.border}` }}>
-          <div style={{ fontSize: 12.5, color: theme.text, marginBottom: 12, fontWeight: 600 }}>En qué se va tu tiempo</div>
-          {catRows.length === 0 ? (
-            <div style={{ fontSize: 12.5, color: theme.text3, padding: '6px 0' }}>Agenda tareas con duración y aquí verás tu reparto real.</div>
-          ) : catRows.map((row, i) => {
-            const c = LIFE_PALETTE[row.color] || LIFE_PALETTE.mint;
-            return (
-              <div key={row.color} style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: i < catRows.length - 1 ? 12 : 0 }}>
-                <div style={{ width: 8, height: 24, borderRadius: 4, background: `linear-gradient(180deg, ${c.from}, ${c.to})` }}/>
-                <span style={{ flex: 1, fontSize: 13.5, color: theme.text, fontWeight: 500 }}>{COLOR_ES[row.color] || row.color}</span>
-                <div style={{ flex: 1.5, height: 6, background: theme.rail, borderRadius: 3, overflow: 'hidden' }}>
-                  <div style={{ width: `${row.pct}%`, height: '100%', background: `linear-gradient(90deg, ${c.from}, ${c.to})`, transition: 'width .6s var(--ease-out-quart)' }}/>
-                </div>
-                <span style={{ fontSize: 11.5, color: theme.text2, width: 38, textAlign: 'right', fontVariantNumeric: 'tabular-nums', fontWeight: 500 }}>{row.hr}</span>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Insight — real best-weekday, only when there's enough signal */}
-        {dowDoneTotal >= 3 && (
-          <div style={{ marginTop: 14, padding: 16,
-            background: `linear-gradient(135deg, ${LIFE_PALETTE.lavender.from}22, ${LIFE_PALETTE.sky.to}14)`,
-            borderRadius: 20, border: `0.5px solid ${LIFE_PALETTE.lavender.to}44` }}>
-            <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
-              <LifeIcon name="sparkle" color="lavender" size={36} shape="rounded"/>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 11, fontWeight: 600, color: LIFE_PALETTE.lavender.to, letterSpacing: 0.4, textTransform: 'uppercase' }}>Insight</div>
-                <div style={{ fontSize: 14.5, fontWeight: 600, color: theme.text, marginTop: 2, letterSpacing: -0.1 }}>Los {DOW_FULL[bestDowIdx]} son tu mejor día</div>
-                <div style={{ fontSize: 12, color: theme.text2, lineHeight: 1.45, marginTop: 4 }}>
-                  Ahí completas el {bestDowPct}% de tus tareas. Aprovecha ese día para lo más importante.
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-function StatCard({ theme, label, value, sub, tone }) {
-  const c = LIFE_PALETTE[tone] || LIFE_PALETTE.coral;
-  return (
-    <div className="lo-lift" style={{ flex: 1, background: theme.surface, borderRadius: 18, padding: 14, border: `0.5px solid ${theme.border}`, position: 'relative', overflow: 'hidden' }}>
-      <div style={{ position: 'absolute', top: -20, right: -20, width: 60, height: 60, borderRadius: 30, background: `radial-gradient(circle, ${c.to}33, transparent 70%)`, pointerEvents: 'none' }}/>
-      <div style={{ fontSize: 10.5, color: theme.text3, fontWeight: 600, letterSpacing: 0.4, textTransform: 'uppercase' }}>{label}</div>
-      <div className="lo-display" style={{ fontSize: 28, fontWeight: 600, color: theme.text, marginTop: 4, letterSpacing: -0.5, lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>{value}</div>
-      <div style={{ fontSize: 10.5, color: c.to, marginTop: 4, fontWeight: 600 }}>{sub}</div>
-    </div>
-  );
-}
-function Heatmap({ theme, accent, userTasks = [] }) {
-  const cols = 14, rows = 7;
-  const today = new Date();
-
-  // Build activity map from real done tasks
-  const activityMap = {};
-  userTasks.filter(t => t.status === 'done' && t.targetDate).forEach(t => {
-    activityMap[t.targetDate] = (activityMap[t.targetDate] || 0) + 1;
-  });
-  const maxActivity = Math.max(...Object.values(activityMap), 1);
-
-  // Grid: 14 weeks back, each col = one week (Mon→Sun)
-  const weekStart = new Date(today);
-  weekStart.setDate(today.getDate() - ((today.getDay() + 6) % 7)); // this Monday
-
-  const grid = Array.from({ length: cols }, (_, ci) => {
-    const colMonday = new Date(weekStart);
-    colMonday.setDate(weekStart.getDate() - (cols - 1 - ci) * 7);
-    return Array.from({ length: rows }, (_, ri) => {
-      const d = new Date(colMonday);
-      d.setDate(colMonday.getDate() + ri);
-      const ds = loDateStr(d);
-      const isFuture = d > today;
-      const activity = activityMap[ds] || 0;
-      return isFuture ? -1 : activity / maxActivity;
-    });
-  });
-
-  return (
-    <div style={{ display: 'grid', gridTemplateColumns: `repeat(${cols}, 1fr)`, gap: 4 }}>
-      {grid.map((col, c) => (
-        <div key={c} style={{ display: 'grid', gridTemplateRows: `repeat(${rows}, 1fr)`, gap: 3 }}>
-          {col.map((v, r) => (
-            <div key={r} style={{
-              aspectRatio: '1/1', minHeight: 12, borderRadius: 3,
-              background: v < 0 ? 'transparent' : (v === 0 ? theme.rail : `color-mix(in srgb, ${accent} ${Math.max(v * 100, 25)}%, transparent)`),
-            }}/>
-          ))}
-        </div>
-      ))}
-    </div>
-  );
-}
 
 // ──────────────────────────────────────────────────────────────
 // Settings — profile hero · pro card · grouped lists with badges
@@ -2385,8 +1962,8 @@ function SettingsScreen({ theme, onBack, embedded, user, onEditName, userTasks =
   const resetApp = () => {
     if (typeof window !== 'undefined' && !window.confirm('Esto borra TODAS tus tareas, hábitos y datos de este dispositivo. ¿Seguro?')) return;
     try {
-      [LO_KEYS.tasks, LO_KEYS.habits, LO_KEYS.inbox, LO_KEYS.routines, 'lifeos.user', 'lifeos.user_tasks'].forEach(k => localStorage.removeItem(k));
-      window.dispatchEvent(new CustomEvent('lo-store-change', { detail: {} }));
+      [LO_KEYS.tasks, LO_KEYS.habits, LO_KEYS.inbox, LO_KEYS.routines, USER_KEY, 'lifeos.user_tasks'].forEach(k => localStorage.removeItem(k));
+      notifyStoreChange();
       location.reload();
     } catch {}
   };
@@ -2553,7 +2130,7 @@ function SettingsScreen({ theme, onBack, embedded, user, onEditName, userTasks =
         </div>
 
         <div style={{ textAlign: 'center', padding: '22px 0 8px', color: theme.text3, fontSize: 11 }}>
-          LifeOS · 2026.09.29 · Hecho con cariño en Chile 🇨🇱
+          LifeOS · {__APP_VERSION__} · Hecho con cariño en Chile 🇨🇱
         </div>
       </div>
     </div>
@@ -2580,9 +2157,7 @@ function SettingsRow({ theme, icon, tint, label, trail, trailNode, onClick, disa
   );
 }
 
-Object.assign(window, {
-  TabBar, FAB, ScreenTopBar,
-  MonthScreen, WeekScreen, CalendarScreen, CreateScreen, DetailScreen,
-  OnboardingScreen, AIScreen, InboxScreen, StatsScreen, SettingsScreen,
-  SettingsIconBadge, AgendaTaskRow, Card, OptionRow, Toggle, glassBtn,
-});
+export {
+  AIScreen, CalendarScreen, CreateScreen, DetailScreen, Divider, FAB, glassBtn, InboxScreen,
+  ScreenTopBar, SectionLabel, SettingsIconBadge, SettingsScreen, TabBar,
+};

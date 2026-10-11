@@ -1,19 +1,37 @@
 {
   "name": "lifeos",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "private": true,
+  "type": "module",
+  "description": "LifeOS — planner diario y hábitos. PWA local-first, sin cuentas ni servidores.",
   "scripts": {
-    "build": "python3 build.py",
-    "test": "node --test tests/*.test.cjs",
-    "test:browser": "node tests/browser.cjs"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "wrangler dev --port 8788",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "check": "npm run lint && npm run typecheck && npm test && npm run build && npm run test:e2e"
+  },
+  "dependencies": {
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
   },
   "devDependencies": {
-    "@babel/core": "7.29.7",
-    "@babel/preset-react": "7.29.7",
-    "playwright": "1.63.0",
-    "wrangler": "4.143.0"
-  },
-  "overrides": {
-    "undici": "7.29.1"
+    "@eslint/js": "10.0.1",
+    "@playwright/test": "1.64.0",
+    "@types/node": "22.20.5",
+    "@types/react": "18.3.31",
+    "@types/react-dom": "18.3.7",
+    "@vitejs/plugin-react": "6.1.2",
+    "eslint": "10.12.0",
+    "eslint-plugin-react-hooks": "7.1.1",
+    "globals": "17.13.0",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.71.1",
+    "vite": "8.3.4",
+    "vitest": "5.0.3",
+    "wrangler": "4.149.0"
   }
 }

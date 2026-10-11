@@ -1,6 +1,14 @@
 // lifeos-timeline.jsx — main timeline screen + 4 layout variants
 // All variants take the same props { tasks, density, blockShape, theme }.
 
+import React from 'react';
+import { fmt12, loDateStr, minutesBetween } from './domain/dates';
+import { LOStore } from './domain/store';
+import { loSubProgress } from './domain/tasks';
+import { EmptyState } from './lifeos-extras.jsx';
+import { LIFE_PALETTE, TaskGlyph, UIIcon } from './lifeos-icons.jsx';
+import { greetingFor } from './lifeos-user.jsx';
+
 const TL_THEMES = {
   dark: {
     bg: '#0B0B11',
@@ -40,19 +48,6 @@ const DENSITY = {
   comfy:   { rowGap: 10, cardPad: 16, iconSize: 44, titleSize: 16,   subSize: 12.5, timeSize: 12 },
 };
 
-// Pretty time formatter "09:00" -> "9:00 AM"
-function fmt12(hhmm) {
-  const [h, m] = hhmm.split(':').map(Number);
-  const ap = h >= 12 ? 'PM' : 'AM';
-  const h12 = ((h + 11) % 12) + 1;
-  return `${h12}:${String(m).padStart(2,'0')} ${ap}`;
-}
-function minutesBetween(a, b) {
-  const [ah, am] = a.split(':').map(Number), [bh, bm] = b.split(':').map(Number);
-  let d = (bh*60 + bm) - (ah*60 + am);
-  if (d < 0) d += 1440; // task crosses midnight → keep the shown duration positive
-  return d;
-}
 
 // ──────────────────────────────────────────────────────────────
 // Shared header — greeting + progress + month/year + week selector
@@ -249,15 +244,6 @@ function TimelineHeaderBody({ theme, userTasks }) {
   );
 }
 
-// Legacy combined header — kept for non-prototype contexts (variants etc.)
-function TimelineHeader({ theme, onOpen, userName }) {
-  return (
-    <>
-      <TimelineTopBar theme={theme} onOpen={onOpen} userName={userName}/>
-      <TimelineHeaderBody theme={theme}/>
-    </>
-  );
-}
 
 function btn(theme) {
   return {
@@ -268,30 +254,6 @@ function btn(theme) {
   };
 }
 
-// ──────────────────────────────────────────────────────────────
-// Quick Actions row — favorite tasks one tap to schedule
-// ──────────────────────────────────────────────────────────────
-function QuickActionsRow({ theme, onAdd }) {
-  return (
-    <div style={{ display: 'flex', gap: 10, padding: '0 20px 16px', overflowX: 'auto' }}>
-      <button onClick={onAdd} className="lo-press" style={{
-        flex: '0 0 auto', width: 80, height: 96,
-        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8,
-        padding: '10px 6px',
-        background: 'transparent', borderRadius: 20,
-        border: `1px dashed ${theme.border}`,
-        cursor: 'pointer', color: theme.text3, fontFamily: 'inherit',
-      }}>
-        <div style={{ width: 38, height: 38, borderRadius: 19, border: `1.5px dashed ${theme.text3}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <UIIcon name="plus" size={18} color={theme.text3} strokeWidth={2}/>
-        </div>
-        <span style={{ fontSize: 11, fontWeight: 500, lineHeight: 1.2 }}>
-          Crear acceso
-        </span>
-      </button>
-    </div>
-  );
-}
 
 // ──────────────────────────────────────────────────────────────
 // Status ring (right side)
@@ -530,147 +492,4 @@ function BreakRow({ task, theme, dense }) {
   );
 }
 
-// ──────────────────────────────────────────────────────────────
-// VARIANT 2: Cards — large rounded cards, no rail, vibrant icon
-// ──────────────────────────────────────────────────────────────
-function TimelineCards({ theme, dense, blockShape }) {
-  const d = dense ? DENSITY.compact : DENSITY.comfy;
-  return (
-    <div style={{ padding: '0 16px 120px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-      {TODAY_TASKS.filter(t => t.kind !== 'break').map((t) => {
-        const c = LIFE_PALETTE[t.color];
-        const isActive = t.status === 'doing';
-        return (
-          <div key={t.id} style={{
-            display: 'flex', gap: 14, alignItems: 'center',
-            padding: 14,
-            background: isActive
-              ? `linear-gradient(135deg, ${c.from}22 0%, ${theme.surface} 60%)`
-              : theme.surface,
-            borderRadius: 22,
-            border: `0.5px solid ${isActive ? c.to + '55' : theme.border}`,
-            opacity: t.status === 'done' ? 0.5 : 1,
-          }}>
-            <TaskGlyph icon={t.icon} color={t.color} size={48} shape={blockShape === 'pill' ? 'pill' : blockShape === 'squircle' ? 'squircle' : 'rounded'}/>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 11.5, color: theme.text3, fontVariantNumeric: 'tabular-nums', fontWeight: 500 }}>
-                {fmt12(t.start)} · {minutesBetween(t.start, t.end)} min
-              </div>
-              <div style={{ fontSize: 16, fontWeight: 600, color: theme.text, marginTop: 2, letterSpacing: -0.2, textDecorationLine: t.status === 'done' ? 'line-through' : 'none' }}>
-                {t.title}
-              </div>
-              {t.subtitle && <div style={{ fontSize: 12, color: theme.text2, marginTop: 2 }}>{t.subtitle}</div>}
-            </div>
-            <StatusRing task={t} theme={theme}/>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-// ──────────────────────────────────────────────────────────────
-// VARIANT 3: Hourly grid — time blocks on an hour grid
-// ──────────────────────────────────────────────────────────────
-function TimelineHourly({ theme, dense, blockShape }) {
-  const startH = 6, endH = 23;
-  const px = 56; // px per hour
-  const hours = [];
-  for (let h = startH; h <= endH; h++) hours.push(h);
-
-  const radius = blockShape === 'pill' ? 999 : blockShape === 'squircle' ? 22 : 18;
-
-  return (
-    <div style={{ position: 'relative', padding: '0 16px 120px' }}>
-      <div style={{ position: 'relative', marginLeft: 48 }}>
-        {/* hour grid */}
-        {hours.map((h, i) => (
-          <div key={h} style={{
-            height: px, borderTop: `0.5px solid ${theme.border}`,
-            position: 'relative',
-          }}>
-            <span style={{
-              position: 'absolute', left: -44, top: -7,
-              fontSize: 10.5, color: theme.text3, fontVariantNumeric: 'tabular-nums', fontWeight: 500,
-            }}>
-              {h === 12 ? '12 PM' : h > 12 ? `${h-12} PM` : `${h} AM`}
-            </span>
-          </div>
-        ))}
-        {/* current time line */}
-        <div style={{ position: 'absolute', left: -8, right: 0, top: (7.92 - startH) * px, height: 1, background: theme.accent, zIndex: 5 }}>
-          <div style={{ width: 8, height: 8, borderRadius: 4, background: theme.accent, position: 'absolute', left: -4, top: -4 }}/>
-        </div>
-        {/* tasks */}
-        {TODAY_TASKS.filter(t => t.kind !== 'break').map((t) => {
-          const [sh, sm] = t.start.split(':').map(Number);
-          const top = (sh + sm/60 - startH) * px;
-          const h = (minutesBetween(t.start, t.end) / 60) * px;
-          const c = LIFE_PALETTE[t.color];
-          return (
-            <div key={t.id} style={{
-              position: 'absolute', left: 6, right: 0,
-              top, height: h - 2,
-              background: `linear-gradient(135deg, ${c.from}28 0%, ${c.to}18 100%)`,
-              border: `0.5px solid ${c.to}55`,
-              borderRadius: radius,
-              padding: '6px 10px',
-              display: 'flex', alignItems: 'center', gap: 8,
-              overflow: 'hidden',
-              opacity: t.status === 'done' ? 0.45 : 1,
-            }}>
-              <TaskGlyph icon={t.icon} color={t.color} size={26} shape={blockShape}/>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 12.5, fontWeight: 600, color: theme.text, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{t.title}</div>
-                {h > 36 && <div style={{ fontSize: 10.5, color: theme.text2, fontVariantNumeric: 'tabular-nums' }}>{fmt12(t.start)}–{fmt12(t.end)}</div>}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-// ──────────────────────────────────────────────────────────────
-// VARIANT 4: Minimal — type-led, no chrome
-// ──────────────────────────────────────────────────────────────
-function TimelineMinimal({ theme }) {
-  return (
-    <div style={{ padding: '0 24px 120px' }}>
-      {TODAY_TASKS.filter(t => t.kind !== 'break').map((t) => {
-        const c = LIFE_PALETTE[t.color];
-        const isActive = t.status === 'doing';
-        return (
-          <div key={t.id} style={{
-            display: 'flex', gap: 14, padding: '14px 0',
-            borderBottom: `0.5px solid ${theme.border}`,
-            opacity: t.status === 'done' ? 0.4 : 1,
-          }}>
-            <div style={{ width: 4, alignSelf: 'stretch', borderRadius: 2, background: c.to, opacity: isActive ? 1 : 0.35 }}/>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 10.5, letterSpacing: 0.4, color: theme.text3, fontWeight: 600, textTransform: 'uppercase' }}>
-                {fmt12(t.start)} — {fmt12(t.end)}
-              </div>
-              <div style={{ fontSize: 17, fontWeight: 600, color: theme.text, letterSpacing: -0.3, marginTop: 2, textDecorationLine: t.status === 'done' ? 'line-through' : 'none' }}>
-                {t.title}
-              </div>
-              {t.subtitle && <div style={{ fontSize: 12.5, color: theme.text2, marginTop: 2 }}>{t.subtitle}</div>}
-            </div>
-            <div style={{ paddingTop: 4 }}>
-              <StatusRing task={t} theme={theme}/>
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-Object.assign(window, {
-  TL_THEMES, DENSITY,
-  TimelineTopBar, TimelineHeaderBody, TimelineHeader,
-  QuickActionsRow,
-  TimelineClassic, TimelineCards, TimelineHourly, TimelineMinimal,
-  StatusRing, BreakRow, fmt12, minutesBetween,
-});
+export { StatusRing, TimelineClassic, TimelineHeaderBody, TimelineTopBar, TL_THEMES };

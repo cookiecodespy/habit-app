@@ -1,6 +1,9 @@
 // lifeos-user.jsx — user state persisted to localStorage + welcome screen
 
-const USER_KEY = 'lifeos.user';
+import React from 'react';
+import { USER_KEY } from './domain/storage';
+import { UIIcon } from './lifeos-icons.jsx';
+import { ScreenTopBar } from './lifeos-screens.jsx';
 
 function loadUser() {
   try {
@@ -54,19 +57,6 @@ function useUser() {
   return { user, setName, update, reset };
 }
 
-// True for the first 7 days from when the user first signed up.
-// Used to gate demo seed data: after a week, the app empties so the user
-// fills it with their own real tasks.
-function isWithinFirstWeek(user) {
-  if (!user) return false;
-  // Missing installedAt = treat as brand-new (legacy users)
-  if (!user.installedAt) return true;
-  return Date.now() - user.installedAt < 7 * 24 * 60 * 60 * 1000;
-}
-
-function isWithinFirstWeekFromStorage() {
-  return isWithinFirstWeek(loadUser());
-}
 
 // First letter of name for avatar
 function avatarLetter(name) {
@@ -241,8 +231,4 @@ function EditNameSheet({ theme, currentName, onSave, onClose }) {
   );
 }
 
-Object.assign(window, {
-  useUser, loadUser, saveUser, clearUser, avatarLetter, greetingFor,
-  isWithinFirstWeek, isWithinFirstWeekFromStorage,
-  WelcomeScreen, EditNameSheet,
-});
+export { avatarLetter, EditNameSheet, greetingFor, useUser, WelcomeScreen };

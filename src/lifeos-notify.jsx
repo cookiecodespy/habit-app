@@ -1,8 +1,17 @@
 // lifeos-notify.jsx — notifications + in-app toast system
 
+import React from 'react';
+import { loDateStr } from './domain/dates';
+import { loDueReminders } from './domain/reminders';
+import { subscribeStore } from './domain/storage';
+import { LOStore } from './domain/store';
+import { LIFE_PALETTE, UIIcon } from './lifeos-icons.jsx';
+import { SettingsIconBadge } from './lifeos-screens.jsx';
+
 const TOAST_KEY_NEXT = { v: 0 };
 
-// In-app toast bus — components subscribe via useToasts(), anyone can call window.lifeosToast()
+// In-app toast bus — components subscribe via useToasts(); anyone can call toast(msg, opts).
+// opts: { tone: 'success'|'error', icon, duration, action: { label, run } }
 const __TOAST_LISTENERS = new Set();
 function toast(msg, opts = {}) {
   const t = { id: ++TOAST_KEY_NEXT.v, msg, ...opts };
@@ -11,19 +20,20 @@ function toast(msg, opts = {}) {
 
 function useToasts() {
   const [items, setItems] = React.useState([]);
+  const dismiss = React.useCallback((id) => setItems(prev => prev.filter(x => x.id !== id)), []);
   React.useEffect(() => {
     const fn = (t) => {
       setItems(prev => [...prev, t]);
-      setTimeout(() => setItems(prev => prev.filter(x => x.id !== t.id)), t.duration || 2800);
+      setTimeout(() => dismiss(t.id), t.duration || (t.action ? 6000 : 2800));
     };
     __TOAST_LISTENERS.add(fn);
     return () => __TOAST_LISTENERS.delete(fn);
-  }, []);
-  return items;
+  }, [dismiss]);
+  return [items, dismiss];
 }
 
 function ToastStack({ theme }) {
-  const items = useToasts();
+  const [items, dismiss] = useToasts();
   return (
     <div style={{
       position: 'absolute', left: 0, right: 0,
@@ -33,7 +43,7 @@ function ToastStack({ theme }) {
       pointerEvents: 'none',
     }}>
       {items.map(t => (
-        <div key={t.id} className="lo-slide-in" style={{
+        <div key={t.id} role="status" className="lo-slide-in" style={{
           background: t.tone === 'success'
             ? `linear-gradient(135deg, ${LIFE_PALETTE.mint.from}, ${LIFE_PALETTE.mint.to})`
             : t.tone === 'error'
@@ -41,15 +51,23 @@ function ToastStack({ theme }) {
             : theme.surfaceHi,
           color: t.tone ? '#fff' : theme.text,
           border: t.tone ? 'none' : `0.5px solid ${theme.border}`,
-          borderRadius: 14, padding: '10px 16px',
+          borderRadius: 14, padding: t.action ? '7px 7px 7px 16px' : '10px 16px',
           fontSize: 13.5, fontWeight: 600, letterSpacing: -0.1,
           maxWidth: '88%',
           boxShadow: '0 12px 32px rgba(0,0,0,0.4)',
           backdropFilter: 'blur(20px)',
           display: 'flex', alignItems: 'center', gap: 8,
+          pointerEvents: t.action ? 'auto' : 'none',
         }}>
           {t.icon && <UIIcon name={t.icon} size={16} color={t.tone ? '#fff' : theme.text} strokeWidth={2.2}/>}
           <span>{t.msg}</span>
+          {t.action && (
+            <button className="lo-press" onClick={() => { dismiss(t.id); t.action.run(); }} style={{
+              marginLeft: 6, border: 'none', borderRadius: 10, padding: '7px 12px', cursor: 'pointer',
+              fontFamily: 'inherit', fontSize: 13, fontWeight: 700,
+              background: t.tone ? 'rgba(0,0,0,0.22)' : theme.accent, color: '#fff',
+            }}>{t.action.label}</button>
+          )}
         </div>
       ))}
     </div>
@@ -72,45 +90,51 @@ async function requestNotifPermission() {
   } catch { return 'denied'; }
 }
 
-function sendNotif(title, body, options = {}) {
-  if (typeof Notification === 'undefined' || Notification.permission !== 'granted') return null;
+// Shows a system notification. Phones (Android, installed iOS apps) only accept notifications
+// raised through the service worker; desktop browsers also accept the direct constructor.
+// Resolves to whether it could be shown.
+async function sendNotif(title, body, options = {}) {
+  if (typeof Notification === 'undefined' || Notification.permission !== 'granted') return false;
+  const details = { body, tag: options.tag || 'lifeos', icon: '/icons/icon-192.png', lang: 'es' };
   try {
-    return new Notification(title, {
-      body, icon: options.icon, tag: options.tag || 'lifeos',
-      ...options,
-    });
-  } catch { return null; }
+    const registration = 'serviceWorker' in navigator ? await navigator.serviceWorker.getRegistration() : null;
+    if (registration && registration.active) {
+      await registration.showNotification(title, details);
+      return true;
+    }
+  } catch {
+    // fall through to the direct constructor
+  }
+  try {
+    new Notification(title, details);
+    return true;
+  } catch {
+    return false;
+  }
 }
 
-// Heartbeat: checks the user's REAL tasks for the day and notifies ~10 min
-// before each one. Runs on a 60s interval (not only on tab activation) so a
-// quiet, open tab still fires, plus an immediate check on mount/visibility.
+// Heartbeat: checks the day's tasks and notifies ~10 min before each one that has its
+// reminder on. Runs every minute, when the tab becomes visible and when the data changes.
+// It only works while the app is open (or recently in the background).
 function useTaskNotifications(user) {
   React.useEffect(() => {
     if (!user) return;
-    const seen = new Set();
+    const sent = new Set();
     const check = () => {
       if (notifPermission() !== 'granted') return;
-      const now = new Date();
-      const nowMins = now.getHours() * 60 + now.getMinutes();
-      const todays = (window.LOStore ? LOStore.tasksForDate(loDateStr()) : []) || [];
-      todays.forEach(t => {
-        if (t.kind === 'break' || t.status !== 'todo' || !t.start || !t.reminder || t.allDay) return;
-        const [h, m] = t.start.split(':').map(Number);
-        const diff = (h * 60 + m) - nowMins;
-        const key = `${t.id}:${t.date}:${t.start}`;
-        if (diff > 0 && diff <= 10 && !seen.has(key)) {
-          if (sendNotif(`En ${diff} min: ${t.title}`, t.note || t.subtitle || '', { tag: t.id })) seen.add(key);
-        }
-      });
+      for (const { key, task, minutes } of loDueReminders(LOStore.tasksForDate(loDateStr()), new Date(), sent)) {
+        sent.add(key);
+        sendNotif(`En ${minutes} min: ${task.title}`, task.note || '', { tag: task.id })
+          .then((shown) => { if (!shown) sent.delete(key); });
+      }
     };
     check();
     const id = setInterval(check, 60000);
     const onVis = () => { if (document.visibilityState === 'visible') check(); };
     document.addEventListener('visibilitychange', onVis);
-    window.addEventListener('lo-store-change', check);
+    const unsubscribe = subscribeStore(check);
     window.addEventListener('lo-notification-permission', check);
-    return () => { clearInterval(id); document.removeEventListener('visibilitychange', onVis); window.removeEventListener('lo-store-change', check); window.removeEventListener('lo-notification-permission', check); };
+    return () => { clearInterval(id); document.removeEventListener('visibilitychange', onVis); unsubscribe(); window.removeEventListener('lo-notification-permission', check); };
   }, [user]);
 }
 
@@ -148,8 +172,4 @@ function NotifSettingsRow({ theme }) {
   );
 }
 
-Object.assign(window, {
-  toast, useToasts, ToastStack,
-  notifPermission, requestNotifPermission, sendNotif,
-  useTaskNotifications, NotifSettingsRow,
-});
+export { NotifSettingsRow, toast, ToastStack, useTaskNotifications };
