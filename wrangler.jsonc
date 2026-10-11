@@ -5,10 +5,11 @@
   "observability": {
     "enabled": true
   },
-  "assets": {
-    "directory": "."
+  // The site is built from src/ on every deploy; only dist/ is published.
+  "build": {
+    "command": "npm run build"
   },
-  "compatibility_flags": [
-    "nodejs_compat"
-  ]
+  "assets": {
+    "directory": "./dist"
+  }
 }

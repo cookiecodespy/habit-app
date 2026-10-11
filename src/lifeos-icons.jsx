@@ -4,16 +4,19 @@
 // small sizes, plus a single low-opacity dark accent for depth (duotone).
 // No glyph copies another app's iconography — all paths are original.
 
-// Reduced 5-colour story, anchored on Ferrari red + violet (a palette with
+// Reduced 5-colour story, anchored on red + violet (a palette with
 // meaning, not 12 random hues). The 12 names are kept so existing data/code
 // keeps working — but they now genuinely COLLAPSE into 5 families + a neutral.
 // Within a family the gradient is identical: no more "Skittles" agenda. Tones
 // are pulled ~15% off neon so colour reads as sophisticated, not candy.
+
+import React from 'react';
+
 const LIFE_PALETTE = {
-  // ── Red (Ferrari) — primary / brand · Tomás ──────────────────
+  // ── Red — primary / brand ────────────────────────────────────
   coral:    { from: '#F0463A', to: '#D41F14' },
   ember:    { from: '#F0463A', to: '#D41F14' },
-  // ── Violet — secondary · la polola ───────────────────────────
+  // ── Violet — secondary ───────────────────────────────────────
   lavender: { from: '#A98BF0', to: '#7A52DE' },
   plum:     { from: '#A98BF0', to: '#7A52DE' },
   rose:     { from: '#A98BF0', to: '#7A52DE' },
@@ -30,15 +33,6 @@ const LIFE_PALETTE = {
   slate:    { from: '#8392A6', to: '#5A6B80' },
 };
 
-// ──────────────────────────────────────────────────────────────
-// DESIGN TOKENS — single source of truth for type scale, spacing,
-// radii. Replaces the magic numbers (13.5 / 14.5 / gap 7,11,12…) that
-// made the UI feel hand-made instead of systematic. Type steps ~1.25×,
-// spacing on a strict 4px base.
-// ──────────────────────────────────────────────────────────────
-const LO_TYPE   = { display: 30, h1: 22, h2: 17, body: 15, sub: 13, caption: 11, micro: 10 };
-const LO_SPACE  = { xs: 4, sm: 8, md: 12, lg: 16, xl: 24, xxl: 32 };
-const LO_RADIUS = { sm: 10, md: 14, lg: 18, xl: 24, pill: 999 };
 
 // Shared squircle wrapper: rounded-square w/ diagonal gradient, glossy top
 // highlight and a soft inner vignette so the white glyph never floats flatly.
@@ -383,7 +377,7 @@ function LifeIcon({ name = 'sparkle', color = 'coral', size = 40, shape = 'round
 
 // A task glyph: a native emoji on the coloured tile, or fall back to a LifeIcon
 // name. Lets new tasks use real (Apple/iOS) emojis while old ones keep their SVG.
-function loIsEmoji(s) { return typeof s === 'string' && /[^ -]/.test(s); }
+function loIsEmoji(s) { return typeof s === 'string' && /[^\p{ASCII}]/u.test(s); }
 function TaskGlyph({ icon, color = 'coral', size = 40, shape = 'rounded' }) {
   if (loIsEmoji(icon)) {
     return (
@@ -490,4 +484,4 @@ function UIIcon({ name, size = 22, color = 'currentColor', strokeWidth = 1.8 }) 
   return <svg {...p}>{paths[name]}</svg>;
 }
 
-Object.assign(window, { LifeIcon, LifeIconBox, UIIcon, TaskGlyph, loIsEmoji, LIFE_PALETTE, LIFE_GLYPHS: G, EmojiPicker, LO_ICON_CATEGORIES, LO_TYPE, LO_SPACE, LO_RADIUS });
+export { EmojiPicker, LIFE_PALETTE, LifeIcon, LifeIconBox, TaskGlyph, UIIcon };

@@ -4,6 +4,16 @@
 // FOCUS MODE — fullscreen current task with countdown + breathing
 // Triggered from Detail screen "Iniciar enfoque"
 // ──────────────────────────────────────────────────────────────
+
+import React from 'react';
+import { fmt12, loDateStr, minutesBetween } from './domain/dates';
+import { loHabitRate, loHabitScheduledOn } from './domain/habits';
+import { LOStore } from './domain/store';
+import { EmojiPicker, LIFE_PALETTE, LifeIcon, TaskGlyph, UIIcon } from './lifeos-icons.jsx';
+import { toast } from './lifeos-notify.jsx';
+import { Divider, ScreenTopBar, SectionLabel, SettingsIconBadge, glassBtn } from './lifeos-screens.jsx';
+import { useHabits, useStoreVersion } from './store-hooks.js';
+
 function FocusMode({ theme, task, onClose, onComplete }) {
   const c = LIFE_PALETTE[task.color] || LIFE_PALETTE.coral;
   // Guard against 0/NaN when a task has no real duration (start===end).
@@ -22,7 +32,7 @@ function FocusMode({ theme, task, onClose, onComplete }) {
   React.useEffect(() => {
     if (remaining === 0 && !firedRef.current) {
       firedRef.current = true;
-      if (window.toast) window.toast('Tiempo cumplido ✨ Toca ✓ para completar', { tone: 'success', icon: 'check' });
+      toast('Tiempo cumplido ✨ Toca ✓ para completar', { tone: 'success', icon: 'check' });
     }
   }, [remaining]);
 
@@ -303,10 +313,10 @@ const STEP_ICONS = ['✨', '☕', '📚', '💼', '🧘', '🍽️', '🏃', '�
 function RoutinesScreen({ theme, onBack, onApply }) {
   const [picked, setPicked] = React.useState(null);
   const [editing, setEditing] = React.useState(null); // routine object | 'new' | null
-  const [version, setVersion] = React.useState(0);
+  useStoreVersion();
 
   // Custom routines persist in the store; defaults are read-only.
-  const custom = React.useMemo(() => LOStore.customRoutines().map(r => ({ ...r, custom: true, sub: routineSub(r.tasks) })), [version]);
+  const custom = LOStore.customRoutines().map(r => ({ ...r, custom: true, sub: routineSub(r.tasks) }));
   const all = [...custom, ...ROUTINES];
   const r = picked && all.find(x => x.id === picked);
 
@@ -314,8 +324,8 @@ function RoutinesScreen({ theme, onBack, onApply }) {
     <RoutineEditor theme={theme}
       initial={editing === 'new' ? null : editing}
       onCancel={() => setEditing(null)}
-      onSaved={() => { setEditing(null); setVersion(v => v + 1); }}
-      onDeleted={() => { setEditing(null); setPicked(null); setVersion(v => v + 1); }}/>
+      onSaved={() => setEditing(null)}
+      onDeleted={() => { setEditing(null); setPicked(null); }}/>
   );
   if (r) return <RoutineDetail theme={theme} routine={r} onBack={() => setPicked(null)}
     onApply={onApply} onEdit={r.custom ? () => setEditing(r) : null}/>;
@@ -402,8 +412,6 @@ function RoutineEditor({ theme, initial, onCancel, onSaved, onDeleted }) {
   const [color, setColor] = React.useState(initial?.color || 'coral');
   const [tasks, setTasks] = React.useState(() =>
     (initial?.tasks?.length ? initial.tasks.map(t => ({ ...t })) : [{ icon: '✨', color: initial?.color || 'coral', label: '', dur: 30 }]));
-  const c = LIFE_PALETTE[color] || LIFE_PALETTE.coral;
-
   const setStep = (i, patch) => setTasks(ts => ts.map((t, k) => k === i ? { ...t, ...patch } : t));
   const cycleStepIcon = (i) => setStep(i, { icon: STEP_ICONS[(STEP_ICONS.indexOf(tasks[i].icon) + 1 + STEP_ICONS.length) % STEP_ICONS.length] });
   const addStep = () => setTasks(ts => [...ts, { icon: '✨', color, label: '', dur: 30 }]);
@@ -726,7 +734,7 @@ function HabitsStrip({ theme, onAdd, onEdit }) {
           const doneToday = !!(h.log || {})[today];
           const mcount = loHabitCounts(h).month;
           // Streaks-style ring around the glyph: 30-day consistency, fills as you keep it.
-          const rate = Math.max(0, Math.min(1, (window.loHabitRate ? loHabitRate(h, 30) : 0) / 100));
+          const rate = Math.max(0, Math.min(1, loHabitRate(h, 30) / 100));
           const R = 23, CIRC = 2 * Math.PI * R;
           const ringColor = doneToday ? '#fff' : c.to;
           const trackColor = doneToday ? 'rgba(255,255,255,0.28)' : theme.rail;
@@ -965,7 +973,7 @@ function HabitHeatmap({ theme, habit }) {
     for (let r = 0; r < 7; r++) {
       const d = new Date(start); d.setDate(start.getDate() + w * 7 + r);
       const ds = loDateStr(d);
-      col.push({ ds, done: !!log[ds], future: d > today, scheduled: window.LOStore ? loHabitScheduledOn(habit, ds) : true });
+      col.push({ ds, done: !!log[ds], future: d > today, scheduled: loHabitScheduledOn(habit, ds) });
     }
     cols.push(col);
   }
@@ -1138,7 +1146,7 @@ function HabitCreateSheet({ theme, onClose, habit = null }) {
 // DEADLINE CARD — surfaces upcoming hard due dates with a countdown
 // ──────────────────────────────────────────────────────────────
 function DeadlineCard({ theme, onOpenTask }) {
-  const items = (typeof LOStore !== 'undefined') ? LOStore.upcomingDeadlines(3) : [];
+  const items = LOStore.upcomingDeadlines(3);
   if (!items.length) return null;
 
   const daysLeft = (ds) => {
@@ -1182,7 +1190,7 @@ function DeadlineCard({ theme, onOpenTask }) {
   );
 }
 
-Object.assign(window, {
-  FocusMode, QuickAddMenu, RoutinesScreen, SearchOverlay, EmptyState, DeadlineCard, ROUTINES,
-  HabitsStrip, HabitCreateSheet, HabitHeatmap, HabitStatPill, HabitsScreen, HabitMonthGrid, loHabitCounts,
-});
+export {
+  DeadlineCard, EmptyState, FocusMode, HabitCreateSheet, HabitsScreen, HabitsStrip, QuickAddMenu,
+  RoutinesScreen, SearchOverlay,
+};

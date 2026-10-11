@@ -1,13 +1,29 @@
-// lifeos-app.jsx — wires the prototype frame + variants into a DesignCanvas
+// lifeos-app.jsx — app shells: phone (single column) and tablet/desktop (sidebar), plus overlays
 
-const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+import React from 'react';
+import { fmt12, loDateStr, loHHMMtoMin, loMinToHHMM } from './domain/dates';
+import { LOStore } from './domain/store';
+import {
+  DeadlineCard, FocusMode, HabitCreateSheet, HabitsScreen, HabitsStrip, QuickAddMenu, RoutinesScreen,
+  SearchOverlay,
+} from './lifeos-extras.jsx';
+import { LIFE_PALETTE, UIIcon } from './lifeos-icons.jsx';
+import { ToastStack, toast, useTaskNotifications } from './lifeos-notify.jsx';
+import {
+  AIScreen, CalendarScreen, CreateScreen, DetailScreen, FAB, InboxScreen, SettingsScreen, TabBar,
+} from './lifeos-screens.jsx';
+import { TL_THEMES, TimelineClassic, TimelineHeaderBody, TimelineTopBar } from './lifeos-timeline.jsx';
+import { EditNameSheet, WelcomeScreen, greetingFor, useUser } from './lifeos-user.jsx';
+import { useTasks } from './store-hooks.js';
+import { useTweaks } from './tweaks.js';
+
+const TWEAK_DEFAULTS = {
   "dark": true,
   "density": "comfy",
   "blockShape": "rounded",
   "accent": "#E0241B"
-}/*EDITMODE-END*/;
+};
 
-const ACCENT_SWATCHES = ['#E0241B', '#9B6DFF', '#F5A623', '#22B8A0', '#3C8DF0'];
 
 // First free 30-min slot on a day — from now if it's today, else 9:00.
 // Used when scheduling an inbox item so it doesn't stomp on a busy hour (B12).
@@ -23,9 +39,8 @@ function loFreeSlotStart(date, durationMin = 30) {
 }
 
 function useThemed(t) {
-  const base = t.dark ? TL_THEMES.dark : TL_THEMES.light;
   return React.useMemo(() => ({
-    ...base,
+    ...(t.dark ? TL_THEMES.dark : TL_THEMES.light),
     accent: t.accent,
     accentSoft: t.accent + (t.dark ? '22' : '18'),
   }), [t.dark, t.accent]);
@@ -74,7 +89,6 @@ function PrototypeFrame({ t, setTweak }) {
   }, [tasks, detailTask]);
 
   const openTaskDetail = (task) => { setDetailTask(task); setOverlay('detail'); };
-  const startFocus = (task) => { setDetailTask(task); setOverlay('focus'); };
   const openHabitEdit = (h) => { setEditHabit(h); setOverlay('habitEdit'); };
 
   // First-time gate
@@ -203,11 +217,6 @@ function PrototypeFrame({ t, setTweak }) {
             onClose={() => setOverlay(null)}/>
         </Sheet>
       )}
-      {overlay === 'onboarding' && (
-        <Sheet theme={theme} onClose={() => setOverlay(null)} full>
-          <OnboardingScreen theme={theme} onBack={() => setOverlay(null)}/>
-        </Sheet>
-      )}
       {overlay === 'search' && (
         <SearchOverlay theme={theme} onClose={() => setOverlay(null)} onPickTask={openTaskDetail}/>
       )}
@@ -264,54 +273,6 @@ function Sheet({ theme, onClose, children, full }) {
   );
 }
 
-// ──────────────────────────────────────────────────────────────
-// VariantArtboard — wraps a timeline variant in a labelled frame
-// ──────────────────────────────────────────────────────────────
-function VariantFrame({ t, label, sub, children }) {
-  const theme = useThemed(t);
-  return (
-    <div style={{ position: 'relative', width: '100%', height: '100%', background: theme.bg, overflow: 'hidden' }}>
-      <div style={{ position: 'absolute', inset: 0, paddingTop: 58, paddingBottom: 80, overflowY: 'auto' }}>
-        <div style={{ padding: '0 20px 14px' }}>
-          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-            <div>
-              <div style={{ fontSize: 11, color: theme.text3, fontWeight: 600, letterSpacing: 0.6, textTransform: 'uppercase' }}>{sub}</div>
-              <h1 style={{ margin: 0, fontSize: 28, fontWeight: 700, color: theme.text, letterSpacing: -0.6, marginTop: 2 }}>
-                {label}
-              </h1>
-            </div>
-            <div style={{ color: theme.text2, display: 'flex', gap: 6 }}>
-              <div style={{ width: 32, height: 32, borderRadius: 16, background: theme.surface, border: `0.5px solid ${theme.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <UIIcon name="search" size={16} color={theme.text2}/>
-              </div>
-              <div style={{ width: 32, height: 32, borderRadius: 16, background: theme.surface, border: `0.5px solid ${theme.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <UIIcon name="ai" size={16} color={theme.text2}/>
-              </div>
-            </div>
-          </div>
-        </div>
-        {children}
-      </div>
-      <FAB theme={theme} onClick={() => {}}/>
-      <TabBar theme={theme} current="timeline" onChange={() => {}}/>
-    </div>
-  );
-}
-
-// ──────────────────────────────────────────────────────────────
-// Static screen wrapper (for non-timeline screens shown as artboards)
-// ──────────────────────────────────────────────────────────────
-function ScreenArtboard({ t, children, withTabBar = true }) {
-  const theme = useThemed(t);
-  return (
-    <div style={{ position: 'relative', width: '100%', height: '100%', background: theme.bg, overflow: 'hidden' }}>
-      <div style={{ position: 'absolute', inset: 0, paddingTop: 58, paddingBottom: withTabBar ? 76 : 0, overflowY: 'auto' }}>
-        {children}
-      </div>
-      {withTabBar && <TabBar theme={theme} current="timeline" onChange={() => {}}/>}
-    </div>
-  );
-}
 
 // ──────────────────────────────────────────────────────────────
 // MobileApp — renders only the PrototypeFrame filling the viewport
@@ -693,49 +654,11 @@ function TabletApp({ t, setTweak }) {
 }
 
 // ──────────────────────────────────────────────────────────────
-// Main App: DesignCanvas with all sections
-// ──────────────────────────────────────────────────────────────
-function useLifeOSFonts() {
-  React.useEffect(() => {
-    if (document.getElementById('lo-fonts')) return;
-    const pre1 = document.createElement('link'); pre1.rel = 'preconnect'; pre1.href = 'https://fonts.googleapis.com';
-    const pre2 = document.createElement('link'); pre2.rel = 'preconnect'; pre2.href = 'https://fonts.gstatic.com'; pre2.crossOrigin = 'anonymous';
-    const link = document.createElement('link'); link.id = 'lo-fonts'; link.rel = 'stylesheet';
-    link.href = 'https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..600&family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap';
-    const style = document.createElement('style');
-    style.id = 'lo-font-vars';
-    style.textContent = `
-:root{--font-ui:'Hanken Grotesk',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
---font-display:'Fraunces','Georgia',serif;
-/* Type scale (px) — no decimals, ~1.25 steps */
---lo-display:30px;--lo-h1:22px;--lo-h2:17px;--lo-body:15px;--lo-sub:13px;--lo-caption:11px;
-/* Spacing — strict 4px base */
---lo-xs:4px;--lo-sm:8px;--lo-md:12px;--lo-lg:16px;--lo-xl:24px;--lo-xxl:32px;
-/* Radii */
---lo-r-sm:10px;--lo-r-md:14px;--lo-r-lg:18px;--lo-r-xl:24px;}
-html,body,input,button,textarea,select{font-family:var(--font-ui);}
-/* Display font carries optical weight + editorial character on big numbers/headers */
-.lo-display{font-family:var(--font-display);font-optical-sizing:auto;letter-spacing:-0.01em;}
-/* Film grain — the tactile signature that flat AI UIs forget. Sits over everything
-   at low opacity, never blocks input. */
-body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9998;opacity:.045;
-mix-blend-mode:overlay;
-background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
-/* Respect users who ask for less motion (accessibility). */
-@media (prefers-reduced-motion: reduce){
-*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;}
-}`;
-    document.head.append(pre1, pre2, link, style);
-  }, []);
-}
-
-// ──────────────────────────────────────────────────────────────
 // Main App — always renders the real product (no design-canvas chrome).
 // Phone → single-column app; tablet/desktop → sidebar app.
 // ──────────────────────────────────────────────────────────────
 function App() {
   const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
-  useLifeOSFonts();
 
   // Live viewport tracking so rotating / resizing swaps layouts cleanly.
   const getIsPhone = React.useCallback(() => {
@@ -759,4 +682,4 @@ function App() {
     : <TabletApp t={t} setTweak={setTweak}/>;
 }
 
-Object.assign(window, { App, PrototypeFrame, TabletApp, MobileApp, Sheet, useThemed, TWEAK_DEFAULTS, ACCENT_SWATCHES, VariantFrame, ScreenArtboard });
+export { App };

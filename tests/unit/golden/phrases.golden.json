@@ -1,0 +1,7250 @@
+{
+ "tuesdayMorning": [
+  {
+   "text": "Gym mañana 7am 1h",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Gym",
+     "date": "2026-09-30",
+     "start": "07:00",
+     "durationMin": 60,
+     "recur": null,
+     "icon": "💪",
+     "color": "coral",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "mañana",
+     "timeLabel": "07:00"
+    }
+   }
+  },
+  {
+   "text": "Estudiar inglés hoy 2pm 90 min",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Estudiar inglés",
+     "date": "2026-09-29",
+     "start": "14:00",
+     "durationMin": 90,
+     "recur": null,
+     "icon": "📚",
+     "color": "plum",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "hoy",
+     "timeLabel": "14:00"
+    }
+   }
+  },
+  {
+   "text": "Reunión con Ana el lunes 10am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Reunión con Ana",
+     "date": "2026-10-05",
+     "start": "10:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "📊",
+     "color": "sky",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "lunes",
+     "timeLabel": "10:00"
+    }
+   }
+  },
+  {
+   "text": "Llamar a mamá cada día 8pm",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Llamar a mamá",
+     "date": "2026-09-29",
+     "start": "20:00",
+     "durationMin": 30,
+     "recur": {
+      "freq": "daily"
+     },
+     "icon": "📞",
+     "color": "teal",
+     "reminder": true
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "20:00"
+    }
+   }
+  },
+  {
+   "text": "gym mañana 7am 1h",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Gym",
+     "date": "2026-09-30",
+     "start": "07:00",
+     "durationMin": 60,
+     "recur": null,
+     "icon": "💪",
+     "color": "coral",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "mañana",
+     "timeLabel": "07:00"
+    }
+   }
+  },
+  {
+   "text": "estudiar inglés el lunes 2pm 90 min",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Estudiar inglés",
+     "date": "2026-10-05",
+     "start": "14:00",
+     "durationMin": 90,
+     "recur": null,
+     "icon": "📚",
+     "color": "plum",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "lunes",
+     "timeLabel": "14:00"
+    }
+   }
+  },
+  {
+   "text": "reunión con cliente Acme todos los miércoles 10am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Reunión con cliente Acme",
+     "date": "2026-09-30",
+     "start": "10:00",
+     "durationMin": 30,
+     "recur": {
+      "freq": "weekly",
+      "days": [
+       3
+      ]
+     },
+     "icon": "📊",
+     "color": "sky",
+     "reminder": true
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "miercoles",
+     "timeLabel": "10:00"
+    }
+   }
+  },
+  {
+   "text": "reunion todos los miercoles 10am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Reunion",
+     "date": "2026-09-30",
+     "start": "10:00",
+     "durationMin": 30,
+     "recur": {
+      "freq": "weekly",
+      "days": [
+       3
+      ]
+     },
+     "icon": "📊",
+     "color": "sky",
+     "reminder": true
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "miercoles",
+     "timeLabel": "10:00"
+    }
+   }
+  },
+  {
+   "text": "dentista hoy a las 4",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Dentista",
+     "date": "2026-09-29",
+     "start": "04:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "💊",
+     "color": "rose",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "hoy",
+     "timeLabel": "04:00"
+    }
+   }
+  },
+  {
+   "text": "dentista pasado mañana 9:30",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Dentista",
+     "date": "2026-10-01",
+     "start": "09:30",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "💊",
+     "color": "rose",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "pasado mañana",
+     "timeLabel": "09:30"
+    }
+   }
+  },
+  {
+   "text": "almuerzo con María el viernes",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Almuerzo con María",
+     "date": "2026-10-02",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "🍽️",
+     "color": "sun",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "viernes",
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "pagar arriendo el 5",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Pagar arriendo",
+     "date": "2026-10-05",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "el 5",
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "pagar arriendo el 29",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Pagar arriendo",
+     "date": "2026-09-29",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "el 29",
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "cumpleaños de Ana el 3 de diciembre",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Cumpleaños Ana",
+     "date": "2026-12-03",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "el 3 de diciembre",
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "viaje el 15 de enero a las 6am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Viaje",
+     "date": "2026-01-15",
+     "start": "06:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "el 15 de enero",
+     "timeLabel": "06:00"
+    }
+   }
+  },
+  {
+   "text": "dentista el 31 de febrero",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Dentista",
+     "date": "2026-03-03",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "💊",
+     "color": "rose",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "el 31 de febrero",
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "comprar pan esta tarde",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Comprar pan tarde",
+     "date": "2026-09-29",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "hoy",
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "correr esta mañana",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Correr mañana",
+     "date": "2026-09-29",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "💪",
+     "color": "coral",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "esta manana",
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "leer esta noche 10pm",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Leer noche",
+     "date": "2026-09-29",
+     "start": "22:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "📚",
+     "color": "plum",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "hoy",
+     "timeLabel": "22:00"
+    }
+   }
+  },
+  {
+   "text": "reunión el próximo martes 15:00",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Reunión",
+     "date": "2026-10-06",
+     "start": "15:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "📊",
+     "color": "sky",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "martes",
+     "timeLabel": "15:00"
+    }
+   }
+  },
+  {
+   "text": "entrega informe este jueves",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Entrega informe",
+     "date": "2026-10-01",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "jueves",
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "sábado asado con amigos 13:30",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Sábado asado con amigos",
+     "date": "2026-10-03",
+     "start": "13:30",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "sabado",
+     "timeLabel": "13:30"
+    }
+   }
+  },
+  {
+   "text": "domingo descansar",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Descansar",
+     "date": "2026-10-04",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "😴",
+     "color": "lavender",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "domingo",
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "cena con Ana a las 8 de la noche",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Cena con Ana noche",
+     "date": "2026-09-29",
+     "start": "08:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "🍽️",
+     "color": "sun",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "08:00"
+    }
+   }
+  },
+  {
+   "text": "desayuno a las 7 y media",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Desayuno y media",
+     "date": "2026-09-29",
+     "start": "07:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "07:00"
+    }
+   }
+  },
+  {
+   "text": "clase a las 8 y cuarto",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Clase y cuarto",
+     "date": "2026-09-29",
+     "start": "08:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "📚",
+     "color": "plum",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "08:00"
+    }
+   }
+  },
+  {
+   "text": "reunión 19h",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Reunión",
+     "date": "2026-09-29",
+     "start": "19:00",
+     "durationMin": 1140,
+     "recur": null,
+     "icon": "📊",
+     "color": "sky",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "19:00"
+    }
+   }
+  },
+  {
+   "text": "reunión a las 19",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Reunión",
+     "date": "2026-09-29",
+     "start": "19:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "📊",
+     "color": "sky",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "19:00"
+    }
+   }
+  },
+  {
+   "text": "llamada 3pm",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Llamada",
+     "date": "2026-09-29",
+     "start": "15:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "📊",
+     "color": "sky",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "15:00"
+    }
+   }
+  },
+  {
+   "text": "llamada 3 p.m.",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Llamada",
+     "date": "2026-09-29",
+     "start": "15:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "📊",
+     "color": "sky",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "15:00"
+    }
+   }
+  },
+  {
+   "text": "café 10.30",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Café",
+     "date": "2026-09-29",
+     "start": "10:30",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "☕",
+     "color": "ember",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "10:30"
+    }
+   }
+  },
+  {
+   "text": "siesta 15:45 20 min",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Siesta",
+     "date": "2026-09-29",
+     "start": "15:45",
+     "durationMin": 20,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "15:45"
+    }
+   }
+  },
+  {
+   "text": "yoga 12am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Yoga",
+     "date": "2026-09-29",
+     "start": "00:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "🧘",
+     "color": "lavender",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "00:00"
+    }
+   }
+  },
+  {
+   "text": "turno 12pm",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Turno",
+     "date": "2026-09-29",
+     "start": "12:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "12:00"
+    }
+   }
+  },
+  {
+   "text": "estudiar cálculo 2 horas",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Estudiar cálculo",
+     "date": "2026-09-29",
+     "start": null,
+     "durationMin": 120,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": false,
+     "dayLabel": null,
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "estudiar cálculo hora y media",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Estudiar cálculo",
+     "date": "2026-09-29",
+     "start": null,
+     "durationMin": 90,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": false,
+     "dayLabel": null,
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "meditar media hora",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Meditar",
+     "date": "2026-09-29",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": false,
+     "dayLabel": null,
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "leer 45 minutos",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Leer",
+     "date": "2026-09-29",
+     "start": null,
+     "durationMin": 45,
+     "recur": null,
+     "icon": "📚",
+     "color": "plum",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": false,
+     "dayLabel": null,
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "caminar 20 min mañana 8am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Caminar",
+     "date": "2026-09-30",
+     "start": "08:00",
+     "durationMin": 20,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "mañana",
+     "timeLabel": "08:00"
+    }
+   }
+  },
+  {
+   "text": "deep work una hora 9am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Deep work",
+     "date": "2026-09-29",
+     "start": "09:00",
+     "durationMin": 60,
+     "recur": null,
+     "icon": "💼",
+     "color": "slate",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "09:00"
+    }
+   }
+  },
+  {
+   "text": "estudiar en 2 horas",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Estudiar en",
+     "date": "2026-09-29",
+     "start": null,
+     "durationMin": 120,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": false,
+     "dayLabel": null,
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "película 2h mañana 9pm",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Película",
+     "date": "2026-09-30",
+     "start": "21:00",
+     "durationMin": 120,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "mañana",
+     "timeLabel": "21:00"
+    }
+   }
+  },
+  {
+   "text": "gym entre semana 7am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Gym",
+     "date": "2026-09-29",
+     "start": "07:00",
+     "durationMin": 30,
+     "recur": {
+      "freq": "weekdays"
+     },
+     "icon": "💪",
+     "color": "coral",
+     "reminder": true
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "07:00"
+    }
+   }
+  },
+  {
+   "text": "gym de lunes a viernes 7am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Gym a viernes",
+     "date": "2026-10-05",
+     "start": "07:00",
+     "durationMin": 30,
+     "recur": {
+      "freq": "weekdays"
+     },
+     "icon": "💪",
+     "color": "coral",
+     "reminder": true
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "lunes",
+     "timeLabel": "07:00"
+    }
+   }
+  },
+  {
+   "text": "tomar agua todos los días 9am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Tomar agua días",
+     "date": "2026-09-29",
+     "start": "09:00",
+     "durationMin": 30,
+     "recur": {
+      "freq": "daily"
+     },
+     "icon": "✨",
+     "color": "mint",
+     "reminder": true
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "09:00"
+    }
+   }
+  },
+  {
+   "text": "yoga cada lunes 7am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Yoga",
+     "date": "2026-10-05",
+     "start": "07:00",
+     "durationMin": 30,
+     "recur": {
+      "freq": "weekly",
+      "days": [
+       1
+      ]
+     },
+     "icon": "🧘",
+     "color": "lavender",
+     "reminder": true
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "lunes",
+     "timeLabel": "07:00"
+    }
+   }
+  },
+  {
+   "text": "yoga lunes, miércoles y viernes 7am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Yoga , miércoles y viernes",
+     "date": "2026-10-05",
+     "start": "07:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "🧘",
+     "color": "lavender",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "lunes",
+     "timeLabel": "07:00"
+    }
+   }
+  },
+  {
+   "text": "planificar la semana cada domingo 8pm",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Planificar semana",
+     "date": "2026-10-04",
+     "start": "20:00",
+     "durationMin": 30,
+     "recur": {
+      "freq": "weekly",
+      "days": [
+       0
+      ]
+     },
+     "icon": "✨",
+     "color": "lavender",
+     "reminder": true
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "domingo",
+     "timeLabel": "20:00"
+    }
+   }
+  },
+  {
+   "text": "revisar correo diariamente 9am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Revisar correo diariamente",
+     "date": "2026-09-29",
+     "start": "09:00",
+     "durationMin": 30,
+     "recur": {
+      "freq": "daily"
+     },
+     "icon": "✨",
+     "color": "lavender",
+     "reminder": true
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "09:00"
+    }
+   }
+  },
+  {
+   "text": "limpieza cada semana sábado 11am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Limpieza sábado",
+     "date": "2026-10-03",
+     "start": "11:00",
+     "durationMin": 30,
+     "recur": {
+      "freq": "weekly"
+     },
+     "icon": "✨",
+     "color": "mint",
+     "reminder": true
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "sabado",
+     "timeLabel": "11:00"
+    }
+   }
+  },
+  {
+   "text": "tomar pastilla a diario 8am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Tomar pastilla a diario",
+     "date": "2026-09-29",
+     "start": "08:00",
+     "durationMin": 30,
+     "recur": {
+      "freq": "daily"
+     },
+     "icon": "💊",
+     "color": "rose",
+     "reminder": true
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "08:00"
+    }
+   }
+  },
+  {
+   "text": "agéndame reunión con Pedro mañana 11am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Reunión con Pedro",
+     "date": "2026-09-30",
+     "start": "11:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "📊",
+     "color": "sky",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "mañana",
+     "timeLabel": "11:00"
+    }
+   }
+  },
+  {
+   "text": "agrega comprar leche hoy",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Comprar leche",
+     "date": "2026-09-29",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "hoy",
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "recuérdame llamar al banco mañana 9am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Llamar al banco",
+     "date": "2026-09-30",
+     "start": "09:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "📞",
+     "color": "teal",
+     "reminder": true
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "mañana",
+     "timeLabel": "09:00"
+    }
+   }
+  },
+  {
+   "text": "tengo que estudiar para la prueba el jueves 4pm",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Estudiar prueba",
+     "date": "2026-10-01",
+     "start": "16:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "📚",
+     "color": "plum",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "jueves",
+     "timeLabel": "16:00"
+    }
+   }
+  },
+  {
+   "text": "necesito ir al supermercado hoy 6pm",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Ir al supermercado",
+     "date": "2026-09-29",
+     "start": "18:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "hoy",
+     "timeLabel": "18:00"
+    }
+   }
+  },
+  {
+   "text": "quiero salir a correr mañana 7am 30 min",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Salir a correr",
+     "date": "2026-09-30",
+     "start": "07:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "💪",
+     "color": "coral",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "mañana",
+     "timeLabel": "07:00"
+    }
+   }
+  },
+  {
+   "text": "pon una alarma para la reunión del viernes 9am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Alarma reunión",
+     "date": "2026-10-02",
+     "start": "09:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "📊",
+     "color": "sky",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "viernes",
+     "timeLabel": "09:00"
+    }
+   }
+  },
+  {
+   "text": "nueva tarea revisar contrato mañana",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Revisar contrato",
+     "date": "2026-09-30",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "lavender",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "mañana",
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "crea tarea de lavar ropa",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Tarea lavar ropa",
+     "date": "2026-09-29",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "📚",
+     "color": "plum",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": false,
+     "dayLabel": null,
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "gym y almuerzo el viernes",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Gym y almuerzo",
+     "date": "2026-10-02",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "💪",
+     "color": "coral",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "viernes",
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "comprar pan, leche y huevos",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Comprar pan, leche y huevos",
+     "date": "2026-09-29",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": false,
+     "dayLabel": null,
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "agéndame",
+   "parsed": {
+    "intent": "unknown",
+    "raw": "agéndame"
+   }
+  },
+  {
+   "text": "¿qué tengo hoy?",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "¿qué tengo ?",
+     "date": "2026-09-29",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "hoy",
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "qué tengo mañana",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Qué tengo",
+     "date": "2026-09-30",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "mañana",
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "hola",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Hola",
+     "date": "2026-09-29",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": false,
+     "dayLabel": null,
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "gracias",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Gracias",
+     "date": "2026-09-29",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": false,
+     "dayLabel": null,
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "",
+   "parsed": {
+    "intent": "unknown",
+    "raw": ""
+   }
+  },
+  {
+   "text": "   ",
+   "parsed": {
+    "intent": "unknown",
+    "raw": ""
+   }
+  },
+  {
+   "text": "7am",
+   "parsed": {
+    "intent": "unknown",
+    "raw": "7am"
+   }
+  },
+  {
+   "text": "mañana",
+   "parsed": {
+    "intent": "unknown",
+    "raw": "mañana"
+   }
+  },
+  {
+   "text": "borra gym",
+   "parsed": {
+    "intent": "delete",
+    "query": "gym"
+   }
+  },
+  {
+   "text": "borrar la tarea de gym",
+   "parsed": {
+    "intent": "delete",
+    "query": "gym"
+   }
+  },
+  {
+   "text": "elimina reunión con Ana",
+   "parsed": {
+    "intent": "delete",
+    "query": "reunión con Ana"
+   }
+  },
+  {
+   "text": "quita el dentista",
+   "parsed": {
+    "intent": "delete",
+    "query": "dentista"
+   }
+  },
+  {
+   "text": "cancela mi reunión de miércoles",
+   "parsed": {
+    "intent": "delete",
+    "query": "reunión miércoles"
+   }
+  },
+  {
+   "text": "cancelar la suscripción de netflix mañana",
+   "parsed": {
+    "intent": "delete",
+    "query": "suscripción netflix mañana"
+   }
+  },
+  {
+   "text": "completa gym",
+   "parsed": {
+    "intent": "complete",
+    "query": "gym"
+   }
+  },
+  {
+   "text": "marca gym como hecho",
+   "parsed": {
+    "intent": "complete",
+    "query": "gym"
+   }
+  },
+  {
+   "text": "ya hice la reunión",
+   "parsed": {
+    "intent": "complete",
+    "query": "reunión"
+   }
+  },
+  {
+   "text": "terminé el informe",
+   "parsed": {
+    "intent": "complete",
+    "query": "informe"
+   }
+  },
+  {
+   "text": "listo el informe",
+   "parsed": {
+    "intent": "complete",
+    "query": "listo informe"
+   }
+  },
+  {
+   "text": "mueve gym a las 6pm",
+   "parsed": {
+    "intent": "move",
+    "query": "gym",
+    "start": "18:00"
+   }
+  },
+  {
+   "text": "mover reunión a las 15:30",
+   "parsed": {
+    "intent": "move",
+    "query": "reunión",
+    "start": "15:30"
+   }
+  },
+  {
+   "text": "posterga el dentista a las 5",
+   "parsed": {
+    "intent": "move",
+    "query": "el dentista",
+    "start": "05:00"
+   }
+  },
+  {
+   "text": "reprograma gym",
+   "parsed": {
+    "intent": "move",
+    "query": "gym",
+    "start": null
+   }
+  },
+  {
+   "text": "mueve gym a mañana",
+   "parsed": {
+    "intent": "move",
+    "query": "gym a mañana",
+    "start": null
+   }
+  },
+  {
+   "text": "pasa a buscar a Ana a las 5pm",
+   "parsed": {
+    "intent": "move",
+    "query": "a buscar a Ana",
+    "start": "17:00"
+   }
+  },
+  {
+   "text": "cambia la hora de gym a las 8am",
+   "parsed": {
+    "intent": "move",
+    "query": "gym",
+    "start": "08:00"
+   }
+  },
+  {
+   "text": "ayuda",
+   "parsed": {
+    "intent": "help"
+   }
+  },
+  {
+   "text": "¿cómo funciona esto?",
+   "parsed": {
+    "intent": "help"
+   }
+  },
+  {
+   "text": "ver cómo va el proyecto mañana 10am",
+   "parsed": {
+    "intent": "help"
+   }
+  },
+  {
+   "text": "qué puedo hacer",
+   "parsed": {
+    "intent": "help"
+   }
+  },
+  {
+   "text": "GYM MAÑANA 7AM",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "GYM",
+     "date": "2026-09-30",
+     "start": "07:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "💪",
+     "color": "coral",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "mañana",
+     "timeLabel": "07:00"
+    }
+   }
+  },
+  {
+   "text": "Reunión: equipo de diseño, mañana 10am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Reunión: equipo diseño,",
+     "date": "2026-09-30",
+     "start": "10:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "📊",
+     "color": "sky",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "mañana",
+     "timeLabel": "10:00"
+    }
+   }
+  },
+  {
+   "text": "café ☕ con Sofía mañana 16:00",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Café ☕ con Sofía",
+     "date": "2026-09-30",
+     "start": "16:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "☕",
+     "color": "ember",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "mañana",
+     "timeLabel": "16:00"
+    }
+   }
+  },
+  {
+   "text": "ir al médico el miércoles a las 9",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Ir al médico miércoles",
+     "date": "2026-09-30",
+     "start": "09:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "💊",
+     "color": "rose",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "miercoles",
+     "timeLabel": "09:00"
+    }
+   }
+  },
+  {
+   "text": "sábado",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Sábado",
+     "date": "2026-10-03",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "sabado",
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "estudio de mercado el sábado 10am 3 horas",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Estudio mercado sábado",
+     "date": "2026-10-03",
+     "start": "10:00",
+     "durationMin": 180,
+     "recur": null,
+     "icon": "🛒",
+     "color": "coral",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "sabado",
+     "timeLabel": "10:00"
+    }
+   }
+  }
+ ],
+ "saturdayLateNight": [
+  {
+   "text": "Gym mañana 7am 1h",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Gym",
+     "date": "2026-10-11",
+     "start": "07:00",
+     "durationMin": 60,
+     "recur": null,
+     "icon": "💪",
+     "color": "coral",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "mañana",
+     "timeLabel": "07:00"
+    }
+   }
+  },
+  {
+   "text": "Estudiar inglés hoy 2pm 90 min",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Estudiar inglés",
+     "date": "2026-10-10",
+     "start": "14:00",
+     "durationMin": 90,
+     "recur": null,
+     "icon": "📚",
+     "color": "plum",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "hoy",
+     "timeLabel": "14:00"
+    }
+   }
+  },
+  {
+   "text": "Reunión con Ana el lunes 10am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Reunión con Ana",
+     "date": "2026-10-12",
+     "start": "10:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "📊",
+     "color": "sky",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "lunes",
+     "timeLabel": "10:00"
+    }
+   }
+  },
+  {
+   "text": "Llamar a mamá cada día 8pm",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Llamar a mamá",
+     "date": "2026-10-10",
+     "start": "20:00",
+     "durationMin": 30,
+     "recur": {
+      "freq": "daily"
+     },
+     "icon": "📞",
+     "color": "teal",
+     "reminder": true
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "20:00"
+    }
+   }
+  },
+  {
+   "text": "gym mañana 7am 1h",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Gym",
+     "date": "2026-10-11",
+     "start": "07:00",
+     "durationMin": 60,
+     "recur": null,
+     "icon": "💪",
+     "color": "coral",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "mañana",
+     "timeLabel": "07:00"
+    }
+   }
+  },
+  {
+   "text": "estudiar inglés el lunes 2pm 90 min",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Estudiar inglés",
+     "date": "2026-10-12",
+     "start": "14:00",
+     "durationMin": 90,
+     "recur": null,
+     "icon": "📚",
+     "color": "plum",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "lunes",
+     "timeLabel": "14:00"
+    }
+   }
+  },
+  {
+   "text": "reunión con cliente Acme todos los miércoles 10am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Reunión con cliente Acme",
+     "date": "2026-10-14",
+     "start": "10:00",
+     "durationMin": 30,
+     "recur": {
+      "freq": "weekly",
+      "days": [
+       3
+      ]
+     },
+     "icon": "📊",
+     "color": "sky",
+     "reminder": true
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "miercoles",
+     "timeLabel": "10:00"
+    }
+   }
+  },
+  {
+   "text": "reunion todos los miercoles 10am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Reunion",
+     "date": "2026-10-14",
+     "start": "10:00",
+     "durationMin": 30,
+     "recur": {
+      "freq": "weekly",
+      "days": [
+       3
+      ]
+     },
+     "icon": "📊",
+     "color": "sky",
+     "reminder": true
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "miercoles",
+     "timeLabel": "10:00"
+    }
+   }
+  },
+  {
+   "text": "dentista hoy a las 4",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Dentista",
+     "date": "2026-10-10",
+     "start": "04:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "💊",
+     "color": "rose",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "hoy",
+     "timeLabel": "04:00"
+    }
+   }
+  },
+  {
+   "text": "dentista pasado mañana 9:30",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Dentista",
+     "date": "2026-10-12",
+     "start": "09:30",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "💊",
+     "color": "rose",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "pasado mañana",
+     "timeLabel": "09:30"
+    }
+   }
+  },
+  {
+   "text": "almuerzo con María el viernes",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Almuerzo con María",
+     "date": "2026-10-16",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "🍽️",
+     "color": "sun",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "viernes",
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "pagar arriendo el 5",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Pagar arriendo",
+     "date": "2026-11-05",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "el 5",
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "pagar arriendo el 29",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Pagar arriendo",
+     "date": "2026-10-29",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "el 29",
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "cumpleaños de Ana el 3 de diciembre",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Cumpleaños Ana",
+     "date": "2026-12-03",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "el 3 de diciembre",
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "viaje el 15 de enero a las 6am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Viaje",
+     "date": "2026-01-15",
+     "start": "06:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "el 15 de enero",
+     "timeLabel": "06:00"
+    }
+   }
+  },
+  {
+   "text": "dentista el 31 de febrero",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Dentista",
+     "date": "2026-03-03",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "💊",
+     "color": "rose",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "el 31 de febrero",
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "comprar pan esta tarde",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Comprar pan tarde",
+     "date": "2026-10-10",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "hoy",
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "correr esta mañana",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Correr mañana",
+     "date": "2026-10-10",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "💪",
+     "color": "coral",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "esta manana",
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "leer esta noche 10pm",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Leer noche",
+     "date": "2026-10-10",
+     "start": "22:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "📚",
+     "color": "plum",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "hoy",
+     "timeLabel": "22:00"
+    }
+   }
+  },
+  {
+   "text": "reunión el próximo martes 15:00",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Reunión",
+     "date": "2026-10-13",
+     "start": "15:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "📊",
+     "color": "sky",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "martes",
+     "timeLabel": "15:00"
+    }
+   }
+  },
+  {
+   "text": "entrega informe este jueves",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Entrega informe",
+     "date": "2026-10-15",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "jueves",
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "sábado asado con amigos 13:30",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Sábado asado con amigos",
+     "date": "2026-10-17",
+     "start": "13:30",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "sabado",
+     "timeLabel": "13:30"
+    }
+   }
+  },
+  {
+   "text": "domingo descansar",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Descansar",
+     "date": "2026-10-11",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "😴",
+     "color": "lavender",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "domingo",
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "cena con Ana a las 8 de la noche",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Cena con Ana noche",
+     "date": "2026-10-10",
+     "start": "08:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "🍽️",
+     "color": "sun",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "08:00"
+    }
+   }
+  },
+  {
+   "text": "desayuno a las 7 y media",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Desayuno y media",
+     "date": "2026-10-10",
+     "start": "07:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "07:00"
+    }
+   }
+  },
+  {
+   "text": "clase a las 8 y cuarto",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Clase y cuarto",
+     "date": "2026-10-10",
+     "start": "08:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "📚",
+     "color": "plum",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "08:00"
+    }
+   }
+  },
+  {
+   "text": "reunión 19h",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Reunión",
+     "date": "2026-10-10",
+     "start": "19:00",
+     "durationMin": 1140,
+     "recur": null,
+     "icon": "📊",
+     "color": "sky",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "19:00"
+    }
+   }
+  },
+  {
+   "text": "reunión a las 19",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Reunión",
+     "date": "2026-10-10",
+     "start": "19:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "📊",
+     "color": "sky",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "19:00"
+    }
+   }
+  },
+  {
+   "text": "llamada 3pm",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Llamada",
+     "date": "2026-10-10",
+     "start": "15:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "📊",
+     "color": "sky",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "15:00"
+    }
+   }
+  },
+  {
+   "text": "llamada 3 p.m.",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Llamada",
+     "date": "2026-10-10",
+     "start": "15:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "📊",
+     "color": "sky",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "15:00"
+    }
+   }
+  },
+  {
+   "text": "café 10.30",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Café",
+     "date": "2026-10-10",
+     "start": "10:30",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "☕",
+     "color": "ember",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "10:30"
+    }
+   }
+  },
+  {
+   "text": "siesta 15:45 20 min",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Siesta",
+     "date": "2026-10-10",
+     "start": "15:45",
+     "durationMin": 20,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "15:45"
+    }
+   }
+  },
+  {
+   "text": "yoga 12am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Yoga",
+     "date": "2026-10-10",
+     "start": "00:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "🧘",
+     "color": "lavender",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "00:00"
+    }
+   }
+  },
+  {
+   "text": "turno 12pm",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Turno",
+     "date": "2026-10-10",
+     "start": "12:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "12:00"
+    }
+   }
+  },
+  {
+   "text": "estudiar cálculo 2 horas",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Estudiar cálculo",
+     "date": "2026-10-10",
+     "start": null,
+     "durationMin": 120,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": false,
+     "dayLabel": null,
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "estudiar cálculo hora y media",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Estudiar cálculo",
+     "date": "2026-10-10",
+     "start": null,
+     "durationMin": 90,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": false,
+     "dayLabel": null,
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "meditar media hora",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Meditar",
+     "date": "2026-10-10",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": false,
+     "dayLabel": null,
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "leer 45 minutos",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Leer",
+     "date": "2026-10-10",
+     "start": null,
+     "durationMin": 45,
+     "recur": null,
+     "icon": "📚",
+     "color": "plum",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": false,
+     "dayLabel": null,
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "caminar 20 min mañana 8am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Caminar",
+     "date": "2026-10-11",
+     "start": "08:00",
+     "durationMin": 20,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "mañana",
+     "timeLabel": "08:00"
+    }
+   }
+  },
+  {
+   "text": "deep work una hora 9am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Deep work",
+     "date": "2026-10-10",
+     "start": "09:00",
+     "durationMin": 60,
+     "recur": null,
+     "icon": "💼",
+     "color": "slate",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "09:00"
+    }
+   }
+  },
+  {
+   "text": "estudiar en 2 horas",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Estudiar en",
+     "date": "2026-10-10",
+     "start": null,
+     "durationMin": 120,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": false,
+     "dayLabel": null,
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "película 2h mañana 9pm",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Película",
+     "date": "2026-10-11",
+     "start": "21:00",
+     "durationMin": 120,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "mañana",
+     "timeLabel": "21:00"
+    }
+   }
+  },
+  {
+   "text": "gym entre semana 7am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Gym",
+     "date": "2026-10-10",
+     "start": "07:00",
+     "durationMin": 30,
+     "recur": {
+      "freq": "weekdays"
+     },
+     "icon": "💪",
+     "color": "coral",
+     "reminder": true
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "07:00"
+    }
+   }
+  },
+  {
+   "text": "gym de lunes a viernes 7am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Gym a viernes",
+     "date": "2026-10-12",
+     "start": "07:00",
+     "durationMin": 30,
+     "recur": {
+      "freq": "weekdays"
+     },
+     "icon": "💪",
+     "color": "coral",
+     "reminder": true
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "lunes",
+     "timeLabel": "07:00"
+    }
+   }
+  },
+  {
+   "text": "tomar agua todos los días 9am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Tomar agua días",
+     "date": "2026-10-10",
+     "start": "09:00",
+     "durationMin": 30,
+     "recur": {
+      "freq": "daily"
+     },
+     "icon": "✨",
+     "color": "mint",
+     "reminder": true
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "09:00"
+    }
+   }
+  },
+  {
+   "text": "yoga cada lunes 7am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Yoga",
+     "date": "2026-10-12",
+     "start": "07:00",
+     "durationMin": 30,
+     "recur": {
+      "freq": "weekly",
+      "days": [
+       1
+      ]
+     },
+     "icon": "🧘",
+     "color": "lavender",
+     "reminder": true
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "lunes",
+     "timeLabel": "07:00"
+    }
+   }
+  },
+  {
+   "text": "yoga lunes, miércoles y viernes 7am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Yoga , miércoles y viernes",
+     "date": "2026-10-12",
+     "start": "07:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "🧘",
+     "color": "lavender",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "lunes",
+     "timeLabel": "07:00"
+    }
+   }
+  },
+  {
+   "text": "planificar la semana cada domingo 8pm",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Planificar semana",
+     "date": "2026-10-11",
+     "start": "20:00",
+     "durationMin": 30,
+     "recur": {
+      "freq": "weekly",
+      "days": [
+       0
+      ]
+     },
+     "icon": "✨",
+     "color": "lavender",
+     "reminder": true
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "domingo",
+     "timeLabel": "20:00"
+    }
+   }
+  },
+  {
+   "text": "revisar correo diariamente 9am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Revisar correo diariamente",
+     "date": "2026-10-10",
+     "start": "09:00",
+     "durationMin": 30,
+     "recur": {
+      "freq": "daily"
+     },
+     "icon": "✨",
+     "color": "lavender",
+     "reminder": true
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "09:00"
+    }
+   }
+  },
+  {
+   "text": "limpieza cada semana sábado 11am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Limpieza sábado",
+     "date": "2026-10-17",
+     "start": "11:00",
+     "durationMin": 30,
+     "recur": {
+      "freq": "weekly"
+     },
+     "icon": "✨",
+     "color": "mint",
+     "reminder": true
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "sabado",
+     "timeLabel": "11:00"
+    }
+   }
+  },
+  {
+   "text": "tomar pastilla a diario 8am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Tomar pastilla a diario",
+     "date": "2026-10-10",
+     "start": "08:00",
+     "durationMin": 30,
+     "recur": {
+      "freq": "daily"
+     },
+     "icon": "💊",
+     "color": "rose",
+     "reminder": true
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "08:00"
+    }
+   }
+  },
+  {
+   "text": "agéndame reunión con Pedro mañana 11am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Reunión con Pedro",
+     "date": "2026-10-11",
+     "start": "11:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "📊",
+     "color": "sky",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "mañana",
+     "timeLabel": "11:00"
+    }
+   }
+  },
+  {
+   "text": "agrega comprar leche hoy",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Comprar leche",
+     "date": "2026-10-10",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "hoy",
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "recuérdame llamar al banco mañana 9am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Llamar al banco",
+     "date": "2026-10-11",
+     "start": "09:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "📞",
+     "color": "teal",
+     "reminder": true
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "mañana",
+     "timeLabel": "09:00"
+    }
+   }
+  },
+  {
+   "text": "tengo que estudiar para la prueba el jueves 4pm",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Estudiar prueba",
+     "date": "2026-10-15",
+     "start": "16:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "📚",
+     "color": "plum",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "jueves",
+     "timeLabel": "16:00"
+    }
+   }
+  },
+  {
+   "text": "necesito ir al supermercado hoy 6pm",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Ir al supermercado",
+     "date": "2026-10-10",
+     "start": "18:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "hoy",
+     "timeLabel": "18:00"
+    }
+   }
+  },
+  {
+   "text": "quiero salir a correr mañana 7am 30 min",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Salir a correr",
+     "date": "2026-10-11",
+     "start": "07:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "💪",
+     "color": "coral",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "mañana",
+     "timeLabel": "07:00"
+    }
+   }
+  },
+  {
+   "text": "pon una alarma para la reunión del viernes 9am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Alarma reunión",
+     "date": "2026-10-16",
+     "start": "09:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "📊",
+     "color": "sky",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "viernes",
+     "timeLabel": "09:00"
+    }
+   }
+  },
+  {
+   "text": "nueva tarea revisar contrato mañana",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Revisar contrato",
+     "date": "2026-10-11",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "lavender",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "mañana",
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "crea tarea de lavar ropa",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Tarea lavar ropa",
+     "date": "2026-10-10",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "📚",
+     "color": "plum",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": false,
+     "dayLabel": null,
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "gym y almuerzo el viernes",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Gym y almuerzo",
+     "date": "2026-10-16",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "💪",
+     "color": "coral",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "viernes",
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "comprar pan, leche y huevos",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Comprar pan, leche y huevos",
+     "date": "2026-10-10",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": false,
+     "dayLabel": null,
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "agéndame",
+   "parsed": {
+    "intent": "unknown",
+    "raw": "agéndame"
+   }
+  },
+  {
+   "text": "¿qué tengo hoy?",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "¿qué tengo ?",
+     "date": "2026-10-10",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "hoy",
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "qué tengo mañana",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Qué tengo",
+     "date": "2026-10-11",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "mañana",
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "hola",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Hola",
+     "date": "2026-10-10",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": false,
+     "dayLabel": null,
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "gracias",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Gracias",
+     "date": "2026-10-10",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": false,
+     "dayLabel": null,
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "",
+   "parsed": {
+    "intent": "unknown",
+    "raw": ""
+   }
+  },
+  {
+   "text": "   ",
+   "parsed": {
+    "intent": "unknown",
+    "raw": ""
+   }
+  },
+  {
+   "text": "7am",
+   "parsed": {
+    "intent": "unknown",
+    "raw": "7am"
+   }
+  },
+  {
+   "text": "mañana",
+   "parsed": {
+    "intent": "unknown",
+    "raw": "mañana"
+   }
+  },
+  {
+   "text": "borra gym",
+   "parsed": {
+    "intent": "delete",
+    "query": "gym"
+   }
+  },
+  {
+   "text": "borrar la tarea de gym",
+   "parsed": {
+    "intent": "delete",
+    "query": "gym"
+   }
+  },
+  {
+   "text": "elimina reunión con Ana",
+   "parsed": {
+    "intent": "delete",
+    "query": "reunión con Ana"
+   }
+  },
+  {
+   "text": "quita el dentista",
+   "parsed": {
+    "intent": "delete",
+    "query": "dentista"
+   }
+  },
+  {
+   "text": "cancela mi reunión de miércoles",
+   "parsed": {
+    "intent": "delete",
+    "query": "reunión miércoles"
+   }
+  },
+  {
+   "text": "cancelar la suscripción de netflix mañana",
+   "parsed": {
+    "intent": "delete",
+    "query": "suscripción netflix mañana"
+   }
+  },
+  {
+   "text": "completa gym",
+   "parsed": {
+    "intent": "complete",
+    "query": "gym"
+   }
+  },
+  {
+   "text": "marca gym como hecho",
+   "parsed": {
+    "intent": "complete",
+    "query": "gym"
+   }
+  },
+  {
+   "text": "ya hice la reunión",
+   "parsed": {
+    "intent": "complete",
+    "query": "reunión"
+   }
+  },
+  {
+   "text": "terminé el informe",
+   "parsed": {
+    "intent": "complete",
+    "query": "informe"
+   }
+  },
+  {
+   "text": "listo el informe",
+   "parsed": {
+    "intent": "complete",
+    "query": "listo informe"
+   }
+  },
+  {
+   "text": "mueve gym a las 6pm",
+   "parsed": {
+    "intent": "move",
+    "query": "gym",
+    "start": "18:00"
+   }
+  },
+  {
+   "text": "mover reunión a las 15:30",
+   "parsed": {
+    "intent": "move",
+    "query": "reunión",
+    "start": "15:30"
+   }
+  },
+  {
+   "text": "posterga el dentista a las 5",
+   "parsed": {
+    "intent": "move",
+    "query": "el dentista",
+    "start": "05:00"
+   }
+  },
+  {
+   "text": "reprograma gym",
+   "parsed": {
+    "intent": "move",
+    "query": "gym",
+    "start": null
+   }
+  },
+  {
+   "text": "mueve gym a mañana",
+   "parsed": {
+    "intent": "move",
+    "query": "gym a mañana",
+    "start": null
+   }
+  },
+  {
+   "text": "pasa a buscar a Ana a las 5pm",
+   "parsed": {
+    "intent": "move",
+    "query": "a buscar a Ana",
+    "start": "17:00"
+   }
+  },
+  {
+   "text": "cambia la hora de gym a las 8am",
+   "parsed": {
+    "intent": "move",
+    "query": "gym",
+    "start": "08:00"
+   }
+  },
+  {
+   "text": "ayuda",
+   "parsed": {
+    "intent": "help"
+   }
+  },
+  {
+   "text": "¿cómo funciona esto?",
+   "parsed": {
+    "intent": "help"
+   }
+  },
+  {
+   "text": "ver cómo va el proyecto mañana 10am",
+   "parsed": {
+    "intent": "help"
+   }
+  },
+  {
+   "text": "qué puedo hacer",
+   "parsed": {
+    "intent": "help"
+   }
+  },
+  {
+   "text": "GYM MAÑANA 7AM",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "GYM",
+     "date": "2026-10-11",
+     "start": "07:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "💪",
+     "color": "coral",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "mañana",
+     "timeLabel": "07:00"
+    }
+   }
+  },
+  {
+   "text": "Reunión: equipo de diseño, mañana 10am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Reunión: equipo diseño,",
+     "date": "2026-10-11",
+     "start": "10:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "📊",
+     "color": "sky",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "mañana",
+     "timeLabel": "10:00"
+    }
+   }
+  },
+  {
+   "text": "café ☕ con Sofía mañana 16:00",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Café ☕ con Sofía",
+     "date": "2026-10-11",
+     "start": "16:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "☕",
+     "color": "ember",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "mañana",
+     "timeLabel": "16:00"
+    }
+   }
+  },
+  {
+   "text": "ir al médico el miércoles a las 9",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Ir al médico miércoles",
+     "date": "2026-10-14",
+     "start": "09:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "💊",
+     "color": "rose",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "miercoles",
+     "timeLabel": "09:00"
+    }
+   }
+  },
+  {
+   "text": "sábado",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Sábado",
+     "date": "2026-10-17",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "sabado",
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "estudio de mercado el sábado 10am 3 horas",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Estudio mercado sábado",
+     "date": "2026-10-17",
+     "start": "10:00",
+     "durationMin": 180,
+     "recur": null,
+     "icon": "🛒",
+     "color": "coral",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "sabado",
+     "timeLabel": "10:00"
+    }
+   }
+  }
+ ],
+ "yearEnd": [
+  {
+   "text": "Gym mañana 7am 1h",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Gym",
+     "date": "2027-01-01",
+     "start": "07:00",
+     "durationMin": 60,
+     "recur": null,
+     "icon": "💪",
+     "color": "coral",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "mañana",
+     "timeLabel": "07:00"
+    }
+   }
+  },
+  {
+   "text": "Estudiar inglés hoy 2pm 90 min",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Estudiar inglés",
+     "date": "2026-12-31",
+     "start": "14:00",
+     "durationMin": 90,
+     "recur": null,
+     "icon": "📚",
+     "color": "plum",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "hoy",
+     "timeLabel": "14:00"
+    }
+   }
+  },
+  {
+   "text": "Reunión con Ana el lunes 10am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Reunión con Ana",
+     "date": "2027-01-04",
+     "start": "10:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "📊",
+     "color": "sky",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "lunes",
+     "timeLabel": "10:00"
+    }
+   }
+  },
+  {
+   "text": "Llamar a mamá cada día 8pm",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Llamar a mamá",
+     "date": "2026-12-31",
+     "start": "20:00",
+     "durationMin": 30,
+     "recur": {
+      "freq": "daily"
+     },
+     "icon": "📞",
+     "color": "teal",
+     "reminder": true
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "20:00"
+    }
+   }
+  },
+  {
+   "text": "gym mañana 7am 1h",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Gym",
+     "date": "2027-01-01",
+     "start": "07:00",
+     "durationMin": 60,
+     "recur": null,
+     "icon": "💪",
+     "color": "coral",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "mañana",
+     "timeLabel": "07:00"
+    }
+   }
+  },
+  {
+   "text": "estudiar inglés el lunes 2pm 90 min",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Estudiar inglés",
+     "date": "2027-01-04",
+     "start": "14:00",
+     "durationMin": 90,
+     "recur": null,
+     "icon": "📚",
+     "color": "plum",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "lunes",
+     "timeLabel": "14:00"
+    }
+   }
+  },
+  {
+   "text": "reunión con cliente Acme todos los miércoles 10am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Reunión con cliente Acme",
+     "date": "2027-01-06",
+     "start": "10:00",
+     "durationMin": 30,
+     "recur": {
+      "freq": "weekly",
+      "days": [
+       3
+      ]
+     },
+     "icon": "📊",
+     "color": "sky",
+     "reminder": true
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "miercoles",
+     "timeLabel": "10:00"
+    }
+   }
+  },
+  {
+   "text": "reunion todos los miercoles 10am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Reunion",
+     "date": "2027-01-06",
+     "start": "10:00",
+     "durationMin": 30,
+     "recur": {
+      "freq": "weekly",
+      "days": [
+       3
+      ]
+     },
+     "icon": "📊",
+     "color": "sky",
+     "reminder": true
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "miercoles",
+     "timeLabel": "10:00"
+    }
+   }
+  },
+  {
+   "text": "dentista hoy a las 4",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Dentista",
+     "date": "2026-12-31",
+     "start": "04:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "💊",
+     "color": "rose",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "hoy",
+     "timeLabel": "04:00"
+    }
+   }
+  },
+  {
+   "text": "dentista pasado mañana 9:30",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Dentista",
+     "date": "2027-01-02",
+     "start": "09:30",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "💊",
+     "color": "rose",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "pasado mañana",
+     "timeLabel": "09:30"
+    }
+   }
+  },
+  {
+   "text": "almuerzo con María el viernes",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Almuerzo con María",
+     "date": "2027-01-01",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "🍽️",
+     "color": "sun",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "viernes",
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "pagar arriendo el 5",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Pagar arriendo",
+     "date": "2027-01-05",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "el 5",
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "pagar arriendo el 29",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Pagar arriendo",
+     "date": "2027-01-29",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "el 29",
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "cumpleaños de Ana el 3 de diciembre",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Cumpleaños Ana",
+     "date": "2026-12-03",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "el 3 de diciembre",
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "viaje el 15 de enero a las 6am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Viaje",
+     "date": "2026-01-15",
+     "start": "06:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "el 15 de enero",
+     "timeLabel": "06:00"
+    }
+   }
+  },
+  {
+   "text": "dentista el 31 de febrero",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Dentista",
+     "date": "2026-03-03",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "💊",
+     "color": "rose",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "el 31 de febrero",
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "comprar pan esta tarde",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Comprar pan tarde",
+     "date": "2026-12-31",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "hoy",
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "correr esta mañana",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Correr mañana",
+     "date": "2026-12-31",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "💪",
+     "color": "coral",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "esta manana",
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "leer esta noche 10pm",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Leer noche",
+     "date": "2026-12-31",
+     "start": "22:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "📚",
+     "color": "plum",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "hoy",
+     "timeLabel": "22:00"
+    }
+   }
+  },
+  {
+   "text": "reunión el próximo martes 15:00",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Reunión",
+     "date": "2027-01-05",
+     "start": "15:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "📊",
+     "color": "sky",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "martes",
+     "timeLabel": "15:00"
+    }
+   }
+  },
+  {
+   "text": "entrega informe este jueves",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Entrega informe",
+     "date": "2027-01-07",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "jueves",
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "sábado asado con amigos 13:30",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Sábado asado con amigos",
+     "date": "2027-01-02",
+     "start": "13:30",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "sabado",
+     "timeLabel": "13:30"
+    }
+   }
+  },
+  {
+   "text": "domingo descansar",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Descansar",
+     "date": "2027-01-03",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "😴",
+     "color": "lavender",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "domingo",
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "cena con Ana a las 8 de la noche",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Cena con Ana noche",
+     "date": "2026-12-31",
+     "start": "08:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "🍽️",
+     "color": "sun",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "08:00"
+    }
+   }
+  },
+  {
+   "text": "desayuno a las 7 y media",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Desayuno y media",
+     "date": "2026-12-31",
+     "start": "07:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "07:00"
+    }
+   }
+  },
+  {
+   "text": "clase a las 8 y cuarto",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Clase y cuarto",
+     "date": "2026-12-31",
+     "start": "08:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "📚",
+     "color": "plum",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "08:00"
+    }
+   }
+  },
+  {
+   "text": "reunión 19h",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Reunión",
+     "date": "2026-12-31",
+     "start": "19:00",
+     "durationMin": 1140,
+     "recur": null,
+     "icon": "📊",
+     "color": "sky",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "19:00"
+    }
+   }
+  },
+  {
+   "text": "reunión a las 19",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Reunión",
+     "date": "2026-12-31",
+     "start": "19:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "📊",
+     "color": "sky",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "19:00"
+    }
+   }
+  },
+  {
+   "text": "llamada 3pm",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Llamada",
+     "date": "2026-12-31",
+     "start": "15:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "📊",
+     "color": "sky",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "15:00"
+    }
+   }
+  },
+  {
+   "text": "llamada 3 p.m.",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Llamada",
+     "date": "2026-12-31",
+     "start": "15:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "📊",
+     "color": "sky",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "15:00"
+    }
+   }
+  },
+  {
+   "text": "café 10.30",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Café",
+     "date": "2026-12-31",
+     "start": "10:30",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "☕",
+     "color": "ember",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "10:30"
+    }
+   }
+  },
+  {
+   "text": "siesta 15:45 20 min",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Siesta",
+     "date": "2026-12-31",
+     "start": "15:45",
+     "durationMin": 20,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "15:45"
+    }
+   }
+  },
+  {
+   "text": "yoga 12am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Yoga",
+     "date": "2026-12-31",
+     "start": "00:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "🧘",
+     "color": "lavender",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "00:00"
+    }
+   }
+  },
+  {
+   "text": "turno 12pm",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Turno",
+     "date": "2026-12-31",
+     "start": "12:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "12:00"
+    }
+   }
+  },
+  {
+   "text": "estudiar cálculo 2 horas",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Estudiar cálculo",
+     "date": "2026-12-31",
+     "start": null,
+     "durationMin": 120,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": false,
+     "dayLabel": null,
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "estudiar cálculo hora y media",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Estudiar cálculo",
+     "date": "2026-12-31",
+     "start": null,
+     "durationMin": 90,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": false,
+     "dayLabel": null,
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "meditar media hora",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Meditar",
+     "date": "2026-12-31",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": false,
+     "dayLabel": null,
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "leer 45 minutos",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Leer",
+     "date": "2026-12-31",
+     "start": null,
+     "durationMin": 45,
+     "recur": null,
+     "icon": "📚",
+     "color": "plum",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": false,
+     "dayLabel": null,
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "caminar 20 min mañana 8am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Caminar",
+     "date": "2027-01-01",
+     "start": "08:00",
+     "durationMin": 20,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "mañana",
+     "timeLabel": "08:00"
+    }
+   }
+  },
+  {
+   "text": "deep work una hora 9am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Deep work",
+     "date": "2026-12-31",
+     "start": "09:00",
+     "durationMin": 60,
+     "recur": null,
+     "icon": "💼",
+     "color": "slate",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "09:00"
+    }
+   }
+  },
+  {
+   "text": "estudiar en 2 horas",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Estudiar en",
+     "date": "2026-12-31",
+     "start": null,
+     "durationMin": 120,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": false,
+     "dayLabel": null,
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "película 2h mañana 9pm",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Película",
+     "date": "2027-01-01",
+     "start": "21:00",
+     "durationMin": 120,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "mañana",
+     "timeLabel": "21:00"
+    }
+   }
+  },
+  {
+   "text": "gym entre semana 7am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Gym",
+     "date": "2026-12-31",
+     "start": "07:00",
+     "durationMin": 30,
+     "recur": {
+      "freq": "weekdays"
+     },
+     "icon": "💪",
+     "color": "coral",
+     "reminder": true
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "07:00"
+    }
+   }
+  },
+  {
+   "text": "gym de lunes a viernes 7am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Gym a viernes",
+     "date": "2027-01-04",
+     "start": "07:00",
+     "durationMin": 30,
+     "recur": {
+      "freq": "weekdays"
+     },
+     "icon": "💪",
+     "color": "coral",
+     "reminder": true
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "lunes",
+     "timeLabel": "07:00"
+    }
+   }
+  },
+  {
+   "text": "tomar agua todos los días 9am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Tomar agua días",
+     "date": "2026-12-31",
+     "start": "09:00",
+     "durationMin": 30,
+     "recur": {
+      "freq": "daily"
+     },
+     "icon": "✨",
+     "color": "mint",
+     "reminder": true
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "09:00"
+    }
+   }
+  },
+  {
+   "text": "yoga cada lunes 7am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Yoga",
+     "date": "2027-01-04",
+     "start": "07:00",
+     "durationMin": 30,
+     "recur": {
+      "freq": "weekly",
+      "days": [
+       1
+      ]
+     },
+     "icon": "🧘",
+     "color": "lavender",
+     "reminder": true
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "lunes",
+     "timeLabel": "07:00"
+    }
+   }
+  },
+  {
+   "text": "yoga lunes, miércoles y viernes 7am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Yoga , miércoles y viernes",
+     "date": "2027-01-04",
+     "start": "07:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "🧘",
+     "color": "lavender",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "lunes",
+     "timeLabel": "07:00"
+    }
+   }
+  },
+  {
+   "text": "planificar la semana cada domingo 8pm",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Planificar semana",
+     "date": "2027-01-03",
+     "start": "20:00",
+     "durationMin": 30,
+     "recur": {
+      "freq": "weekly",
+      "days": [
+       0
+      ]
+     },
+     "icon": "✨",
+     "color": "lavender",
+     "reminder": true
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "domingo",
+     "timeLabel": "20:00"
+    }
+   }
+  },
+  {
+   "text": "revisar correo diariamente 9am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Revisar correo diariamente",
+     "date": "2026-12-31",
+     "start": "09:00",
+     "durationMin": 30,
+     "recur": {
+      "freq": "daily"
+     },
+     "icon": "✨",
+     "color": "lavender",
+     "reminder": true
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "09:00"
+    }
+   }
+  },
+  {
+   "text": "limpieza cada semana sábado 11am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Limpieza sábado",
+     "date": "2027-01-02",
+     "start": "11:00",
+     "durationMin": 30,
+     "recur": {
+      "freq": "weekly"
+     },
+     "icon": "✨",
+     "color": "mint",
+     "reminder": true
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "sabado",
+     "timeLabel": "11:00"
+    }
+   }
+  },
+  {
+   "text": "tomar pastilla a diario 8am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Tomar pastilla a diario",
+     "date": "2026-12-31",
+     "start": "08:00",
+     "durationMin": 30,
+     "recur": {
+      "freq": "daily"
+     },
+     "icon": "💊",
+     "color": "rose",
+     "reminder": true
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "08:00"
+    }
+   }
+  },
+  {
+   "text": "agéndame reunión con Pedro mañana 11am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Reunión con Pedro",
+     "date": "2027-01-01",
+     "start": "11:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "📊",
+     "color": "sky",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "mañana",
+     "timeLabel": "11:00"
+    }
+   }
+  },
+  {
+   "text": "agrega comprar leche hoy",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Comprar leche",
+     "date": "2026-12-31",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "hoy",
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "recuérdame llamar al banco mañana 9am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Llamar al banco",
+     "date": "2027-01-01",
+     "start": "09:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "📞",
+     "color": "teal",
+     "reminder": true
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "mañana",
+     "timeLabel": "09:00"
+    }
+   }
+  },
+  {
+   "text": "tengo que estudiar para la prueba el jueves 4pm",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Estudiar prueba",
+     "date": "2027-01-07",
+     "start": "16:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "📚",
+     "color": "plum",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "jueves",
+     "timeLabel": "16:00"
+    }
+   }
+  },
+  {
+   "text": "necesito ir al supermercado hoy 6pm",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Ir al supermercado",
+     "date": "2026-12-31",
+     "start": "18:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "hoy",
+     "timeLabel": "18:00"
+    }
+   }
+  },
+  {
+   "text": "quiero salir a correr mañana 7am 30 min",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Salir a correr",
+     "date": "2027-01-01",
+     "start": "07:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "💪",
+     "color": "coral",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "mañana",
+     "timeLabel": "07:00"
+    }
+   }
+  },
+  {
+   "text": "pon una alarma para la reunión del viernes 9am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Alarma reunión",
+     "date": "2027-01-01",
+     "start": "09:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "📊",
+     "color": "sky",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "viernes",
+     "timeLabel": "09:00"
+    }
+   }
+  },
+  {
+   "text": "nueva tarea revisar contrato mañana",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Revisar contrato",
+     "date": "2027-01-01",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "lavender",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "mañana",
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "crea tarea de lavar ropa",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Tarea lavar ropa",
+     "date": "2026-12-31",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "📚",
+     "color": "plum",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": false,
+     "dayLabel": null,
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "gym y almuerzo el viernes",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Gym y almuerzo",
+     "date": "2027-01-01",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "💪",
+     "color": "coral",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "viernes",
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "comprar pan, leche y huevos",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Comprar pan, leche y huevos",
+     "date": "2026-12-31",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": false,
+     "dayLabel": null,
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "agéndame",
+   "parsed": {
+    "intent": "unknown",
+    "raw": "agéndame"
+   }
+  },
+  {
+   "text": "¿qué tengo hoy?",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "¿qué tengo ?",
+     "date": "2026-12-31",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "hoy",
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "qué tengo mañana",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Qué tengo",
+     "date": "2027-01-01",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "mañana",
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "hola",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Hola",
+     "date": "2026-12-31",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": false,
+     "dayLabel": null,
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "gracias",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Gracias",
+     "date": "2026-12-31",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": false,
+     "dayLabel": null,
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "",
+   "parsed": {
+    "intent": "unknown",
+    "raw": ""
+   }
+  },
+  {
+   "text": "   ",
+   "parsed": {
+    "intent": "unknown",
+    "raw": ""
+   }
+  },
+  {
+   "text": "7am",
+   "parsed": {
+    "intent": "unknown",
+    "raw": "7am"
+   }
+  },
+  {
+   "text": "mañana",
+   "parsed": {
+    "intent": "unknown",
+    "raw": "mañana"
+   }
+  },
+  {
+   "text": "borra gym",
+   "parsed": {
+    "intent": "delete",
+    "query": "gym"
+   }
+  },
+  {
+   "text": "borrar la tarea de gym",
+   "parsed": {
+    "intent": "delete",
+    "query": "gym"
+   }
+  },
+  {
+   "text": "elimina reunión con Ana",
+   "parsed": {
+    "intent": "delete",
+    "query": "reunión con Ana"
+   }
+  },
+  {
+   "text": "quita el dentista",
+   "parsed": {
+    "intent": "delete",
+    "query": "dentista"
+   }
+  },
+  {
+   "text": "cancela mi reunión de miércoles",
+   "parsed": {
+    "intent": "delete",
+    "query": "reunión miércoles"
+   }
+  },
+  {
+   "text": "cancelar la suscripción de netflix mañana",
+   "parsed": {
+    "intent": "delete",
+    "query": "suscripción netflix mañana"
+   }
+  },
+  {
+   "text": "completa gym",
+   "parsed": {
+    "intent": "complete",
+    "query": "gym"
+   }
+  },
+  {
+   "text": "marca gym como hecho",
+   "parsed": {
+    "intent": "complete",
+    "query": "gym"
+   }
+  },
+  {
+   "text": "ya hice la reunión",
+   "parsed": {
+    "intent": "complete",
+    "query": "reunión"
+   }
+  },
+  {
+   "text": "terminé el informe",
+   "parsed": {
+    "intent": "complete",
+    "query": "informe"
+   }
+  },
+  {
+   "text": "listo el informe",
+   "parsed": {
+    "intent": "complete",
+    "query": "listo informe"
+   }
+  },
+  {
+   "text": "mueve gym a las 6pm",
+   "parsed": {
+    "intent": "move",
+    "query": "gym",
+    "start": "18:00"
+   }
+  },
+  {
+   "text": "mover reunión a las 15:30",
+   "parsed": {
+    "intent": "move",
+    "query": "reunión",
+    "start": "15:30"
+   }
+  },
+  {
+   "text": "posterga el dentista a las 5",
+   "parsed": {
+    "intent": "move",
+    "query": "el dentista",
+    "start": "05:00"
+   }
+  },
+  {
+   "text": "reprograma gym",
+   "parsed": {
+    "intent": "move",
+    "query": "gym",
+    "start": null
+   }
+  },
+  {
+   "text": "mueve gym a mañana",
+   "parsed": {
+    "intent": "move",
+    "query": "gym a mañana",
+    "start": null
+   }
+  },
+  {
+   "text": "pasa a buscar a Ana a las 5pm",
+   "parsed": {
+    "intent": "move",
+    "query": "a buscar a Ana",
+    "start": "17:00"
+   }
+  },
+  {
+   "text": "cambia la hora de gym a las 8am",
+   "parsed": {
+    "intent": "move",
+    "query": "gym",
+    "start": "08:00"
+   }
+  },
+  {
+   "text": "ayuda",
+   "parsed": {
+    "intent": "help"
+   }
+  },
+  {
+   "text": "¿cómo funciona esto?",
+   "parsed": {
+    "intent": "help"
+   }
+  },
+  {
+   "text": "ver cómo va el proyecto mañana 10am",
+   "parsed": {
+    "intent": "help"
+   }
+  },
+  {
+   "text": "qué puedo hacer",
+   "parsed": {
+    "intent": "help"
+   }
+  },
+  {
+   "text": "GYM MAÑANA 7AM",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "GYM",
+     "date": "2027-01-01",
+     "start": "07:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "💪",
+     "color": "coral",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "mañana",
+     "timeLabel": "07:00"
+    }
+   }
+  },
+  {
+   "text": "Reunión: equipo de diseño, mañana 10am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Reunión: equipo diseño,",
+     "date": "2027-01-01",
+     "start": "10:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "📊",
+     "color": "sky",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "mañana",
+     "timeLabel": "10:00"
+    }
+   }
+  },
+  {
+   "text": "café ☕ con Sofía mañana 16:00",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Café ☕ con Sofía",
+     "date": "2027-01-01",
+     "start": "16:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "☕",
+     "color": "ember",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "mañana",
+     "timeLabel": "16:00"
+    }
+   }
+  },
+  {
+   "text": "ir al médico el miércoles a las 9",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Ir al médico miércoles",
+     "date": "2027-01-06",
+     "start": "09:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "💊",
+     "color": "rose",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "miercoles",
+     "timeLabel": "09:00"
+    }
+   }
+  },
+  {
+   "text": "sábado",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Sábado",
+     "date": "2027-01-02",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "sabado",
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "estudio de mercado el sábado 10am 3 horas",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Estudio mercado sábado",
+     "date": "2027-01-02",
+     "start": "10:00",
+     "durationMin": 180,
+     "recur": null,
+     "icon": "🛒",
+     "color": "coral",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "sabado",
+     "timeLabel": "10:00"
+    }
+   }
+  }
+ ],
+ "sundayNoon": [
+  {
+   "text": "Gym mañana 7am 1h",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Gym",
+     "date": "2026-10-05",
+     "start": "07:00",
+     "durationMin": 60,
+     "recur": null,
+     "icon": "💪",
+     "color": "coral",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "mañana",
+     "timeLabel": "07:00"
+    }
+   }
+  },
+  {
+   "text": "Estudiar inglés hoy 2pm 90 min",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Estudiar inglés",
+     "date": "2026-10-04",
+     "start": "14:00",
+     "durationMin": 90,
+     "recur": null,
+     "icon": "📚",
+     "color": "plum",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "hoy",
+     "timeLabel": "14:00"
+    }
+   }
+  },
+  {
+   "text": "Reunión con Ana el lunes 10am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Reunión con Ana",
+     "date": "2026-10-05",
+     "start": "10:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "📊",
+     "color": "sky",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "lunes",
+     "timeLabel": "10:00"
+    }
+   }
+  },
+  {
+   "text": "Llamar a mamá cada día 8pm",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Llamar a mamá",
+     "date": "2026-10-04",
+     "start": "20:00",
+     "durationMin": 30,
+     "recur": {
+      "freq": "daily"
+     },
+     "icon": "📞",
+     "color": "teal",
+     "reminder": true
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "20:00"
+    }
+   }
+  },
+  {
+   "text": "gym mañana 7am 1h",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Gym",
+     "date": "2026-10-05",
+     "start": "07:00",
+     "durationMin": 60,
+     "recur": null,
+     "icon": "💪",
+     "color": "coral",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "mañana",
+     "timeLabel": "07:00"
+    }
+   }
+  },
+  {
+   "text": "estudiar inglés el lunes 2pm 90 min",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Estudiar inglés",
+     "date": "2026-10-05",
+     "start": "14:00",
+     "durationMin": 90,
+     "recur": null,
+     "icon": "📚",
+     "color": "plum",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "lunes",
+     "timeLabel": "14:00"
+    }
+   }
+  },
+  {
+   "text": "reunión con cliente Acme todos los miércoles 10am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Reunión con cliente Acme",
+     "date": "2026-10-07",
+     "start": "10:00",
+     "durationMin": 30,
+     "recur": {
+      "freq": "weekly",
+      "days": [
+       3
+      ]
+     },
+     "icon": "📊",
+     "color": "sky",
+     "reminder": true
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "miercoles",
+     "timeLabel": "10:00"
+    }
+   }
+  },
+  {
+   "text": "reunion todos los miercoles 10am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Reunion",
+     "date": "2026-10-07",
+     "start": "10:00",
+     "durationMin": 30,
+     "recur": {
+      "freq": "weekly",
+      "days": [
+       3
+      ]
+     },
+     "icon": "📊",
+     "color": "sky",
+     "reminder": true
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "miercoles",
+     "timeLabel": "10:00"
+    }
+   }
+  },
+  {
+   "text": "dentista hoy a las 4",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Dentista",
+     "date": "2026-10-04",
+     "start": "04:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "💊",
+     "color": "rose",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "hoy",
+     "timeLabel": "04:00"
+    }
+   }
+  },
+  {
+   "text": "dentista pasado mañana 9:30",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Dentista",
+     "date": "2026-10-06",
+     "start": "09:30",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "💊",
+     "color": "rose",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "pasado mañana",
+     "timeLabel": "09:30"
+    }
+   }
+  },
+  {
+   "text": "almuerzo con María el viernes",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Almuerzo con María",
+     "date": "2026-10-09",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "🍽️",
+     "color": "sun",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "viernes",
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "pagar arriendo el 5",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Pagar arriendo",
+     "date": "2026-10-05",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "el 5",
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "pagar arriendo el 29",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Pagar arriendo",
+     "date": "2026-10-29",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "el 29",
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "cumpleaños de Ana el 3 de diciembre",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Cumpleaños Ana",
+     "date": "2026-12-03",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "el 3 de diciembre",
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "viaje el 15 de enero a las 6am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Viaje",
+     "date": "2026-01-15",
+     "start": "06:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "el 15 de enero",
+     "timeLabel": "06:00"
+    }
+   }
+  },
+  {
+   "text": "dentista el 31 de febrero",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Dentista",
+     "date": "2026-03-03",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "💊",
+     "color": "rose",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "el 31 de febrero",
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "comprar pan esta tarde",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Comprar pan tarde",
+     "date": "2026-10-04",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "hoy",
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "correr esta mañana",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Correr mañana",
+     "date": "2026-10-04",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "💪",
+     "color": "coral",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "esta manana",
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "leer esta noche 10pm",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Leer noche",
+     "date": "2026-10-04",
+     "start": "22:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "📚",
+     "color": "plum",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "hoy",
+     "timeLabel": "22:00"
+    }
+   }
+  },
+  {
+   "text": "reunión el próximo martes 15:00",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Reunión",
+     "date": "2026-10-06",
+     "start": "15:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "📊",
+     "color": "sky",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "martes",
+     "timeLabel": "15:00"
+    }
+   }
+  },
+  {
+   "text": "entrega informe este jueves",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Entrega informe",
+     "date": "2026-10-08",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "jueves",
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "sábado asado con amigos 13:30",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Sábado asado con amigos",
+     "date": "2026-10-10",
+     "start": "13:30",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "sabado",
+     "timeLabel": "13:30"
+    }
+   }
+  },
+  {
+   "text": "domingo descansar",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Descansar",
+     "date": "2026-10-11",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "😴",
+     "color": "lavender",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "domingo",
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "cena con Ana a las 8 de la noche",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Cena con Ana noche",
+     "date": "2026-10-04",
+     "start": "08:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "🍽️",
+     "color": "sun",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "08:00"
+    }
+   }
+  },
+  {
+   "text": "desayuno a las 7 y media",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Desayuno y media",
+     "date": "2026-10-04",
+     "start": "07:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "07:00"
+    }
+   }
+  },
+  {
+   "text": "clase a las 8 y cuarto",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Clase y cuarto",
+     "date": "2026-10-04",
+     "start": "08:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "📚",
+     "color": "plum",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "08:00"
+    }
+   }
+  },
+  {
+   "text": "reunión 19h",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Reunión",
+     "date": "2026-10-04",
+     "start": "19:00",
+     "durationMin": 1140,
+     "recur": null,
+     "icon": "📊",
+     "color": "sky",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "19:00"
+    }
+   }
+  },
+  {
+   "text": "reunión a las 19",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Reunión",
+     "date": "2026-10-04",
+     "start": "19:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "📊",
+     "color": "sky",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "19:00"
+    }
+   }
+  },
+  {
+   "text": "llamada 3pm",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Llamada",
+     "date": "2026-10-04",
+     "start": "15:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "📊",
+     "color": "sky",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "15:00"
+    }
+   }
+  },
+  {
+   "text": "llamada 3 p.m.",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Llamada",
+     "date": "2026-10-04",
+     "start": "15:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "📊",
+     "color": "sky",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "15:00"
+    }
+   }
+  },
+  {
+   "text": "café 10.30",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Café",
+     "date": "2026-10-04",
+     "start": "10:30",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "☕",
+     "color": "ember",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "10:30"
+    }
+   }
+  },
+  {
+   "text": "siesta 15:45 20 min",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Siesta",
+     "date": "2026-10-04",
+     "start": "15:45",
+     "durationMin": 20,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "15:45"
+    }
+   }
+  },
+  {
+   "text": "yoga 12am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Yoga",
+     "date": "2026-10-04",
+     "start": "00:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "🧘",
+     "color": "lavender",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "00:00"
+    }
+   }
+  },
+  {
+   "text": "turno 12pm",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Turno",
+     "date": "2026-10-04",
+     "start": "12:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "12:00"
+    }
+   }
+  },
+  {
+   "text": "estudiar cálculo 2 horas",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Estudiar cálculo",
+     "date": "2026-10-04",
+     "start": null,
+     "durationMin": 120,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": false,
+     "dayLabel": null,
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "estudiar cálculo hora y media",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Estudiar cálculo",
+     "date": "2026-10-04",
+     "start": null,
+     "durationMin": 90,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": false,
+     "dayLabel": null,
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "meditar media hora",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Meditar",
+     "date": "2026-10-04",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": false,
+     "dayLabel": null,
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "leer 45 minutos",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Leer",
+     "date": "2026-10-04",
+     "start": null,
+     "durationMin": 45,
+     "recur": null,
+     "icon": "📚",
+     "color": "plum",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": false,
+     "dayLabel": null,
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "caminar 20 min mañana 8am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Caminar",
+     "date": "2026-10-05",
+     "start": "08:00",
+     "durationMin": 20,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "mañana",
+     "timeLabel": "08:00"
+    }
+   }
+  },
+  {
+   "text": "deep work una hora 9am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Deep work",
+     "date": "2026-10-04",
+     "start": "09:00",
+     "durationMin": 60,
+     "recur": null,
+     "icon": "💼",
+     "color": "slate",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "09:00"
+    }
+   }
+  },
+  {
+   "text": "estudiar en 2 horas",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Estudiar en",
+     "date": "2026-10-04",
+     "start": null,
+     "durationMin": 120,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": false,
+     "dayLabel": null,
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "película 2h mañana 9pm",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Película",
+     "date": "2026-10-05",
+     "start": "21:00",
+     "durationMin": 120,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "mañana",
+     "timeLabel": "21:00"
+    }
+   }
+  },
+  {
+   "text": "gym entre semana 7am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Gym",
+     "date": "2026-10-04",
+     "start": "07:00",
+     "durationMin": 30,
+     "recur": {
+      "freq": "weekdays"
+     },
+     "icon": "💪",
+     "color": "coral",
+     "reminder": true
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "07:00"
+    }
+   }
+  },
+  {
+   "text": "gym de lunes a viernes 7am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Gym a viernes",
+     "date": "2026-10-05",
+     "start": "07:00",
+     "durationMin": 30,
+     "recur": {
+      "freq": "weekdays"
+     },
+     "icon": "💪",
+     "color": "coral",
+     "reminder": true
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "lunes",
+     "timeLabel": "07:00"
+    }
+   }
+  },
+  {
+   "text": "tomar agua todos los días 9am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Tomar agua días",
+     "date": "2026-10-04",
+     "start": "09:00",
+     "durationMin": 30,
+     "recur": {
+      "freq": "daily"
+     },
+     "icon": "✨",
+     "color": "mint",
+     "reminder": true
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "09:00"
+    }
+   }
+  },
+  {
+   "text": "yoga cada lunes 7am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Yoga",
+     "date": "2026-10-05",
+     "start": "07:00",
+     "durationMin": 30,
+     "recur": {
+      "freq": "weekly",
+      "days": [
+       1
+      ]
+     },
+     "icon": "🧘",
+     "color": "lavender",
+     "reminder": true
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "lunes",
+     "timeLabel": "07:00"
+    }
+   }
+  },
+  {
+   "text": "yoga lunes, miércoles y viernes 7am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Yoga , miércoles y viernes",
+     "date": "2026-10-05",
+     "start": "07:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "🧘",
+     "color": "lavender",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "lunes",
+     "timeLabel": "07:00"
+    }
+   }
+  },
+  {
+   "text": "planificar la semana cada domingo 8pm",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Planificar semana",
+     "date": "2026-10-11",
+     "start": "20:00",
+     "durationMin": 30,
+     "recur": {
+      "freq": "weekly",
+      "days": [
+       0
+      ]
+     },
+     "icon": "✨",
+     "color": "lavender",
+     "reminder": true
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "domingo",
+     "timeLabel": "20:00"
+    }
+   }
+  },
+  {
+   "text": "revisar correo diariamente 9am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Revisar correo diariamente",
+     "date": "2026-10-04",
+     "start": "09:00",
+     "durationMin": 30,
+     "recur": {
+      "freq": "daily"
+     },
+     "icon": "✨",
+     "color": "lavender",
+     "reminder": true
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "09:00"
+    }
+   }
+  },
+  {
+   "text": "limpieza cada semana sábado 11am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Limpieza sábado",
+     "date": "2026-10-10",
+     "start": "11:00",
+     "durationMin": 30,
+     "recur": {
+      "freq": "weekly"
+     },
+     "icon": "✨",
+     "color": "mint",
+     "reminder": true
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "sabado",
+     "timeLabel": "11:00"
+    }
+   }
+  },
+  {
+   "text": "tomar pastilla a diario 8am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Tomar pastilla a diario",
+     "date": "2026-10-04",
+     "start": "08:00",
+     "durationMin": 30,
+     "recur": {
+      "freq": "daily"
+     },
+     "icon": "💊",
+     "color": "rose",
+     "reminder": true
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": true,
+     "dayLabel": null,
+     "timeLabel": "08:00"
+    }
+   }
+  },
+  {
+   "text": "agéndame reunión con Pedro mañana 11am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Reunión con Pedro",
+     "date": "2026-10-05",
+     "start": "11:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "📊",
+     "color": "sky",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "mañana",
+     "timeLabel": "11:00"
+    }
+   }
+  },
+  {
+   "text": "agrega comprar leche hoy",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Comprar leche",
+     "date": "2026-10-04",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "hoy",
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "recuérdame llamar al banco mañana 9am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Llamar al banco",
+     "date": "2026-10-05",
+     "start": "09:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "📞",
+     "color": "teal",
+     "reminder": true
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "mañana",
+     "timeLabel": "09:00"
+    }
+   }
+  },
+  {
+   "text": "tengo que estudiar para la prueba el jueves 4pm",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Estudiar prueba",
+     "date": "2026-10-08",
+     "start": "16:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "📚",
+     "color": "plum",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "jueves",
+     "timeLabel": "16:00"
+    }
+   }
+  },
+  {
+   "text": "necesito ir al supermercado hoy 6pm",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Ir al supermercado",
+     "date": "2026-10-04",
+     "start": "18:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "hoy",
+     "timeLabel": "18:00"
+    }
+   }
+  },
+  {
+   "text": "quiero salir a correr mañana 7am 30 min",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Salir a correr",
+     "date": "2026-10-05",
+     "start": "07:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "💪",
+     "color": "coral",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "mañana",
+     "timeLabel": "07:00"
+    }
+   }
+  },
+  {
+   "text": "pon una alarma para la reunión del viernes 9am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Alarma reunión",
+     "date": "2026-10-09",
+     "start": "09:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "📊",
+     "color": "sky",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "viernes",
+     "timeLabel": "09:00"
+    }
+   }
+  },
+  {
+   "text": "nueva tarea revisar contrato mañana",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Revisar contrato",
+     "date": "2026-10-05",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "lavender",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "mañana",
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "crea tarea de lavar ropa",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Tarea lavar ropa",
+     "date": "2026-10-04",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "📚",
+     "color": "plum",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": false,
+     "dayLabel": null,
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "gym y almuerzo el viernes",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Gym y almuerzo",
+     "date": "2026-10-09",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "💪",
+     "color": "coral",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "viernes",
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "comprar pan, leche y huevos",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Comprar pan, leche y huevos",
+     "date": "2026-10-04",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": false,
+     "dayLabel": null,
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "agéndame",
+   "parsed": {
+    "intent": "unknown",
+    "raw": "agéndame"
+   }
+  },
+  {
+   "text": "¿qué tengo hoy?",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "¿qué tengo ?",
+     "date": "2026-10-04",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "hoy",
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "qué tengo mañana",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Qué tengo",
+     "date": "2026-10-05",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "mañana",
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "hola",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Hola",
+     "date": "2026-10-04",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": false,
+     "dayLabel": null,
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "gracias",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Gracias",
+     "date": "2026-10-04",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": false,
+     "hadTime": false,
+     "dayLabel": null,
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "",
+   "parsed": {
+    "intent": "unknown",
+    "raw": ""
+   }
+  },
+  {
+   "text": "   ",
+   "parsed": {
+    "intent": "unknown",
+    "raw": ""
+   }
+  },
+  {
+   "text": "7am",
+   "parsed": {
+    "intent": "unknown",
+    "raw": "7am"
+   }
+  },
+  {
+   "text": "mañana",
+   "parsed": {
+    "intent": "unknown",
+    "raw": "mañana"
+   }
+  },
+  {
+   "text": "borra gym",
+   "parsed": {
+    "intent": "delete",
+    "query": "gym"
+   }
+  },
+  {
+   "text": "borrar la tarea de gym",
+   "parsed": {
+    "intent": "delete",
+    "query": "gym"
+   }
+  },
+  {
+   "text": "elimina reunión con Ana",
+   "parsed": {
+    "intent": "delete",
+    "query": "reunión con Ana"
+   }
+  },
+  {
+   "text": "quita el dentista",
+   "parsed": {
+    "intent": "delete",
+    "query": "dentista"
+   }
+  },
+  {
+   "text": "cancela mi reunión de miércoles",
+   "parsed": {
+    "intent": "delete",
+    "query": "reunión miércoles"
+   }
+  },
+  {
+   "text": "cancelar la suscripción de netflix mañana",
+   "parsed": {
+    "intent": "delete",
+    "query": "suscripción netflix mañana"
+   }
+  },
+  {
+   "text": "completa gym",
+   "parsed": {
+    "intent": "complete",
+    "query": "gym"
+   }
+  },
+  {
+   "text": "marca gym como hecho",
+   "parsed": {
+    "intent": "complete",
+    "query": "gym"
+   }
+  },
+  {
+   "text": "ya hice la reunión",
+   "parsed": {
+    "intent": "complete",
+    "query": "reunión"
+   }
+  },
+  {
+   "text": "terminé el informe",
+   "parsed": {
+    "intent": "complete",
+    "query": "informe"
+   }
+  },
+  {
+   "text": "listo el informe",
+   "parsed": {
+    "intent": "complete",
+    "query": "listo informe"
+   }
+  },
+  {
+   "text": "mueve gym a las 6pm",
+   "parsed": {
+    "intent": "move",
+    "query": "gym",
+    "start": "18:00"
+   }
+  },
+  {
+   "text": "mover reunión a las 15:30",
+   "parsed": {
+    "intent": "move",
+    "query": "reunión",
+    "start": "15:30"
+   }
+  },
+  {
+   "text": "posterga el dentista a las 5",
+   "parsed": {
+    "intent": "move",
+    "query": "el dentista",
+    "start": "05:00"
+   }
+  },
+  {
+   "text": "reprograma gym",
+   "parsed": {
+    "intent": "move",
+    "query": "gym",
+    "start": null
+   }
+  },
+  {
+   "text": "mueve gym a mañana",
+   "parsed": {
+    "intent": "move",
+    "query": "gym a mañana",
+    "start": null
+   }
+  },
+  {
+   "text": "pasa a buscar a Ana a las 5pm",
+   "parsed": {
+    "intent": "move",
+    "query": "a buscar a Ana",
+    "start": "17:00"
+   }
+  },
+  {
+   "text": "cambia la hora de gym a las 8am",
+   "parsed": {
+    "intent": "move",
+    "query": "gym",
+    "start": "08:00"
+   }
+  },
+  {
+   "text": "ayuda",
+   "parsed": {
+    "intent": "help"
+   }
+  },
+  {
+   "text": "¿cómo funciona esto?",
+   "parsed": {
+    "intent": "help"
+   }
+  },
+  {
+   "text": "ver cómo va el proyecto mañana 10am",
+   "parsed": {
+    "intent": "help"
+   }
+  },
+  {
+   "text": "qué puedo hacer",
+   "parsed": {
+    "intent": "help"
+   }
+  },
+  {
+   "text": "GYM MAÑANA 7AM",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "GYM",
+     "date": "2026-10-05",
+     "start": "07:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "💪",
+     "color": "coral",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "mañana",
+     "timeLabel": "07:00"
+    }
+   }
+  },
+  {
+   "text": "Reunión: equipo de diseño, mañana 10am",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Reunión: equipo diseño,",
+     "date": "2026-10-05",
+     "start": "10:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "📊",
+     "color": "sky",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "mañana",
+     "timeLabel": "10:00"
+    }
+   }
+  },
+  {
+   "text": "café ☕ con Sofía mañana 16:00",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Café ☕ con Sofía",
+     "date": "2026-10-05",
+     "start": "16:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "☕",
+     "color": "ember",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "mañana",
+     "timeLabel": "16:00"
+    }
+   }
+  },
+  {
+   "text": "ir al médico el miércoles a las 9",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Ir al médico miércoles",
+     "date": "2026-10-07",
+     "start": "09:00",
+     "durationMin": 30,
+     "recur": null,
+     "icon": "💊",
+     "color": "rose",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "miercoles",
+     "timeLabel": "09:00"
+    }
+   }
+  },
+  {
+   "text": "sábado",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Sábado",
+     "date": "2026-10-10",
+     "start": null,
+     "durationMin": 30,
+     "recur": null,
+     "icon": "✨",
+     "color": "mint",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": false,
+     "dayLabel": "sabado",
+     "timeLabel": null
+    }
+   }
+  },
+  {
+   "text": "estudio de mercado el sábado 10am 3 horas",
+   "parsed": {
+    "intent": "create",
+    "task": {
+     "title": "Estudio mercado sábado",
+     "date": "2026-10-10",
+     "start": "10:00",
+     "durationMin": 180,
+     "recur": null,
+     "icon": "🛒",
+     "color": "coral",
+     "reminder": false
+    },
+    "meta": {
+     "hadDate": true,
+     "hadTime": true,
+     "dayLabel": "sabado",
+     "timeLabel": "10:00"
+    }
+   }
+  }
+ ]
+}

@@ -1,12 +1,9 @@
 .DS_Store
 Thumbs.db
 
-# dev tooling (local syntax-check + headless smoke tests)
+# dependencies and build output
 node_modules
-package.dev.json
-check.js
-smoke.js
-flow.js
+dist
 
 # wrangler files
 .wrangler
@@ -15,20 +12,6 @@ flow.js
 .env*
 !.env.example
 
-# stale backups (local snapshots, not source of truth)
-.backup-*/
-.openclaw-backup*/
-.openclaw-polish-backup*/
-
-# test artifacts (regression screenshots)
-shot-*.png
-
-# dev capture artifacts
-cap*.js
-h-*.png
-v-*.png
-accent-*.png
-tour-*.png
-
-# Local browser evidence
-artifacts/
+# test output
+test-results
+playwright-report
