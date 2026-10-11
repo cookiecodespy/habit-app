@@ -21,7 +21,9 @@ src/
     nlp.ts              intérprete de frases en español → acción sobre el store
     reminders.ts        qué tareas merecen aviso ahora
   store-hooks.js        enlace con React: re-render cuando cambian los datos
-  lifeos-*.jsx          INTERFAZ — pantallas y componentes
+  lifeos-app.jsx        INTERFAZ — las dos carcasas (teléfono, escritorio) y su controlador
+  lifeos-ui.jsx         piezas comunes: hojas y diálogos, preguntas, selector de repetición
+  lifeos-*.jsx          pantallas y componentes
   pwa.js                registro del service worker y almacenamiento persistente
   sw.template.js        plantilla del service worker (se completa en el build)
 public/                 manifest, iconos y cabeceras HTTP (_headers)
@@ -57,6 +59,17 @@ una fecha y su id es `<id de la serie>@<fecha>`. Solo cuando un día concreto ca
 completa, se edita, se borra) se guarda un registro propio para ese día, con `_from` apuntando
 a la serie. Un día borrado deja una lápida (`_deleted`) para que no reaparezca.
 
+Las operaciones sobre la serie completa viven en el store: `seriesOf`, `updateSeries`
+(alcanza a los días guardados solo por estar completados; respeta los editados a mano),
+`endSeries` (deja de repetir conservando lo vivido) y `removeFromSeries` (un día, ese día en
+adelante, o todo). `updateTask` sobre un día nunca guarda una repetición en ese día.
+
+### Deshacer
+
+`LOStore.snapshot()` devuelve el texto guardado de las cuatro colecciones y `restore()` lo
+repone tal cual. La interfaz toma una instantánea antes de cada acción destructiva y ofrece
+"Deshacer"; como se repone el texto exacto, deshacer no puede dejar datos a medias.
+
 ### Lectura con caché
 
 Leer la lista completa y normalizarla en cada consulta hacía la Agenda más lenta cuanto más se
@@ -89,6 +102,15 @@ Las cabeceras se definen en `public/_headers` y Cloudflare las aplica a cada res
 
 Las pruebas de `tests/e2e/arranque.spec.ts` comprueban cabeceras y que los archivos internos
 responden 404.
+
+## Interfaz
+
+Las dos carcasas (`PhoneApp`, `DesktopApp`) comparten un controlador, `useApp`, con la sección
+abierta, el día que muestra "Hoy", la capa abierta y las acciones; y un único componente
+`Overlays` que dibuja las capas. `Sheet` es hoja inferior en teléfono y diálogo centrado en
+pantallas anchas: atrapa el foco, cierra con Escape y devuelve el foco al cerrar. `useNow`
+refresca la pantalla cuando cambia el minuto o la app vuelve al frente, de modo que "hoy" y
+el marcador de "ahora" nunca quedan viejos.
 
 ## Límites conocidos
 

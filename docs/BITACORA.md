@@ -5,6 +5,77 @@ Cada sesión de trabajo relevante añade una entrada arriba.
 
 ---
 
+## 2026-10-11 — v2.1: lógica sólida e interfaz pulida (pasadas 2 y 3)
+
+**Por qué.** Una auditoría de la v2.0 encontró fallos que las pruebas existentes no cubrían:
+algunos corrompían datos, otros hacían que la app dijera cosas que no eran ciertas.
+
+**Fallos corregidos**
+
+- *Series anidadas.* Cambiar "Repetir" en un día de una tarea repetida convertía ese día en
+  una segunda serie y dejaba ids con dos fechas que el resto del código leía mal. Ahora un día
+  nunca se repite por sí mismo, y los datos que ya quedaron así se leen bien.
+- *El planner inventaba.* "hola" creaba una tarea llamada "Hola"; "a las 8 de la noche" se
+  agendaba a las 8 de la mañana; "reunión 19h" duraba 19 horas; "el 31 de febrero" caía en
+  marzo; "el 15 de enero" en octubre quedaba en el pasado; los títulos perdían palabras
+  ("Estudiar para la prueba" → "Estudiar prueba"). Cuando no entendía, respondía con frases de
+  relleno que afirmaban haber agendado algo. Intérprete reescrito: lee cada trozo una sola vez
+  y, si no entiende, lo dice.
+- *Detalle con datos viejos.* Reabrir una tarea repetida ya completada seguía mostrándola como
+  completada.
+- *Hábitos.* La constancia de un hábito nuevo partía en 3 % aunque se cumpliera todos los
+  días (contaba los 30 días anteriores a crearlo).
+- *Modo enfoque.* El contador se atrasaba o se detenía con la app en segundo plano, y
+  "completar" sobre una tarea ya hecha la reabría.
+- *Agenda.* Cambiar de mes con el día 31 elegido dejaba una fecha inexistente.
+- *Colores.* El selector ofrecía 12 colores de los que solo 6 eran distintos; un color
+  desconocido en datos importados podía dejar la pantalla en blanco.
+- *Iconos sugeridos.* "estudiar", "comprar" o "entrenar" nunca recibían su icono.
+
+**Qué cambió**
+
+- *Tareas repetidas de verdad.* El detalle muestra la repetición real y permite elegir días
+  de la semana. Cada edición se aplica a "solo este día" o a "toda la serie". Al eliminar se
+  elige: este día, este y los siguientes, o toda la serie. "Dejar de repetir" conserva lo ya
+  hecho.
+- *Deshacer en vez de confirmar.* Eliminar una tarea, un hábito, un pendiente o lo que hizo
+  una frase del planner se puede deshacer durante unos segundos. Las preguntas que quedan
+  (borrar todo, reemplazar datos) son diálogos propios, no los del navegador.
+- *Hoy.* La tira de la semana es navegable: se puede ver y planificar cualquier día. Marcador
+  de "ahora", tarea en curso con minutos restantes, y el día cambia solo a medianoche. En el
+  teléfono la lista del día sube unos 350 px: hábitos y fechas límite pasaron a ser compactos.
+- *Planner.* Se llama "Planner" (ya no "IA"). Nuevo: varios días ("martes y jueves"),
+  "15/11", "en 3 días", "por la tarde", "¿qué tengo mañana?", mover a otro día, aviso cuando
+  una tarea se cruza con otra.
+- *Escritorio.* Las hojas son diálogos centrados; atajos `N` (nueva tarea), `/` (buscar),
+  `T` (hoy), `Esc` (cerrar).
+- *Accesibilidad.* Nombres para todos los botones de solo icono, foco visible con teclado,
+  foco atrapado en diálogos, tarjetas operables con teclado, barras de desplazamiento con
+  ratón.
+- *Ajustes.* Espacio usado, fecha del último respaldo y aviso si tiene más de un mes. Se
+  retiró "Sync entre dispositivos · Pronto": no hay nada en camino (ver DECISIONES).
+- *Robustez.* Colecciones dañadas se leen como vacías; horas y duraciones inválidas se
+  corrigen al leer; un respaldo de una versión más nueva se rechaza sin tocar nada.
+
+**Cómo se verificó**
+
+- 58 pruebas de lógica (36 nuevas: series, deshacer, planner, hábitos). Los 594 resultados de
+  referencia se regeneraron y cada diferencia se revisó: todas son correcciones deliberadas.
+- 27 pruebas de navegador por tamaño de pantalla (6 nuevas: navegar días, editar y eliminar
+  series, deshacer, planner, enfoque), en teléfono y escritorio.
+- La prueba de actualización sigue pasando: el formato de los datos guardados no cambió y la
+  versión nueva no reescribe nada al arrancar. La única clave nueva es
+  `lifeos.lastBackupAt`.
+
+**Qué queda**
+
+- La lista "Todo el mes" tarda en dibujarse con cientos de tareas.
+- Arrastrar tareas para moverlas de hora; editar varios pasos a la vez.
+- Los avisos siguen necesitando la app abierta.
+- Sonido; capturas del README en tema claro.
+
+---
+
 ## 2026-10-10 — v2.0: cimientos nuevos (pasada 1 de 3)
 
 **Por qué.** La app funcionaba, pero sobre una base frágil: un único `index.html` generado a

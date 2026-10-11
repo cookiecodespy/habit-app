@@ -60,13 +60,12 @@ export function stored<T = unknown>(page: Page, key: string): Promise<T> {
 export const isPhone = (page: Page): boolean => (page.viewportSize()?.width ?? 0) < 760;
 
 /** Go to a main section by its visible name in the tab bar (phone) or the sidebar (desktop). */
-export async function goTo(page: Page, section: 'Hoy' | 'Agenda' | 'IA' | 'Hábitos' | 'Ajustes'): Promise<void> {
-  const label = section === 'IA' && !isPhone(page) ? 'IA Planner' : section;
-  await page.locator('button.lo-press').filter({ hasText: new RegExp(`^${label}$`) }).first().click();
+export async function goTo(page: Page, section: 'Hoy' | 'Agenda' | 'Planner' | 'Hábitos' | 'Ajustes'): Promise<void> {
+  await page.locator('button.lo-press').filter({ hasText: new RegExp(`^${section}$`) }).first().click();
 }
 
 /** Open the "add" menu and pick an entry. */
-export async function quickAdd(page: Page, entry: 'Nueva tarea' | 'Nuevo hábito' | 'Nueva rutina' | 'Inbox rápido' | 'Dictar con IA'): Promise<void> {
+export async function quickAdd(page: Page, entry: 'Nueva tarea' | 'Nuevo hábito' | 'Nueva rutina' | 'Inbox rápido' | 'Escribir una frase'): Promise<void> {
   await page.getByRole('button', { name: 'Añadir', exact: true }).click();
   await page.locator('[data-screen-label="Quick Add"]').getByRole('button', { name: entry, exact: true }).click();
 }

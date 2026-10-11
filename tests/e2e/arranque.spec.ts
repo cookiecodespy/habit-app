@@ -35,7 +35,7 @@ test('recorrer todas las secciones no produce errores ni infracciones de segurid
   await page.getByPlaceholder('Tu nombre').fill('Prueba');
   await page.getByRole('button', { name: /Empezar/ }).click();
   await appReady(page);
-  for (const section of ['Agenda', 'IA', 'Hábitos', 'Ajustes', 'Hoy'] as const) {
+  for (const section of ['Agenda', 'Planner', 'Hábitos', 'Ajustes', 'Hoy'] as const) {
     await goTo(page, section);
     await page.waitForTimeout(250);
   }

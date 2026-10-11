@@ -102,6 +102,21 @@ export const LOStore = {
   /** The series a task belongs to, or null when it does not repeat. */
   seriesOf(task: Pick<Task, 'id' | 'recur' | '_from'>): Task | null { return loSeriesOf(task); },
   /**
+   * The day of a series to show when the series itself is asked for: the first one from
+   * `from` on, or failing that the last one before it.
+   */
+  dayOfSeries(seriesId: string, from: DateStr = loDateStr()): Task | null {
+    const series = loTaskById(seriesId);
+    if (!series || !series.recur) return null;
+    for (const step of [1, -1]) {
+      for (let i = step === 1 ? 0 : 1; i <= 370; i++) {
+        const day = loTaskById(`${seriesId}@${loAddDays(from, i * step)}`);
+        if (day) return day;
+      }
+    }
+    return null;
+  },
+  /**
    * Change every day of a series. Days stored only because they were completed follow the
    * change; days edited by hand keep what was edited. `recur: null` is ignored here — use
    * endSeries, which keeps the days already lived.
@@ -147,6 +162,8 @@ export const LOStore = {
     const task = loTaskById(id);
     const seriesId = task ? loSeriesIdOf(task) : null;
     if (!task || !seriesId) { LOStore.removeTask(id); return; }
+    // "One day" needs a day: with the id of the series itself there is none to pick.
+    if (scope !== 'all' && !loSplitOccurrenceId(task.id)) return;
     if (scope === 'all') LOStore.removeTask(seriesId);
     else if (scope === 'following') LOStore.endSeries(seriesId, loAddDays(loSplitOccurrenceId(task.id)?.[1] ?? task.date, -1));
     else LOStore.removeTask(id);

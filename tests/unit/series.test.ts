@@ -105,6 +105,25 @@ test('removing from a series: one day, that day onwards, or all of it', () => {
   expect(LOStore.allTasks()).toEqual([]);
 });
 
+test('asking to remove "one day" with the id of the series removes nothing', () => {
+  freshWorld(NOW);
+  dailyGym();
+  LOStore.removeFromSeries('gym', 'day');
+  LOStore.removeFromSeries('gym', 'following');
+  expect(titles(TUE)).toEqual(['Gym']);
+  LOStore.removeFromSeries('gym', 'all');
+  expect(LOStore.allTasks()).toEqual([]);
+});
+
+test('the day shown for a series is the next one, or the last when it has ended', () => {
+  freshWorld(NOW);
+  LOStore.addTask({ id: 'yoga', title: 'Yoga', date: TUE, start: '07:00', recur: { freq: 'weekly', days: [4] } }); // Thursdays
+  expect(LOStore.dayOfSeries('yoga')!.id).toBe(`yoga@${THU}`);
+  LOStore.endSeries('yoga', THU);
+  expect(LOStore.dayOfSeries('yoga', '2026-11-01')!.id).toBe(`yoga@${THU}`);
+  expect(LOStore.dayOfSeries('nope')).toBeNull();
+});
+
 test('removeFromSeries on a plain task simply removes it', () => {
   freshWorld(NOW);
   LOStore.addTask({ id: 'one', title: 'Dentista', date: TUE });

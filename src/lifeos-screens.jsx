@@ -1,33 +1,36 @@
-// lifeos-screens.jsx — auxiliary screens (Month, Week, Create, Detail, Onboarding, AI, Settings, Inbox, Stats)
-
-// Reusable: bottom tab bar — solid background, pill indicator, safe-area aware
+// lifeos-screens.jsx — the screens behind the tabs and sheets: Agenda (month and week), create
+// and detail of a task, the planner by phrases, the inbox and Ajustes.
 
 import React from 'react';
 import { LO_CATEGORIES, LO_CAT_BY_ID, loGuessCategory } from './domain/categories';
 import {
-  MONTH_NAMES, buildMonth, fmt12, loDateStr, loDow, loHHMMtoMin, loMinToHHMM, minutesBetween,
+  MONTH_NAMES, buildMonth, fmt12, loAddDays, loDateStr, loDow, loHHMMtoMin, loMinToHHMM,
 } from './domain/dates';
-import { loExecuteCommand, loParseCommand } from './domain/nlp';
-import { LO_KEYS, USER_KEY, notifyStoreChange } from './domain/storage';
+import { loDayLabel, loExecuteCommand, loParseCommand, loRecurLabel } from './domain/nlp';
+import { LAST_BACKUP_KEY, LO_KEYS, USER_KEY, notifyStoreChange } from './domain/storage';
 import { LOStore } from './domain/store';
-import { loUid } from './domain/tasks';
+import { loSplitOccurrenceId, loUid } from './domain/tasks';
 import { EmptyState } from './lifeos-extras.jsx';
 import { EmojiPicker, LIFE_PALETTE, LifeIcon, LifeIconBox, TaskGlyph, UIIcon } from './lifeos-icons.jsx';
 import { NotifSettingsRow, toast } from './lifeos-notify.jsx';
 import { StatusRing } from './lifeos-timeline.jsx';
+import { ColorSwatches, RecurPicker, confirmAsk, haptic, pal } from './lifeos-ui.jsx';
 import { avatarLetter } from './lifeos-user.jsx';
-import { useInbox } from './store-hooks.js';
+import { useInbox, useStoreVersion } from './store-hooks.js';
+
+const lengthLabel = (min) => (min < 60 ? `${min} min` : `${Math.floor(min / 60)} h${min % 60 ? ` ${min % 60} min` : ''}`);
+const chipLabel = (min) => (min < 60 ? `${min}m` : `${Math.floor(min / 60)}h${min % 60 ? `${min % 60}m` : ''}`);
 
 function TabBar({ theme, current, onChange }) {
   const tabs = [
     { id: 'timeline', icon: 'timeline', label: 'Hoy' },
     { id: 'month',    icon: 'calendar', label: 'Agenda' },
-    { id: 'ai',       icon: 'ai',       label: 'IA' },
+    { id: 'ai',       icon: 'ai',       label: 'Planner' },
     { id: 'stats',    icon: 'repeat',   label: 'Hábitos' },
     { id: 'settings', icon: 'settings', label: 'Ajustes' },
   ];
   return (
-    <div style={{
+    <nav aria-label="Secciones" style={{
       position: 'absolute', left: 0, right: 0, bottom: 0,
       background: theme.bg,
       borderTop: `0.5px solid ${theme.border}`,
@@ -38,7 +41,7 @@ function TabBar({ theme, current, onChange }) {
         {tabs.map(t => {
           const active = current === t.id;
           return (
-            <button key={t.id} onClick={() => onChange(t.id)} className="lo-press" style={{
+            <button key={t.id} onClick={() => { if (!active) haptic(4); onChange(t.id); }} aria-current={active ? 'page' : undefined} className="lo-press" style={{
               flex: 1, background: 'transparent', border: 'none', cursor: 'pointer',
               display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3,
               padding: '0 2px 10px', fontFamily: 'inherit',
@@ -51,12 +54,12 @@ function TabBar({ theme, current, onChange }) {
               }}>
                 <UIIcon name={t.icon} size={21} color={active ? theme.accent : theme.text3} strokeWidth={active ? 2.2 : 1.7}/>
               </div>
-              <span style={{ fontSize: 9.5, fontWeight: active ? 700 : 500, color: active ? theme.accent : theme.text3, letterSpacing: 0.1 }}>{t.label}</span>
+              <span style={{ fontSize: 10, fontWeight: active ? 700 : 500, color: active ? theme.accent : theme.text3, letterSpacing: 0.1 }}>{t.label}</span>
             </button>
           );
         })}
       </div>
-    </div>
+    </nav>
   );
 }
 
@@ -84,7 +87,7 @@ function ScreenTopBar({ theme, title, onBack, trailing, embedded }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px 14px', height: 44 }}>
       {embedded ? <div style={{ width: 36 }}/> : (
-        <button onClick={onBack} className="lo-press" style={{
+        <button onClick={onBack} aria-label="Volver" className="lo-press" style={{
           width: 36, height: 36, borderRadius: 18,
           background: theme.surface, border: `0.5px solid ${theme.border}`,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -111,15 +114,19 @@ function SettingsIconBadge({ name, color, size = 32 }) {
 // Agenda — month calendar with month navigation, selectable days,
 // task dots, and a list of the selected day's tasks below.
 // ──────────────────────────────────────────────────────────────
-function MonthScreen({ theme, onBack, embedded = false, onOpenTask, onAdd, userTasks = [] }) {
-  const _today = new Date();
-  const _ty = _today.getFullYear(), _tm = _today.getMonth(), _td = _today.getDate();
+function MonthScreen({ theme, now, onOpenTask, onAdd }) {
+  const today = loDateStr(now);
+  const [_ty, _tm1, _td] = today.split('-').map(Number);
+  const _tm = _tm1 - 1;
   const [yyMm, setYyMm] = React.useState({ y: _ty, m: _tm });
-  const [selected, setSelected] = React.useState(_td);
+  const [pickedDay, setSelected] = React.useState(_td);
   const [filter, setFilter] = React.useState('todo');   // 'todo' | 'vida' | 'trabajo' | 'uni'
   const [scope, setScope] = React.useState('day');      // 'day' | 'month'
   const cells = React.useMemo(() => buildMonth(yyMm.y, yyMm.m), [yyMm.y, yyMm.m]);
   const catMatch = (t) => filter === 'todo' || t.category === filter;
+  const daysInMonth = new Date(yyMm.y, yyMm.m + 1, 0).getDate();
+  // The 31st does not exist in every month: stay on the last day instead of an invalid date.
+  const selected = Math.min(pickedDay, daysInMonth);
 
   const goPrev = () => setYyMm(({ y, m }) => m === 0 ? { y: y - 1, m: 11 } : { y, m: m - 1 });
   const goNext = () => setYyMm(({ y, m }) => m === 11 ? { y: y + 1, m: 0 } : { y, m: m + 1 });
@@ -127,12 +134,12 @@ function MonthScreen({ theme, onBack, embedded = false, onOpenTask, onAdd, userT
   const dateOf = (day) => `${yyMm.y}-${String(yyMm.m + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
   const dotsFor = (day) => LOStore.tasksForDate(dateOf(day)).filter(t => t.kind !== 'break').slice(0, 5).map(t => t.color);
   const tasksForSelected = LOStore.tasksForDate(dateOf(selected));
+  const addHere = () => onAdd && onAdd(dateOf(selected) >= today ? dateOf(selected) : today);
 
-  // Every day of the month that has tasks, grouped → the bank-style list. Only needed in
-  // "Todo el mes"; the store caches each day, so this is cheap to recompute.
+  // Every day of the month that has tasks, grouped. Only needed in "Todo el mes"; the store
+  // caches each day, so this is cheap to recompute.
   const monthGroups = [];
   if (scope === 'month') {
-    const daysInMonth = new Date(yyMm.y, yyMm.m + 1, 0).getDate();
     for (let day = 1; day <= daysInMonth; day++) {
       const tasks = LOStore.tasksForDate(dateOf(day));
       if (tasks.length) monthGroups.push({ day, dateStr: dateOf(day), tasks });
@@ -142,15 +149,12 @@ function MonthScreen({ theme, onBack, embedded = false, onOpenTask, onAdd, userT
   const dayList = tasksForSelected.filter(catMatch);
   const monthFiltered = monthGroups.map(g => ({ ...g, tasks: g.tasks.filter(catMatch) })).filter(g => g.tasks.length);
   const monthCount = monthFiltered.reduce((n, g) => n + g.tasks.length, 0);
-  const goToDay = (dateStr) => { const day = Number(dateStr.split('-')[2]); setSelected(day); setScope('day'); };
 
   return (
     <div>
-      {!embedded && <ScreenTopBar theme={theme} title="Agenda" onBack={onBack}/>}
-
       <div style={{ padding: '0 18px' }}>
         {/* Header: month nav + Today pill */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: embedded ? 2 : 0, marginBottom: 12 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 2, marginBottom: 12 }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
             <h2 className="lo-display" style={{ margin: 0, fontSize: 30, fontWeight: 600, color: theme.text, letterSpacing: -0.5 }}>
               {MONTH_NAMES[yyMm.m]}
@@ -158,8 +162,8 @@ function MonthScreen({ theme, onBack, embedded = false, onOpenTask, onAdd, userT
             <span className="lo-display" style={{ fontSize: 28, fontWeight: 400, letterSpacing: -0.4, color: theme.text3 }}>{yyMm.y}</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-            <button onClick={() => { setYyMm({ y: _ty, m: _tm }); setSelected(_td); }}
-              style={{ background: theme.accentSoft, color: theme.accent, border: 'none',
+            <button onClick={() => { setYyMm({ y: _ty, m: _tm }); setSelected(_td); }} className="lo-press"
+              style={{ background: theme.accentSoft, color: theme.accent, border: 'none', fontFamily: 'inherit',
                 padding: '6px 12px', borderRadius: 999, fontSize: 12, fontWeight: 600,
                 cursor: 'pointer', marginRight: 6 }}>Hoy</button>
             <CalChev theme={theme} dir="left" onClick={goPrev}/>
@@ -182,8 +186,10 @@ function MonthScreen({ theme, onBack, embedded = false, onOpenTask, onAdd, userT
             const isSelected = c.inMonth && c.d === selected;
             return (
               <button key={i}
-                disabled={!c.inMonth}
-                onClick={() => c.inMonth && setSelected(c.d)}
+                disabled={!c.inMonth} aria-hidden={c.inMonth ? undefined : 'true'}
+                aria-pressed={c.inMonth ? isSelected : undefined} aria-current={isToday ? 'date' : undefined}
+                aria-label={c.inMonth ? `${c.d} de ${MONTH_NAMES[yyMm.m]}, ${dots.length} ${dots.length === 1 ? 'tarea' : 'tareas'}` : undefined}
+                onClick={() => c.inMonth && setSelected(c.d)} className={c.inMonth ? 'lo-day-cell' : ''}
                 style={{
                   appearance: 'none', border: 'none', cursor: c.inMonth ? 'pointer' : 'default',
                   height: 46,
@@ -203,7 +209,7 @@ function MonthScreen({ theme, onBack, embedded = false, onOpenTask, onAdd, userT
                   {dots.slice(0, 5).map((dot, k) => (
                     <div key={k} style={{
                       width: 3.5, height: 3.5, borderRadius: 2,
-                      background: isSelected ? 'rgba(255,255,255,0.95)' : LIFE_PALETTE[dot].to,
+                      background: isSelected ? 'rgba(255,255,255,0.95)' : pal(dot).to,
                     }}/>
                   ))}
                 </div>
@@ -228,11 +234,11 @@ function MonthScreen({ theme, onBack, embedded = false, onOpenTask, onAdd, userT
 
         {/* Theme filter chips */}
         <div style={{ display: 'flex', gap: 7, overflowX: 'auto', padding: '12px 0 4px', marginLeft: -2, marginRight: -2 }}>
-          {[{ id: 'todo', label: 'Todo', color: theme.accentRaw || 'coral' }, ...LO_CATEGORIES].map(cat => {
+          {[{ id: 'todo', label: 'Todo' }, ...LO_CATEGORIES].map(cat => {
             const active = filter === cat.id;
-            const cc = LIFE_PALETTE[cat.color] || { from: theme.accent, to: theme.accent };
+            const cc = cat.color ? pal(cat.color) : { from: theme.accent, to: theme.accent };
             return (
-              <button key={cat.id} onClick={() => setFilter(cat.id)} className="lo-press" style={{
+              <button key={cat.id} onClick={() => setFilter(cat.id)} aria-pressed={active} className="lo-press" style={{
                 flexShrink: 0, display: 'flex', alignItems: 'center', gap: 6, padding: '7px 13px', borderRadius: 999,
                 cursor: 'pointer', fontFamily: 'inherit', fontSize: 12.5, fontWeight: active ? 700 : 500,
                 color: active ? '#fff' : theme.text2,
@@ -275,7 +281,7 @@ function MonthScreen({ theme, onBack, embedded = false, onOpenTask, onAdd, userT
                   title={filter === 'todo' ? 'Nada agendado para este día' : `Nada de ${LO_CAT_BY_ID[filter].label.toLowerCase()} este día`}
                   body={filter === 'todo' ? 'Tómate el día libre o añade tu primera tarea.' : 'Prueba otro tema o cambia a “Todo el mes”.'}
                   ctaLabel="+ Añadir tarea"
-                  onCta={onAdd || (() => {})}/>
+                  onCta={addHere}/>
               )}
             </div>
           </>
@@ -295,7 +301,7 @@ function MonthScreen({ theme, onBack, embedded = false, onOpenTask, onAdd, userT
               <EmptyState theme={theme} icon="sparkle"
                 title={filter === 'todo' ? 'Nada agendado este mes' : `Sin tareas de ${LO_CAT_BY_ID[filter].label.toLowerCase()}`}
                 body="Lo que agendes este mes aparecerá aquí, ordenado por día."
-                ctaLabel="+ Añadir tarea" onCta={onAdd || (() => {})}/>
+                ctaLabel="+ Añadir tarea" onCta={addHere}/>
             ) : (
               <div className="lo-stagger" style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                 {monthFiltered.map((g, gi) => {
@@ -315,7 +321,7 @@ function MonthScreen({ theme, onBack, embedded = false, onOpenTask, onAdd, userT
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                         {g.tasks.map(t => (
-                          <AgendaTaskRow key={t.id} task={t} theme={theme} showChevron onClick={() => goToDay(g.dateStr)}/>
+                          <AgendaTaskRow key={t.id} task={t} theme={theme} showChevron onClick={() => onOpenTask && onOpenTask(t)}/>
                         ))}
                       </div>
                     </div>
@@ -332,7 +338,7 @@ function MonthScreen({ theme, onBack, embedded = false, onOpenTask, onAdd, userT
 
 function CalChev({ theme, dir, onClick }) {
   return (
-    <button onClick={onClick} style={{
+    <button onClick={onClick} aria-label={dir === 'left' ? 'Anterior' : 'Siguiente'} className="lo-press" style={{
       width: 32, height: 32, borderRadius: 16,
       background: theme.surface, border: `0.5px solid ${theme.border}`,
       cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -350,13 +356,11 @@ function selectedDayLabel(y, m, d) {
 
 function AgendaTaskRow({ task, theme, onClick, showChevron }) {
   const cat = task.category && LO_CAT_BY_ID[task.category];
-  const catC = cat && LIFE_PALETTE[cat.color];
-  const timeLabel = task.allDay
-    ? 'Todo el día'
-    : `${fmt12(task.start)} · ${Math.round((parseInt(task.end.split(':')[0]) * 60 + parseInt(task.end.split(':')[1])) - (parseInt(task.start.split(':')[0]) * 60 + parseInt(task.start.split(':')[1])))} min`;
+  const catC = cat && pal(cat.color);
+  const timeLabel = task.allDay ? 'Todo el día' : `${fmt12(task.start)} · ${lengthLabel(task.durationMin)}`;
   return (
-    <button onClick={onClick} className="lo-press" style={{
-      display: 'flex', alignItems: 'center', gap: 11, padding: '10px 12px 10px 0',
+    <button onClick={onClick} className="lo-press lo-card" style={{
+      fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 11, padding: '10px 12px 10px 0',
       background: theme.surface, border: `0.5px solid ${theme.border}`,
       borderRadius: 14, cursor: 'pointer', textAlign: 'left', color: theme.text, overflow: 'hidden',
       opacity: task.status === 'done' ? 0.55 : 1,
@@ -381,7 +385,7 @@ function AgendaTaskRow({ task, theme, onClick, showChevron }) {
 // ──────────────────────────────────────────────────────────────
 // Week screen — 7-day swimlanes
 // ──────────────────────────────────────────────────────────────
-function WeekScreen({ theme, onOpenTask, userTasks = [] }) {
+function WeekScreen({ theme, now, onOpenTask }) {
   const [weekOffset, setWeekOffset] = React.useState(0);
   const dayLabels = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
 
@@ -394,7 +398,7 @@ function WeekScreen({ theme, onOpenTask, userTasks = [] }) {
     return t;
   }, [weekOffset]);
 
-  const todayStr = loDateStr();
+  const todayStr = loDateStr(now);
   const week = Array.from({ length: 7 }).map((_, i) => {
     const d = new Date(monday);
     d.setDate(monday.getDate() + i);
@@ -412,7 +416,7 @@ function WeekScreen({ theme, onOpenTask, userTasks = [] }) {
   const empty = week.every(d => d.tasks.length === 0);
 
   const startH = 6, endH = 23, hPx = 30, span = endH - startH;
-  const nowMins = (() => { const n = new Date(); return n.getHours() * 60 + n.getMinutes(); })();
+  const nowMins = now.getHours() * 60 + now.getMinutes();
 
   return (
     <div className="lo-fade">
@@ -469,9 +473,9 @@ function WeekScreen({ theme, onOpenTask, userTasks = [] }) {
                 <div key={hi} style={{ height: hPx, borderTop: `0.5px solid ${hi === 0 ? 'transparent' : theme.border}` }}/>
               ))}
               {d.tasks.map((t) => {
-                const c = LIFE_PALETTE[t.color] || LIFE_PALETTE.coral;
+                const c = pal(t.color);
                 const top = ((loHHMMtoMin(t.start) / 60) - startH) * hPx;
-                const h = (Math.max(20, minutesBetween(t.start, t.end)) / 60) * hPx;
+                const h = (Math.max(20, t.durationMin) / 60) * hPx;
                 if (top + h < 0 || top > span * hPx) return null;
                 const bh = Math.max(9, h - 2);
                 const done = t.status === 'done';
@@ -520,10 +524,11 @@ function WeekScreen({ theme, onOpenTask, userTasks = [] }) {
 // ──────────────────────────────────────────────────────────────
 // Calendar tab — segmented Month / Week switch over a shared header
 // ──────────────────────────────────────────────────────────────
-function CalendarScreen({ theme, onBack, embedded = false, onOpenTask, onAdd, userTasks = [] }) {
+function CalendarScreen({ theme, now, onOpenTask, onAdd }) {
   const [view, setView] = React.useState('month');
   const seg = (id, label) => (
-    <button key={id} onClick={() => setView(id)} className="lo-press" style={{
+    <button key={id} onClick={() => setView(id)} aria-pressed={view === id} className="lo-press" style={{
+      fontFamily: 'inherit',
       flex: 1, padding: '7px 0', border: 'none', cursor: 'pointer', borderRadius: 9,
       background: view === id ? theme.surface : 'transparent',
       color: view === id ? theme.text : theme.text3,
@@ -541,8 +546,8 @@ function CalendarScreen({ theme, onBack, embedded = false, onOpenTask, onAdd, us
         </div>
       </div>
       {view === 'month'
-        ? <MonthScreen theme={theme} onBack={onBack} embedded onOpenTask={onOpenTask} onAdd={onAdd} userTasks={userTasks}/>
-        : <WeekScreen theme={theme} onOpenTask={onOpenTask} userTasks={userTasks}/>}
+        ? <MonthScreen theme={theme} now={now} onOpenTask={onOpenTask} onAdd={onAdd}/>
+        : <WeekScreen theme={theme} now={now} onOpenTask={onOpenTask}/>}
     </div>
   );
 }
@@ -551,9 +556,7 @@ function CalendarScreen({ theme, onBack, embedded = false, onOpenTask, onAdd, us
 // Create / Edit Task — premium immersive modal
 // Hero gradient · date picker · visual time ribbon · priority
 // ──────────────────────────────────────────────────────────────
-function CreateScreen({ theme, onBack, onSave }) {
-  const colors = ['coral','amber','rose','mint','sky','lavender','lime','teal','plum','sun','ember','slate'];
-  const COLOR_LABELS = { coral:'Coral', amber:'Ámbar', rose:'Rosa', mint:'Menta', sky:'Cielo', lavender:'Lavanda', lime:'Lima', teal:'Verde', plum:'Ciruela', sun:'Sol', ember:'Fuego', slate:'Pizarra' };
+function CreateScreen({ theme, onBack, onSave, initialDate }) {
   const PRIORITIES = [
     { id: 'low',    label: 'Baja',  desc: 'Sin prisa',   color: 'mint' },
     { id: 'medium', label: 'Media', desc: 'Importante',  color: 'amber' },
@@ -565,14 +568,14 @@ function CreateScreen({ theme, onBack, onSave }) {
   const [title, setTitle] = React.useState('');
   const [subtitle, setSub] = React.useState('');
   const [duration, setDuration] = React.useState(30);
-  const [selectedDate, setSelectedDate] = React.useState(() => loDateStr());
+  const [selectedDate, setSelectedDate] = React.useState(() => initialDate || loDateStr());
   const [showCal, setShowCal] = React.useState(false);
   const [calCursor, setCalCursor] = React.useState(() => { const n = new Date(); return { y: n.getFullYear(), m: n.getMonth() }; });
   const [priority, setPriority] = React.useState('medium');
   const [showChecklist, setShowChecklist] = React.useState(false);
 
   const [reminderOn, setReminder] = React.useState(false);
-  const [repeatOn, setRepeat] = React.useState(false);
+  const [recur, setRecur] = React.useState(null);
   const [allDayOn, setAllDay] = React.useState(false);
   const [deadline, setDeadline] = React.useState(null); // 'YYYY-MM-DD' hard due date
   const [category, setCategory] = React.useState(null); // Agenda theme
@@ -584,16 +587,17 @@ function CreateScreen({ theme, onBack, onSave }) {
     if (!catTouched) setCategory(loGuessCategory(title));
   }, [title, catTouched]);
 
-  const c = LIFE_PALETTE[pickedColor];
+  const c = pal(pickedColor);
 
   // Start time as "HH:MM" string — native <input type="time"> drives it on iOS (opens wheel picker)
   const defaultStartTime = React.useMemo(() => {
+    if (initialDate && initialDate !== loDateStr()) return '09:00';
     const n = new Date();
     const total = n.getHours() * 60 + n.getMinutes();
     const rounded = Math.ceil(total / 30) * 30;
     const h = Math.floor(rounded / 60) % 24, m = rounded % 60;
     return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
-  }, []);
+  }, [initialDate]);
   const [startTime, setStartTime] = React.useState(defaultStartTime);
   const startMins = React.useMemo(() => {
     const [h, m] = startTime.split(':').map(Number);
@@ -669,16 +673,18 @@ function CreateScreen({ theme, onBack, onSave }) {
       title: title.trim(), subtitle: subtitle.trim() || undefined,
       icon: pickedIcon, color: pickedColor, status: 'todo', priority,
       date: selectedDate, reminder: reminderOn,
-      recur: repeatOn ? { freq: 'weekdays' } : null,
+      recur,
       deadline: deadline || null, allDay: allDayOn, category: category || null,
       subtasks: cleanSteps.length > 0 ? cleanSteps : undefined,
     };
     if (onSave) onSave(task);
     onBack();
   };
+  // Enter in the name, or Ctrl/⌘+Enter anywhere, saves.
+  const onFormKey = (e) => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); submit(); } };
 
   return (
-    <div data-screen-label="Create Task" style={{ position: 'relative', minHeight: '100%', background: theme.bg }}>
+    <div data-screen-label="Create Task" onKeyDown={onFormKey} style={{ position: 'relative', minHeight: '100%', background: theme.bg }}>
       {/* ─── HEADER BAR — title + subtitle + primary action ─── */}
       <div style={{
         position: 'sticky', top: 0, zIndex: 10, display: 'flex', alignItems: 'center', gap: 12,
@@ -695,9 +701,9 @@ function CreateScreen({ theme, onBack, onSave }) {
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div className="lo-display" style={{ fontSize: 19, fontWeight: 600, color: theme.text, letterSpacing: -0.3 }}>Nueva tarea</div>
-          <div style={{ fontSize: 12, color: theme.text3, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Crea una tarea y mantén el foco en lo que importa.</div>
+          <div style={{ fontSize: 12, color: theme.text3, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{fmtDateLabel(selectedDate)}{allDayOn ? ' · todo el día' : ` · ${fmtMin(startMins)}`}</div>
         </div>
-        <button onClick={onBack} className="lo-press" style={{
+        <button onClick={onBack} aria-label="Cerrar sin guardar" className="lo-press" style={{
           width: 38, height: 38, borderRadius: 12, cursor: 'pointer', flexShrink: 0,
           background: theme.surfaceHi, border: `0.5px solid ${theme.border}`,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -725,10 +731,11 @@ function CreateScreen({ theme, onBack, onSave }) {
             <TaskGlyph icon={pickedIcon} color={pickedColor} size={58} shape="squircle"/>
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Nombre de la tarea" autoFocus
+            <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Nombre de la tarea" aria-label="Nombre de la tarea" autoFocus maxLength={120}
+              onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); submit(); } }}
               style={{ display: 'block', width: '100%', background: 'transparent', border: 'none', outline: 'none',
                 fontSize: 22, fontWeight: 700, color: theme.text, letterSpacing: -0.4, fontFamily: 'inherit', caretColor: c.to }}/>
-            <input value={subtitle} onChange={(e) => setSub(e.target.value)} placeholder="Añade una nota corta…"
+            <input value={subtitle} onChange={(e) => setSub(e.target.value)} placeholder="Añade una nota corta…" aria-label="Nota" maxLength={200}
               style={{ display: 'block', width: '100%', marginTop: 4, background: 'transparent', border: 'none', outline: 'none',
                 fontSize: 13, color: theme.text3, fontFamily: 'inherit', caretColor: c.to }}/>
           </div>
@@ -753,7 +760,7 @@ function CreateScreen({ theme, onBack, onSave }) {
             {dateStrip.map(({ off, dow, day, mon, dateStr }) => {
               const active = selectedDate === dateStr;
               return (
-                <button key={off} onClick={() => setSelectedDate(dateStr)} className="lo-press" style={{
+                <button key={off} onClick={() => setSelectedDate(dateStr)} aria-pressed={active} className="lo-press" style={{
                   flexShrink: 0, width: 58, display: 'flex', flexDirection: 'column', alignItems: 'center',
                   padding: '12px 4px 10px',
                   borderRadius: 20,
@@ -835,7 +842,7 @@ function CreateScreen({ theme, onBack, onSave }) {
           <CardHead theme={theme} icon="clock" accent={pickedColor} title="Horario" help="¿A qué hora?" trailing={
             <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
               <span style={{ fontSize: 12.5, color: theme.text2, fontWeight: 500 }}>Todo el día</span>
-              <Toggle on={allDayOn} onChange={() => setAllDay(v => !v)} theme={theme}/>
+              <Toggle on={allDayOn} onChange={() => setAllDay(v => !v)} theme={theme} label="Todo el día"/>
             </label>
           }/>
           {allDayOn ? (
@@ -849,7 +856,7 @@ function CreateScreen({ theme, onBack, onSave }) {
                 <div style={{ fontSize: 22, fontWeight: 700, color: theme.accent, letterSpacing: -0.5, fontVariantNumeric: 'tabular-nums' }}>{fmtMin(startMins)}</div>
                 <div style={{ fontSize: 9, color: theme.text3, marginTop: 3, letterSpacing: 0.2 }}>toca para cambiar</div>
               </div>
-              <input type="time" value={startTime} onChange={e => setStartTime(e.target.value)}
+              <input type="time" value={startTime} aria-label="Hora de inicio" onChange={e => { if (e.target.value) setStartTime(e.target.value); }}
                 style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer', width: '100%', height: '100%', borderRadius: 14 }}/>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', color: theme.text3, fontSize: 20, padding: '0 4px', paddingBottom: 18 }}>→</div>
@@ -894,7 +901,7 @@ function CreateScreen({ theme, onBack, onSave }) {
             {[15, 30, 45, 60, 90, 120].map(d => {
               const active = duration === d;
               return (
-                <button key={d} onClick={() => setDuration(d)} className="lo-press" style={{
+                <button key={d} onClick={() => setDuration(d)} aria-pressed={active} className="lo-press" style={{
                   flexShrink: 0,
                   background: active ? `linear-gradient(135deg, ${c.from}, ${c.to})` : theme.surfaceHi,
                   color: active ? '#fff' : theme.text2,
@@ -903,42 +910,25 @@ function CreateScreen({ theme, onBack, onSave }) {
                   fontWeight: active ? 700 : 500, cursor: 'pointer', fontFamily: 'inherit',
                   boxShadow: 'none',
                   transition: 'all .18s var(--ease-out-back)',
-                }}>{d < 60 ? `${d}m` : `${Math.floor(d/60)}h${d%60 ? `${d%60}m` : ''}`}</button>
+                }}>{chipLabel(d)}</button>
               );
             })}
           </div>
           </>)}
         </div>
 
+        {/* ── Repetición ── */}
+        <div style={loCardStyle(theme)}>
+          <CardHead theme={theme} accent={pickedColor} title="Repetición"/>
+          <RecurPicker theme={theme} value={recur} date={selectedDate} onChange={setRecur} color={pickedColor}/>
+        </div>
+
         {/* ── Color | Icono (par de 2 columnas) ── */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(248px, 1fr))', gap: 12 }}>
         {/* ── Color ── */}
         <div style={loCardStyle(theme)}>
-          <CardHead theme={theme} icon="sparkle" accent={pickedColor} title="Color" help="El color de tu tarea" trailing={
-            <span style={{ fontSize: 12.5, color: c.from, fontWeight: 700 }}>{COLOR_LABELS[pickedColor]}</span>
-          }/>
-          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', paddingBottom: 6, alignItems: 'center', rowGap: 14 }}>
-            {colors.map(col => {
-              const cc = LIFE_PALETTE[col];
-              const active = pickedColor === col;
-              return (
-                <button key={col} onClick={() => setColor(col)} className="lo-press" style={{
-                  flexShrink: 0, alignSelf: 'center',
-                  width: active ? 48 : 38, height: active ? 48 : 38,
-                  borderRadius: '50%',
-                  background: `linear-gradient(145deg, ${cc.from}, ${cc.to})`,
-                  border: 'none', cursor: 'pointer', padding: 0,
-                  boxShadow: active ? `0 0 0 3px ${theme.bg}, 0 0 0 5px ${cc.to}` : 'none',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  transition: 'all .22s var(--ease-out-back)',
-                }}>
-                  {active && <span key={col} className="lo-pop" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <UIIcon name="check" size={21} color="#fff" strokeWidth={2.8}/>
-                  </span>}
-                </button>
-              );
-            })}
-          </div>
+          <CardHead theme={theme} accent={pickedColor} title="Color"/>
+          <ColorSwatches theme={theme} value={pickedColor} onChange={setColor} size={38}/>
         </div>
 
         {/* ── Icono ── */}
@@ -956,7 +946,7 @@ function CreateScreen({ theme, onBack, onSave }) {
               const active = priority === p.id;
               const pc = LIFE_PALETTE[p.color];
               return (
-                <button key={p.id} onClick={() => setPriority(p.id)} className="lo-press" style={{
+                <button key={p.id} onClick={() => setPriority(p.id)} aria-pressed={active} className="lo-press" style={{
                   flex: 1, padding: '12px 8px', borderRadius: 16,
                   background: active ? `linear-gradient(145deg, ${pc.from}28, ${pc.to}40)` : theme.surfaceHi,
                   border: `1.5px solid ${active ? pc.to : theme.border}`,
@@ -986,10 +976,6 @@ function CreateScreen({ theme, onBack, onSave }) {
           <OptionRow theme={theme} icon="bell" tint="coral" label="Recordatorio"
             on={reminderOn} onToggle={() => setReminder(!reminderOn)}
             sub={reminderOn ? '10 min antes' : 'Apagado'} />
-          <Divider theme={theme}/>
-          <OptionRow theme={theme} icon="repeat" tint="lavender" label="Repetir"
-            on={repeatOn} onToggle={() => setRepeat(!repeatOn)}
-            sub={repeatOn ? 'Entre semana · Lun–Vie' : 'No se repite'} />
           <Divider theme={theme}/>
           <DeadlineRow theme={theme} value={deadline} onChange={setDeadline}/>
         </div>
@@ -1038,7 +1024,7 @@ function CreateScreen({ theme, onBack, onSave }) {
                       fontFamily: 'inherit', color: s.done ? theme.text3 : theme.text,
                       textDecorationLine: s.done ? 'line-through' : 'none', caretColor: c.to,
                     }}/>
-                  <button onClick={() => setSubtasks(subtasks.filter(x => x.id !== s.id))} style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 4 }}>
+                  <button onClick={() => setSubtasks(subtasks.filter(x => x.id !== s.id))} aria-label="Quitar paso" style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 4 }}>
                     <UIIcon name="x" size={14} color={theme.text3}/>
                   </button>
                 </div>
@@ -1056,18 +1042,6 @@ function CreateScreen({ theme, onBack, onSave }) {
           )}
         </div>
 
-        {/* ── Consejo ── */}
-        <div style={{
-          display: 'flex', alignItems: 'flex-start', gap: 11, padding: '13px 15px', borderRadius: 16,
-          background: `linear-gradient(135deg, ${c.from}1c, ${theme.surface} 70%)`,
-          border: `0.5px solid ${c.to}33`,
-        }}>
-          <UIIcon name="sparkle" size={16} color={c.to}/>
-          <div style={{ fontSize: 12.5, color: theme.text2, lineHeight: 1.45 }}>
-            <span style={{ fontWeight: 700, color: theme.text }}>Consejo · </span>
-            mantén el nombre claro y específico; tu yo del futuro lo agradecerá.
-          </div>
-        </div>
       </div>
 
     </div>
@@ -1101,7 +1075,7 @@ function Card({ theme, children, style }) {
 // editorial label Things/Linear would use. `icon`/`help` kept in the signature
 // for call-site compatibility but intentionally no longer rendered.
 function CardHead({ theme, icon, accent, title, help, trailing }) {
-  const tick = accent ? (LIFE_PALETTE[accent]?.to || theme.accent) : theme.accent;
+  const tick = accent ? pal(accent).to : theme.accent;
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 13 }}>
       <span style={{ width: 3, height: 13, borderRadius: 2, background: tick, flexShrink: 0 }}/>
@@ -1132,9 +1106,9 @@ function CategoryPicker({ theme, value, onChange }) {
     <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
       {LO_CATEGORIES.map(cat => {
         const active = value === cat.id;
-        const cc = LIFE_PALETTE[cat.color];
+        const cc = pal(cat.color);
         return (
-          <button key={cat.id} onClick={() => onChange(active ? null : cat.id)} className="lo-press" style={{
+          <button key={cat.id} onClick={() => onChange(active ? null : cat.id)} aria-pressed={active} className="lo-press" style={{
             display: 'flex', alignItems: 'center', gap: 7, padding: '9px 15px', borderRadius: 999, cursor: 'pointer',
             fontFamily: 'inherit', fontSize: 13.5, fontWeight: active ? 700 : 500,
             color: active ? '#fff' : theme.text2,
@@ -1171,7 +1145,7 @@ function DeadlineRow({ theme, value, onChange }) {
         color: value ? theme.text : theme.accent, fontSize: 13, fontWeight: 600, cursor: 'pointer',
       }}>
         {value ? 'Cambiar' : 'Elegir'}
-        <input type="date" value={value || ''} onChange={(e) => onChange(e.target.value || null)}
+        <input type="date" value={value || ''} aria-label="Fecha límite" onChange={(e) => onChange(e.target.value || null)}
           style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer', width: '100%', height: '100%' }}/>
       </label>
     </div>
@@ -1187,7 +1161,7 @@ function OptionRow({ theme, icon, tint, label, sub, on, onToggle, arrow }) {
         <div style={{ fontSize: 11.5, color: theme.text2, marginTop: 1 }}>{sub}</div>
       </div>
       {onToggle ? (
-        <Toggle on={on} onChange={onToggle} theme={theme}/>
+        <Toggle on={on} onChange={onToggle} theme={theme} label={label}/>
       ) : arrow ? (
         <UIIcon name="chevronR" size={14} color={theme.text3}/>
       ) : null}
@@ -1197,9 +1171,9 @@ function OptionRow({ theme, icon, tint, label, sub, on, onToggle, arrow }) {
 
 // A switch. `onChange` receives the NEW value (it used to receive the click event, which
 // made the "Modo oscuro" switch in Ajustes unable to turn dark mode off).
-function Toggle({ on, onChange, theme }) {
+function Toggle({ on, onChange, theme, label }) {
   return (
-    <button role="switch" aria-checked={!!on} onClick={() => onChange && onChange(!on)} className="lo-press" style={{
+    <button role="switch" aria-checked={!!on} aria-label={label} onClick={() => { haptic(4); onChange && onChange(!on); }} className="lo-press" style={{
       width: 44, height: 26, borderRadius: 13,
       background: on ? '#34C759' : theme.rail,
       border: 'none', padding: 0, cursor: 'pointer',
@@ -1229,341 +1203,385 @@ function SectionLabel({ children, theme, inline }) {
 function Divider({ theme }) { return <div style={{ height: 0.5, background: theme.border, marginLeft: 14 }}/>; }
 
 // ──────────────────────────────────────────────────────────────
-// Detail screen — opened by tapping a task. Hero gradient + content cards.
+// Detail — one task: what it is, when, and its steps. For a task that repeats, every edit
+// goes to that day or to the whole series, whichever is chosen at the top.
 // ──────────────────────────────────────────────────────────────
-const DETAIL_DEMO = { id: 'demo', title: 'Bici al estudio', subtitle: '4.2 km · ruta escénica', icon: '🚴', color: 'mint', status: 'todo', start: '08:15', end: '08:45' };
+const PRIORITY_CHOICES = [
+  { id: 'low', label: 'Baja', color: 'mint' },
+  { id: 'medium', label: 'Media', color: 'amber' },
+  { id: 'high', label: 'Alta', color: 'coral' },
+];
+const DAY_SHORT = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+const MONTH_SHORT = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
 
-const PRIORITY_LABELS = { low: 'Baja', medium: 'Media', high: 'Alta' };
-const RECUR_LABELS = { daily: 'Cada día', weekdays: 'Entre semana', weekly: 'Cada semana' };
-function recurSub(recur) { return recur ? (RECUR_LABELS[recur.freq] || 'Personalizada') : 'No se repite'; }
+function DetailScreen({ theme, taskId, onBack, onStartFocus, onDelete }) {
+  useStoreVersion();
+  const stored = LOStore.getTask(taskId);
+  // A series is never shown as such: its nearest day is, and edits can still reach all of it.
+  const task = stored && stored.recur ? (LOStore.dayOfSeries(stored.id) || stored) : stored;
+  const series = task ? LOStore.seriesOf(task) : null;
+  const isDay = !!series && series.id !== task.id;
+  const [scope, setScope] = React.useState('day'); // what edits change: this day | the series
+  const whole = !!series && (scope === 'series' || !isDay);
+  const t = whole ? series : task; // where the editable fields are read from
 
-function DetailScreen({ theme, task, onBack, onStartFocus, onComplete, onToggleSubtask, onUpdate, onDelete }) {
-  const t = task || DETAIL_DEMO;
-  const c = LIFE_PALETTE[t.color] || LIFE_PALETTE.mint;
-  const subtasks = Array.isArray(t.subtasks) ? t.subtasks : [];
-  const isDone = t.status === 'done';
-  const doneCount = subtasks.filter(s => s.done).length;
-  const pct = subtasks.length > 0 ? Math.round((doneCount / subtasks.length) * 100) : (isDone ? 100 : 0);
-  const live = !!onUpdate; // only wired when opened from the real app (not the static artboard)
   const [newStep, setNewStep] = React.useState('');
-  const [editOpen, setEditOpen] = React.useState(false);
+  const [lookOpen, setLookOpen] = React.useState(false);
+  const [titleDraft, setTitleDraft] = React.useState(t ? t.title : '');
+  const [noteDraft, setNoteDraft] = React.useState(t ? t.note || '' : '');
+  // Drafts follow the record being edited (another task, the other scope, a change elsewhere).
+  const draftKey = t ? `${t.id}|${t.title}|${t.note}` : '';
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- reset only when the record behind the drafts changes
+  React.useEffect(() => { if (t) { setTitleDraft(t.title); setNoteDraft(t.note || ''); } }, [draftKey]);
+  // The task was deleted while its detail was open (undo, another tab): nothing left to show.
+  React.useEffect(() => { if (!task) onBack(); }, [task, onBack]);
 
-  // Inline-editable title + note (B16) — drafts reset when a different task opens.
-  const [titleDraft, setTitleDraft] = React.useState(t.title);
-  const [noteDraft, setNoteDraft] = React.useState(t.note || t.subtitle || '');
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- only reset when another task opens, not on every edit
-  React.useEffect(() => { setTitleDraft(t.title); setNoteDraft(t.note || t.subtitle || ''); }, [t.id]);
-  const commitTitle = () => { const v = titleDraft.trim(); if (live && v && v !== t.title) onUpdate({ title: v }); else if (!v) setTitleDraft(t.title); };
-  const commitNote = () => { if (live && noteDraft.trim() !== (t.note || t.subtitle || '')) onUpdate({ note: noteDraft.trim() }); };
-  const durMin = minutesBetween(t.start, t.end);
-  const setField = (patch) => { if (live) onUpdate(patch); };
-
-  const DETAIL_COLORS = ['coral','amber','rose','mint','sky','lavender','lime','teal','plum','sun','ember','slate'];
-  const DETAIL_DATES = React.useMemo(() => {
-    const _t = new Date(); const DS = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb']; const MS = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-    return Array.from({ length: 14 }, (_, off) => { const d = new Date(_t); d.setDate(_t.getDate() + off); return { off, dow: off === 0 ? 'Hoy' : off === 1 ? 'Mañ' : DS[d.getDay()], day: d.getDate(), mon: (off === 0 || d.getDate() === 1) ? MS[d.getMonth()] : null, dateStr: loDateStr(d) }; });
+  const dates = React.useMemo(() => {
+    const today = loDateStr();
+    return Array.from({ length: 14 }, (_, off) => {
+      const dateStr = loAddDays(today, off);
+      const [, m, d] = dateStr.split('-').map(Number);
+      return { off, dateStr, day: d, dow: off === 0 ? 'Hoy' : off === 1 ? 'Mañ' : DAY_SHORT[loDow(dateStr)], mon: off === 0 || d === 1 ? MONTH_SHORT[m - 1] : null };
+    });
   }, []);
 
-  const toggleSub = (s) => { if (onToggleSubtask) onToggleSubtask(s.id); };
+  if (!task) return null;
+
+  const c = pal(t.color);
+  const subtasks = task.subtasks;
+  const isDone = task.status === 'done';
+  const doneCount = subtasks.filter(x => x.done).length;
+  const pct = subtasks.length > 0 ? Math.round((doneCount / subtasks.length) * 100) : 0;
+  const dayActions = !task.recur; // a series with no day left cannot be completed or postponed
+
+  const update = (patch) => (whole ? LOStore.updateSeries(series.id, patch) : LOStore.updateTask(task.id, patch));
+  const updateDay = (patch) => LOStore.updateTask(task.id, patch);
+  const commitTitle = () => { const v = titleDraft.trim(); if (v && v !== t.title) update({ title: v }); else if (!v) setTitleDraft(t.title); };
+  const commitNote = () => { if (noteDraft.trim() !== (t.note || '')) update({ note: noteDraft.trim() }); };
+
   const addStep = () => {
     const label = newStep.trim();
-    if (!label || !onUpdate) return;
-    onUpdate({ subtasks: [...subtasks, { id: loUid('sub'), label, done: false }] });
+    if (!label) return;
+    updateDay({ subtasks: [...subtasks, { id: loUid('sub'), label, done: false }] });
     setNewStep('');
   };
-  const cyclePriority = () => {
-    if (!onUpdate) return;
-    const order = ['low', 'medium', 'high'];
-    onUpdate({ priority: order[(order.indexOf(t.priority || 'medium') + 1) % 3] });
-  };
-  const cycleRecur = () => {
-    if (!onUpdate) return;
-    const order = [null, { freq: 'daily' }, { freq: 'weekdays' }, { freq: 'weekly', days: [loDow(t.date)] }];
-    const idx = t.recur ? order.findIndex(o => o && o.freq === t.recur.freq) : 0;
-    onUpdate({ recur: order[(idx + 1) % order.length] });
-  };
+  const removeStep = (id) => updateDay({ subtasks: subtasks.filter(x => x.id !== id) });
   const snooze = () => {
-    if (!onUpdate) return;
-    const minutes = loHHMMtoMin(t.start) + 30;
-    const date = new Date(t.date + 'T12:00:00');
-    date.setDate(date.getDate() + Math.floor(minutes / 1440));
-    onUpdate({ start: loMinToHHMM(minutes), date: loDateStr(date) });
+    const minutes = loHHMMtoMin(task.start) + 30;
+    updateDay({ start: loMinToHHMM(minutes), date: loAddDays(task.date, Math.floor(minutes / 1440)) });
     toast('Pospuesta 30 min', { icon: 'clock' });
   };
-  const del = () => {
-    if (!onDelete) return;
-    if (typeof window !== 'undefined' && !window.confirm('¿Eliminar esta tarea?')) return;
-    onDelete();
+  const toggleDone = () => { haptic(isDone ? 4 : 12); LOStore.toggleTask(task.id); };
+  const toggleReminder = () => {
+    const on = !t.reminder;
+    update({ reminder: on });
+    if (on && typeof Notification !== 'undefined' && Notification.permission !== 'granted') {
+      toast('Activa las notificaciones en Ajustes para recibir el aviso', { icon: 'bell', duration: 5000 });
+    }
+  };
+  const setRecur = async (recur) => {
+    if (!series) { LOStore.updateTask(task.id, { recur }); return; } // a single task starts repeating
+    if (recur) { LOStore.updateSeries(series.id, { recur }); return; }
+    const last = isDay ? (loSplitOccurrenceId(task.id) || [null, task.date])[1] : loDateStr();
+    const ok = await confirmAsk('¿Dejar de repetir?', {
+      body: `"${series.title}" no volverá a aparecer después de ${loDayLabel(last)}. Lo que ya hiciste se conserva.`,
+      confirm: 'Dejar de repetir',
+    });
+    if (ok) LOStore.endSeries(series.id, last);
   };
 
+  const fieldLabel = { fontSize: 10.5, fontWeight: 700, color: theme.text3, letterSpacing: 1, textTransform: 'uppercase', margin: '0 0 9px' };
+  const chip = (active) => ({
+    flexShrink: 0, padding: '8px 15px', borderRadius: 999, fontSize: 13, fontFamily: 'inherit', cursor: 'pointer',
+    fontWeight: active ? 700 : 500, color: active ? '#fff' : theme.text2,
+    background: active ? `linear-gradient(135deg, ${c.from}, ${c.to})` : theme.surfaceHi,
+    border: `1px solid ${active ? 'transparent' : theme.border}`,
+  });
+  const durations = [15, 30, 45, 60, 90, 120];
+  if (!durations.includes(t.durationMin)) durations.push(t.durationMin);
+  durations.sort((a, b) => a - b);
+
   return (
-    <div data-screen-label="Task Detail" className="lo-detail">
+    <div data-screen-label="Task Detail">
       {/* HERO */}
       <div style={{
         background: `linear-gradient(165deg, ${c.from} 0%, ${c.to} 55%, ${theme.bg} 100%)`,
-        padding: '0 16px 24px',
-        position: 'relative', overflow: 'hidden',
+        padding: '0 16px 22px', position: 'relative', overflow: 'hidden',
       }}>
-        <div style={{
-          position: 'absolute', top: -100, left: -80, width: 320, height: 320,
-          borderRadius: '50%',
-          background: `radial-gradient(circle, ${c.from}55 0%, transparent 70%)`,
-          pointerEvents: 'none',
+        <div aria-hidden="true" style={{
+          position: 'absolute', top: -100, left: -80, width: 320, height: 320, borderRadius: '50%',
+          background: `radial-gradient(circle, ${c.from}55 0%, transparent 70%)`, pointerEvents: 'none',
         }}/>
-        {/* top bar */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: 44, position: 'relative', zIndex: 2 }}>
-          <button onClick={onBack} className="lo-press" style={glassBtn}>
-            <UIIcon name="chevronL" size={18} color="#fff" strokeWidth={2.2}/>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: 48, position: 'relative', zIndex: 2 }}>
+          <button onClick={onBack} aria-label="Cerrar" className="lo-press" style={glassBtn}>
+            <UIIcon name="chevronD" size={18} color="#fff" strokeWidth={2.2}/>
           </button>
           <div style={{ display: 'flex', gap: 6 }}>
-            <button onClick={() => live && onUpdate({ reminder: !t.reminder })} className="lo-press" style={{ ...glassBtn, background: t.reminder ? 'rgba(255,255,255,0.32)' : glassBtn.background }}>
+            <button onClick={toggleReminder} aria-pressed={!!t.reminder} aria-label="Recordatorio" title="Recordatorio" className="lo-press"
+              style={{ ...glassBtn, background: t.reminder ? 'rgba(255,255,255,0.32)' : glassBtn.background }}>
               <UIIcon name="bell" size={16} color="#fff" strokeWidth={2}/>
             </button>
-            <button onClick={del} className="lo-press" style={glassBtn}>
+            <button onClick={() => onDelete(task.id)} aria-label="Eliminar tarea" title="Eliminar" className="lo-press" style={glassBtn}>
               <UIIcon name="trash" size={16} color="#fff" strokeWidth={2}/>
             </button>
           </div>
         </div>
-        {/* hero icon + title */}
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: 12, position: 'relative', zIndex: 2 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: 4, position: 'relative', zIndex: 2 }}>
           <div className="lo-scale-in" style={{ filter: `drop-shadow(0 12px 24px ${c.to}77)` }}>
-            <TaskGlyph icon={t.icon} color={t.color} size={92} shape="squircle"/>
+            <TaskGlyph icon={t.icon} color={t.color} size={76} shape="squircle"/>
           </div>
-          {live ? (
-            <input value={titleDraft} onChange={(e) => setTitleDraft(e.target.value)} onBlur={commitTitle}
-              onKeyDown={(e) => { if (e.key === 'Enter') e.target.blur(); }}
-              className="lo-display" placeholder="Título de la tarea"
-              style={{ marginTop: 18, width: '100%', background: 'transparent', border: 'none', outline: 'none',
-                textAlign: 'center', fontSize: 30, fontWeight: 600, color: '#fff', letterSpacing: -0.5,
-                caretColor: 'rgba(255,255,255,0.7)' }}/>
-          ) : (
-            <div className="lo-display" style={{ marginTop: 18, fontSize: 30, fontWeight: 600, color: '#fff', letterSpacing: -0.5, textAlign: 'center' }}>{t.title}</div>
-          )}
-          {live ? (
-            <input value={noteDraft} onChange={(e) => setNoteDraft(e.target.value)} onBlur={commitNote}
-              onKeyDown={(e) => { if (e.key === 'Enter') e.target.blur(); }}
-              placeholder="Añade una nota…"
-              style={{ marginTop: 4, width: '100%', background: 'transparent', border: 'none', outline: 'none',
-                textAlign: 'center', fontSize: 13, color: 'rgba(255,255,255,0.82)', fontFamily: 'inherit',
-                caretColor: 'rgba(255,255,255,0.7)' }}/>
-          ) : (
-            (t.note || t.subtitle) && <div style={{ marginTop: 4, fontSize: 13, color: 'rgba(255,255,255,0.78)', textAlign: 'center' }}>{t.note || t.subtitle}</div>
-          )}
-          <div style={{ marginTop: 12, position: 'relative', display: 'flex', gap: 6, alignItems: 'center', background: 'rgba(0,0,0,0.25)', padding: '6px 12px', borderRadius: 999, backdropFilter: 'blur(20px)' }}>
-            <UIIcon name="clock" size={14} color="rgba(255,255,255,0.92)" strokeWidth={2}/>
-            <span style={{ fontSize: 13, color: '#fff', fontWeight: 600, fontVariantNumeric: 'tabular-nums', letterSpacing: -0.1 }}>
-              {fmt12(t.start)} – {fmt12(t.end)} · {durMin}m
-            </span>
-            {live && <input type="time" value={t.start} onChange={(e) => setField({ start: e.target.value })}
-              aria-label="Cambiar hora de inicio"
-              style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer', width: '100%', height: '100%', borderRadius: 999 }}/>}
+          <input value={titleDraft} onChange={(e) => setTitleDraft(e.target.value)} onBlur={commitTitle}
+            onKeyDown={(e) => { if (e.key === 'Enter') e.target.blur(); }}
+            className="lo-display lo-on-color" placeholder="Título de la tarea" aria-label="Título" maxLength={120}
+            style={{ marginTop: 14, width: '100%', background: 'transparent', border: 'none', outline: 'none',
+              textAlign: 'center', fontSize: 28, fontWeight: 600, color: '#fff', letterSpacing: -0.5,
+              textDecoration: isDone ? 'line-through' : 'none', textDecorationColor: 'rgba(255,255,255,0.6)',
+              caretColor: 'rgba(255,255,255,0.7)' }}/>
+          <input value={noteDraft} onChange={(e) => setNoteDraft(e.target.value)} onBlur={commitNote}
+            onKeyDown={(e) => { if (e.key === 'Enter') e.target.blur(); }}
+            className="lo-on-color" placeholder="Añade una nota…" aria-label="Nota" maxLength={200}
+            style={{ marginTop: 2, width: '100%', background: 'transparent', border: 'none', outline: 'none',
+              textAlign: 'center', fontSize: 13.5, color: 'rgba(255,255,255,0.9)', fontFamily: 'inherit',
+              caretColor: 'rgba(255,255,255,0.7)' }}/>
+          <div style={{ marginTop: 10, display: 'flex', flexWrap: 'wrap', gap: 6, justifyContent: 'center' }}>
+            <div style={{ position: 'relative', display: 'flex', gap: 6, alignItems: 'center', background: 'rgba(0,0,0,0.25)', padding: '6px 12px', borderRadius: 999 }}>
+              <UIIcon name="clock" size={14} color="rgba(255,255,255,0.92)" strokeWidth={2}/>
+              <span style={{ fontSize: 13, color: '#fff', fontWeight: 600, fontVariantNumeric: 'tabular-nums', letterSpacing: -0.1 }}>
+                {t.allDay ? 'Todo el día' : `${fmt12(t.start)} – ${fmt12(t.end)}`}
+              </span>
+              {!t.allDay && <input type="time" value={t.start} onChange={(e) => { if (e.target.value) update({ start: e.target.value }); }}
+                aria-label="Cambiar hora de inicio"
+                style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer', width: '100%', height: '100%', borderRadius: 999 }}/>}
+            </div>
+            <div style={{ display: 'flex', gap: 6, alignItems: 'center', background: 'rgba(0,0,0,0.25)', padding: '6px 12px', borderRadius: 999, fontSize: 13, color: '#fff', fontWeight: 600 }}>
+              <UIIcon name="calendar" size={14} color="rgba(255,255,255,0.92)" strokeWidth={2}/>
+              <span style={{ textTransform: 'capitalize' }}>{whole ? loRecurLabel(series.recur, series.date) : loDayLabel(task.date).replace(/^el /, '')}</span>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* CONTENT CARDS */}
-      <div className="lo-stagger" style={{ padding: '0 16px 40px', marginTop: 4 }}>
-        {/* Progress card — only if there are subtasks */}
-        {subtasks.length > 0 && (
+      <div className="lo-stagger" style={{ padding: '14px 16px 28px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+        {/* For a repeated task: what the edits below change */}
+        {isDay && (
           <div style={{ '--i': 0 }}>
-            <Card theme={theme} style={{ padding: 16, marginTop: 12 }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-                <SectionLabel theme={theme} inline>Progreso</SectionLabel>
-                <span className="lo-display" style={{ fontSize: 26, fontWeight: 600, color: theme.text, fontVariantNumeric: 'tabular-nums', letterSpacing: -0.4 }}>{pct}<span style={{ fontSize: 14, color: theme.text2, fontFamily: 'var(--font-ui)' }}>%</span></span>
+            <div role="radiogroup" aria-label="Qué cambian las ediciones" style={{ display: 'flex', gap: 3, padding: 3, borderRadius: 13, background: theme.surface, border: `0.5px solid ${theme.border}` }}>
+              {[['day', 'Solo este día'], ['series', 'Toda la serie']].map(([id, label]) => (
+                <button key={id} role="radio" aria-checked={scope === id} onClick={() => setScope(id)} className="lo-press" style={{
+                  flex: 1, padding: '8px 0', border: 'none', cursor: 'pointer', borderRadius: 10, fontFamily: 'inherit',
+                  background: scope === id ? theme.surfaceHi : 'transparent', color: scope === id ? theme.text : theme.text3,
+                  fontSize: 13, fontWeight: 600, boxShadow: scope === id ? '0 1px 3px rgba(0,0,0,0.22)' : 'none',
+                }}>{label}</button>
+              ))}
+            </div>
+            <div style={{ fontSize: 12, color: theme.text3, margin: '7px 6px 0' }}>
+              {whole ? `Los cambios se aplican a todos los días: se repite ${loRecurLabel(series.recur, series.date)}.` : `Se repite ${loRecurLabel(series.recur, series.date)}. Los cambios quedan solo en este día.`}
+            </div>
+          </div>
+        )}
+
+        {/* Checklist — always of this day */}
+        {dayActions && (
+          <div style={{ '--i': 1 }}>
+            <Card theme={theme} style={{ padding: 14, marginTop: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: subtasks.length ? 10 : 6 }}>
+                <SectionLabel theme={theme} inline>Checklist</SectionLabel>
+                {subtasks.length > 0 && <span style={{ fontSize: 11.5, color: theme.text3, fontVariantNumeric: 'tabular-nums' }}>{doneCount} de {subtasks.length}</span>}
               </div>
-              <div style={{ height: 8, background: theme.rail, borderRadius: 4, overflow: 'hidden' }}>
-                <div style={{ width: `${pct}%`, height: '100%', background: `linear-gradient(90deg, ${c.from}, ${c.to})`, transition: 'width .4s var(--ease-out-quart)' }}/>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6, fontSize: 11, color: theme.text3, fontWeight: 500 }}>
-                <span>{doneCount} de {subtasks.length} hechos</span>
-                <span>faltan {subtasks.length - doneCount}</span>
+              {subtasks.length > 0 && (
+                <div style={{ height: 5, background: theme.rail, borderRadius: 3, overflow: 'hidden', marginBottom: 4 }}>
+                  <div style={{ width: `${pct}%`, height: '100%', background: `linear-gradient(90deg, ${c.from}, ${c.to})`, transition: 'width .4s var(--ease-out-quart)' }}/>
+                </div>
+              )}
+              {subtasks.map((step, i) => (
+                <div key={step.id || i} style={{ display: 'flex', alignItems: 'center', gap: 10, borderTop: i ? `0.5px solid ${theme.border}` : 'none' }}>
+                  <button className="lo-press" onClick={() => { haptic(); LOStore.toggleSubtask(task.id, step.id); }}
+                    role="checkbox" aria-checked={step.done} aria-label={step.label} style={{
+                      display: 'flex', alignItems: 'center', gap: 10, flex: 1, minWidth: 0, padding: '10px 0', background: 'transparent',
+                      border: 'none', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left',
+                    }}>
+                    <span style={{
+                      width: 22, height: 22, borderRadius: 11, flexShrink: 0,
+                      border: `1.5px solid ${step.done ? c.to : theme.railFilled}`, background: step.done ? c.to : 'transparent',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background .2s, border-color .2s',
+                    }}>{step.done && <UIIcon name="check" size={13} color="#fff" strokeWidth={2.6}/>}</span>
+                    <span style={{ fontSize: 14, color: step.done ? theme.text3 : theme.text, textDecorationLine: step.done ? 'line-through' : 'none', textDecorationColor: theme.text3 }}>{step.label}</span>
+                  </button>
+                  <button onClick={() => removeStep(step.id)} aria-label={`Quitar "${step.label}"`} className="lo-press" style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 6, display: 'flex' }}>
+                    <UIIcon name="x" size={14} color={theme.text3}/>
+                  </button>
+                </div>
+              ))}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: subtasks.length ? 6 : 0 }}>
+                <input value={newStep} onChange={(e) => setNewStep(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') addStep(); }}
+                  placeholder="Añadir un paso…" aria-label="Nuevo paso" maxLength={120} style={{
+                    flex: 1, minWidth: 0, background: theme.bg, border: `1px solid ${theme.border}`, borderRadius: 10,
+                    padding: '9px 12px', color: theme.text, fontSize: 14, outline: 'none', fontFamily: 'inherit',
+                  }}/>
+                <button className="lo-press" onClick={addStep} aria-label="Añadir paso" disabled={!newStep.trim()} style={{
+                  width: 36, height: 36, borderRadius: 10, flexShrink: 0, border: 'none', cursor: newStep.trim() ? 'pointer' : 'default',
+                  background: newStep.trim() ? c.to : theme.rail, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}><UIIcon name="plus" size={16} color="#fff" strokeWidth={2.6}/></button>
               </div>
             </Card>
           </div>
         )}
 
-        {/* Subtasks / checklist */}
-        <div style={{ '--i': 1 }}>
-          <Card theme={theme} style={{ padding: 14, marginTop: subtasks.length > 0 ? 10 : 12 }}>
-            <SectionLabel theme={theme} inline>Checklist</SectionLabel>
-            {subtasks.map((s, i) => (
-              <div key={s.id || i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 0', borderTop: i ? `0.5px solid ${theme.border}` : 'none', marginTop: i ? 0 : 6 }}>
-                <button className="lo-press" onClick={() => toggleSub(s)} style={{
-                  width: 22, height: 22, borderRadius: 11,
-                  border: `1.5px solid ${s.done ? c.to : theme.rail}`,
-                  background: s.done ? c.to : 'transparent',
-                  cursor: 'pointer', padding: 0,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  transition: 'all .2s',
-                }}>{s.done && <UIIcon name="check" size={13} color="#fff" strokeWidth={2.6}/>}</button>
-                <span style={{ flex: 1, fontSize: 14, color: s.done ? theme.text3 : theme.text, textDecorationLine: s.done ? 'line-through' : 'none', textDecorationColor: theme.text3 }}>{s.label}</span>
+        {/* When */}
+        <div style={{ '--i': 2 }}>
+          <Card theme={theme} style={{ padding: 14, marginTop: 0 }}>
+            {!whole && (<>
+              <div style={fieldLabel}>Día</div>
+              <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 12 }}>
+                {dates.map(d => {
+                  const active = task.date === d.dateStr;
+                  return (
+                    <button key={d.off} onClick={() => updateDay({ date: d.dateStr })} aria-pressed={active} className="lo-press" style={{
+                      flexShrink: 0, width: 52, padding: '8px 4px', borderRadius: 14, cursor: 'pointer', fontFamily: 'inherit',
+                      background: active ? `linear-gradient(145deg, ${c.from}, ${c.to})` : theme.surfaceHi,
+                      border: `1.5px solid ${active ? 'transparent' : theme.border}`,
+                      display: 'flex', flexDirection: 'column', alignItems: 'center',
+                    }}>
+                      <span style={{ fontSize: 9.5, fontWeight: 600, color: active ? 'rgba(255,255,255,0.85)' : theme.text3 }}>{d.dow}</span>
+                      <span className="lo-display" style={{ fontSize: 18, fontWeight: 600, color: active ? '#fff' : theme.text, letterSpacing: -0.4, fontVariantNumeric: 'tabular-nums' }}>{d.day}</span>
+                      {d.mon && <span style={{ fontSize: 8, fontWeight: 700, color: active ? 'rgba(255,255,255,0.7)' : theme.text3 }}>{d.mon}</span>}
+                    </button>
+                  );
+                })}
+                <label className="lo-press" style={{
+                  position: 'relative', flexShrink: 0, width: 62, borderRadius: 14, cursor: 'pointer',
+                  background: dates.some(d => d.dateStr === task.date) ? theme.surfaceHi : `linear-gradient(145deg, ${c.from}, ${c.to})`,
+                  border: `1.5px solid ${theme.border}`, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3,
+                  color: dates.some(d => d.dateStr === task.date) ? theme.text2 : '#fff', fontSize: 10.5, fontWeight: 600,
+                }}>
+                  <UIIcon name="calendar" size={16} color="currentColor"/> Otra
+                  <input type="date" value={task.date} aria-label="Otra fecha" onChange={(e) => { if (e.target.value) updateDay({ date: e.target.value }); }}
+                    style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer', width: '100%', height: '100%' }}/>
+                </label>
               </div>
-            ))}
-            {live && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: subtasks.length ? 8 : 6 }}>
-                <input value={newStep} onChange={(e) => setNewStep(e.target.value)}
-                  onKeyDown={(e) => { if (e.key === 'Enter') addStep(); }}
-                  placeholder="Añadir un paso…" style={{
-                    flex: 1, background: theme.bg, border: `1px solid ${theme.border}`, borderRadius: 10,
-                    padding: '9px 12px', color: theme.text, fontSize: 13.5, outline: 'none', fontFamily: 'inherit',
-                  }}/>
-                <button className="lo-press" onClick={addStep} style={{
-                  width: 34, height: 34, borderRadius: 10, flexShrink: 0, border: 'none', cursor: 'pointer',
-                  background: newStep.trim() ? c.to : theme.rail, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}><UIIcon name="plus" size={16} color="#fff" strokeWidth={2.6}/></button>
+            </>)}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 9 }}>
+              <div style={{ ...fieldLabel, margin: 0 }}>Duración</div>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 12.5, color: theme.text2 }}>
+                Todo el día <Toggle on={t.allDay} onChange={(v) => update({ allDay: v })} theme={theme} label="Todo el día"/>
+              </label>
+            </div>
+            {!t.allDay && (
+              <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 2 }}>
+                {durations.map(d => (
+                  <button key={d} onClick={() => update({ durationMin: d })} aria-pressed={t.durationMin === d} className="lo-press" style={chip(t.durationMin === d)}>{chipLabel(d)}</button>
+                ))}
               </div>
             )}
           </Card>
         </div>
 
-        {/* Focus mode CTA */}
-        <div style={{ '--i': 2 }}>
-          <button onClick={onStartFocus} className="lo-press lo-lift" style={{
-            marginTop: 12, width: '100%',
-            background: `linear-gradient(135deg, ${c.from}22, ${c.to}11)`,
-            border: `0.5px solid ${c.to}55`,
-            borderRadius: 18, padding: '14px 16px',
-            display: 'flex', alignItems: 'center', gap: 12,
-            cursor: 'pointer', color: theme.text, fontFamily: 'inherit', textAlign: 'left',
-          }}>
-            <div style={{
-              width: 40, height: 40, borderRadius: 12,
-              background: `linear-gradient(135deg, ${c.from}, ${c.to})`,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: `0 4px 12px ${c.to}55`,
-            }}>
-              <UIIcon name="play" size={18} color="#fff"/>
-            </div>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 14.5, fontWeight: 600, color: theme.text, letterSpacing: -0.1 }}>Iniciar modo enfoque</div>
-              <div style={{ fontSize: 12, color: theme.text2, marginTop: 1 }}>Cronómetro fullscreen sin distracciones</div>
-            </div>
-            <UIIcon name="chevronR" size={14} color={theme.text3}/>
-          </button>
-        </div>
-
-        {/* Options — now reflect real task data and are tappable */}
+        {/* Repetition */}
         <div style={{ '--i': 3 }}>
-          <Card theme={theme} style={{ padding: 0, marginTop: 10 }}>
-            <OptionRow theme={theme} icon="bell" tint="coral" label="Recordatorio"
-              sub={t.reminder ? 'Activado' : 'Desactivado'}
-              on={t.reminder} onToggle={() => live && onUpdate({ reminder: !t.reminder })}/>
-            <Divider theme={theme}/>
-            <button onClick={cycleRecur} className="lo-press" style={detailRowBtn}>
-              <OptionRow theme={theme} icon="repeat" tint="lavender" label="Repetir" sub={recurSub(t.recur)} arrow/>
-            </button>
-            <Divider theme={theme}/>
-            <button onClick={cyclePriority} className="lo-press" style={detailRowBtn}>
-              <OptionRow theme={theme} icon="flag" tint="amber" label="Prioridad" sub={PRIORITY_LABELS[t.priority || 'medium']} arrow/>
-            </button>
-            {live && <><Divider theme={theme}/>
-              <DeadlineRow theme={theme} value={t.deadline || null} onChange={(v) => onUpdate({ deadline: v })}/>
-              <Divider theme={theme}/>
-              <div style={{ padding: '12px 14px' }}>
-                <div style={{ fontSize: 11.5, color: theme.text2, fontWeight: 500, marginBottom: 10 }}>Tema</div>
-                <CategoryPicker theme={theme} value={t.category || null} onChange={(v) => onUpdate({ category: v })}/>
-              </div>
-            </>}
+          <Card theme={theme} style={{ padding: 14, marginTop: 0 }}>
+            <div style={fieldLabel}>Repetición</div>
+            <RecurPicker theme={theme} value={series ? series.recur : null} date={series ? series.date : task.date} onChange={setRecur} color={t.color}/>
           </Card>
         </div>
 
-        {/* Edit panel — change date, duration, color, icon (B16) */}
-        {live && (
-          <div style={{ '--i': 3.5 }}>
-            <Card theme={theme} style={{ padding: 0, marginTop: 10, overflow: 'hidden' }}>
-              <button onClick={() => setEditOpen(v => !v)} className="lo-press" style={{ ...detailRowBtn, padding: '13px 14px', display: 'flex', alignItems: 'center', gap: 12 }}>
-                <SettingsIconBadge name="pencil" color="sky" size={32}/>
-                <span style={{ flex: 1, fontSize: 14.5, color: theme.text, letterSpacing: -0.1 }}>Editar detalles</span>
-                <div style={{ transform: editOpen ? 'rotate(90deg)' : 'none', transition: 'transform .22s var(--ease-smooth)' }}>
-                  <UIIcon name="chevronR" size={14} color={theme.text3}/>
+        {/* Options */}
+        <div style={{ '--i': 4 }}>
+          <Card theme={theme} style={{ padding: 0, marginTop: 0 }}>
+            <OptionRow theme={theme} icon="bell" tint="coral" label="Recordatorio"
+              sub={t.reminder ? '10 min antes, con la app abierta' : 'Desactivado'}
+              on={t.reminder} onToggle={toggleReminder}/>
+            <Divider theme={theme}/>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px' }}>
+              <SettingsIconBadge name="flag" color="amber" size={30}/>
+              <div style={{ flex: 1, fontSize: 14.5, color: theme.text, fontWeight: 500, letterSpacing: -0.1 }}>Prioridad</div>
+              <div role="radiogroup" aria-label="Prioridad" style={{ display: 'flex', background: theme.rail, borderRadius: 10, padding: 2 }}>
+                {PRIORITY_CHOICES.map(p => {
+                  const active = (t.priority || 'medium') === p.id;
+                  return (
+                    <button key={p.id} role="radio" aria-checked={active} onClick={() => update({ priority: p.id })} className="lo-press" style={{
+                      border: 'none', cursor: 'pointer', padding: '6px 11px', borderRadius: 8, fontSize: 12.5, fontWeight: 600, fontFamily: 'inherit',
+                      background: active ? theme.surface : 'transparent', color: active ? pal(p.color).to : theme.text3,
+                      boxShadow: active ? '0 1px 4px rgba(0,0,0,0.18)' : 'none',
+                    }}>{p.label}</button>
+                  );
+                })}
+              </div>
+            </div>
+            <Divider theme={theme}/>
+            <DeadlineRow theme={theme} value={t.deadline || null} onChange={(v) => update({ deadline: v })}/>
+            <Divider theme={theme}/>
+            <div style={{ padding: '12px 14px' }}>
+              <div style={{ fontSize: 11.5, color: theme.text2, fontWeight: 500, marginBottom: 10 }}>Tema</div>
+              <CategoryPicker theme={theme} value={t.category || null} onChange={(v) => update({ category: v })}/>
+            </div>
+          </Card>
+        </div>
+
+        {/* Look */}
+        <div style={{ '--i': 5 }}>
+          <Card theme={theme} style={{ padding: 0, marginTop: 0, overflow: 'hidden' }}>
+            <button onClick={() => setLookOpen(v => !v)} aria-expanded={lookOpen} className="lo-press" style={{ ...detailRowBtn, padding: '13px 14px', display: 'flex', alignItems: 'center', gap: 12 }}>
+              <SettingsIconBadge name="pencil" color="sky" size={30}/>
+              <span style={{ flex: 1, fontSize: 14.5, color: theme.text, fontWeight: 500, letterSpacing: -0.1 }}>Color e icono</span>
+              <div style={{ transform: lookOpen ? 'rotate(90deg)' : 'none', transition: 'transform .22s var(--ease-smooth)' }}>
+                <UIIcon name="chevronR" size={14} color={theme.text3}/>
+              </div>
+            </button>
+            {lookOpen && (
+              <div className="lo-fade" style={{ padding: '6px 14px 16px' }}>
+                <div style={fieldLabel}>Color</div>
+                <ColorSwatches theme={theme} value={t.color} onChange={(color) => update({ color })}/>
+                <div style={{ ...fieldLabel, marginTop: 16 }}>Icono</div>
+                <EmojiPicker theme={theme} value={t.icon} onChange={(icon) => update({ icon })} color={t.color}/>
+              </div>
+            )}
+          </Card>
+        </div>
+
+        {/* Actions */}
+        {dayActions && (
+          <div style={{ '--i': 6, display: 'flex', flexDirection: 'column', gap: 10, marginTop: 2 }}>
+            {!isDone && !task.allDay && (
+              <button onClick={() => onStartFocus(task.id)} className="lo-press lo-card" style={{
+                width: '100%', background: `linear-gradient(135deg, ${c.from}22, ${c.to}11)`, border: `0.5px solid ${c.to}55`,
+                borderRadius: 16, padding: '11px 14px', display: 'flex', alignItems: 'center', gap: 12,
+                cursor: 'pointer', color: theme.text, fontFamily: 'inherit', textAlign: 'left',
+              }}>
+                <div style={{ width: 36, height: 36, borderRadius: 11, background: `linear-gradient(135deg, ${c.from}, ${c.to})`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <UIIcon name="play" size={16} color="#fff"/>
                 </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 14.5, fontWeight: 600, letterSpacing: -0.1 }}>Iniciar modo enfoque</div>
+                  <div style={{ fontSize: 12, color: theme.text2, marginTop: 1 }}>Cuenta atrás de {lengthLabel(task.durationMin)} a pantalla completa</div>
+                </div>
+                <UIIcon name="chevronR" size={14} color={theme.text3}/>
               </button>
-              {editOpen && (
-                <div className="lo-fade" style={{ padding: '4px 14px 16px' }}>
-                  {/* Fecha */}
-                  <div style={{ fontSize: 10.5, fontWeight: 700, color: theme.text3, letterSpacing: 1, textTransform: 'uppercase', margin: '6px 0 8px' }}>Fecha</div>
-                  <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
-                    {DETAIL_DATES.map(d => {
-                      const active = t.date === d.dateStr;
-                      return (
-                        <button key={d.off} onClick={() => setField({ date: d.dateStr })} className="lo-press" style={{
-                          flexShrink: 0, width: 52, padding: '8px 4px', borderRadius: 14, cursor: 'pointer', fontFamily: 'inherit',
-                          background: active ? `linear-gradient(145deg, ${c.from}, ${c.to})` : theme.surfaceHi,
-                          border: `1.5px solid ${active ? 'transparent' : theme.border}`,
-                          display: 'flex', flexDirection: 'column', alignItems: 'center',
-                        }}>
-                          <span style={{ fontSize: 9.5, fontWeight: 600, color: active ? 'rgba(255,255,255,0.85)' : theme.text3 }}>{d.dow}</span>
-                          <span style={{ fontSize: 18, fontWeight: 800, color: active ? '#fff' : theme.text, letterSpacing: -0.4, fontVariantNumeric: 'tabular-nums' }}>{d.day}</span>
-                          {d.mon && <span style={{ fontSize: 8, fontWeight: 700, color: active ? 'rgba(255,255,255,0.7)' : theme.text3 }}>{d.mon}</span>}
-                        </button>
-                      );
-                    })}
-                  </div>
-                  {/* Duración */}
-                  <div style={{ fontSize: 10.5, fontWeight: 700, color: theme.text3, letterSpacing: 1, textTransform: 'uppercase', margin: '14px 0 8px' }}>Duración</div>
-                  <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 2 }}>
-                    {[15, 30, 45, 60, 90, 120].map(d => {
-                      const active = durMin === d;
-                      return (
-                        <button key={d} onClick={() => setField({ durationMin: d })} className="lo-press" style={{
-                          flexShrink: 0, padding: '8px 15px', borderRadius: 999, fontSize: 13, fontFamily: 'inherit', cursor: 'pointer',
-                          fontWeight: active ? 700 : 500, color: active ? '#fff' : theme.text2,
-                          background: active ? `linear-gradient(135deg, ${c.from}, ${c.to})` : theme.surfaceHi,
-                          border: `1px solid ${active ? 'transparent' : theme.border}`,
-                        }}>{d < 60 ? `${d}m` : `${Math.floor(d/60)}h${d%60 ? `${d%60}m` : ''}`}</button>
-                      );
-                    })}
-                  </div>
-                  {/* Color */}
-                  <div style={{ fontSize: 10.5, fontWeight: 700, color: theme.text3, letterSpacing: 1, textTransform: 'uppercase', margin: '14px 0 8px' }}>Color</div>
-                  <div style={{ display: 'flex', gap: 10, overflowX: 'auto', paddingBottom: 4, alignItems: 'center' }}>
-                    {DETAIL_COLORS.map(col => {
-                      const cc = LIFE_PALETTE[col]; const active = t.color === col;
-                      return (
-                        <button key={col} onClick={() => setField({ color: col })} className="lo-press" style={{
-                          flexShrink: 0, width: active ? 38 : 30, height: active ? 38 : 30, borderRadius: '50%', padding: 0, border: 'none', cursor: 'pointer',
-                          background: `linear-gradient(145deg, ${cc.from}, ${cc.to})`,
-                          boxShadow: active ? `0 0 0 2.5px ${theme.surface}, 0 0 0 4.5px ${cc.to}` : 'none',
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        }}>{active && <UIIcon name="check" size={16} color="#fff" strokeWidth={2.8}/>}</button>
-                      );
-                    })}
-                  </div>
-                  {/* Icono */}
-                  <div style={{ fontSize: 10.5, fontWeight: 700, color: theme.text3, letterSpacing: 1, textTransform: 'uppercase', margin: '14px 0 8px' }}>Icono</div>
-                  <EmojiPicker theme={theme} value={t.icon} onChange={(n) => setField({ icon: n })} color={t.color}/>
-                </div>
+            )}
+            <div style={{ display: 'flex', gap: 10 }}>
+              {!isDone && !task.allDay && (
+                <button onClick={snooze} className="lo-press lo-card" style={{
+                  flex: 1, padding: '14px 12px', borderRadius: 16, background: theme.surface, border: `0.5px solid ${theme.border}`,
+                  color: theme.text, fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                }}>
+                  <UIIcon name="clock" size={16} color={theme.text}/> +30 min
+                </button>
               )}
-            </Card>
+              <button onClick={toggleDone} className="lo-press" style={{
+                flex: 1.4, padding: '14px 12px', borderRadius: 16,
+                background: isDone ? theme.surface : `linear-gradient(135deg, ${c.from}, ${c.to})`,
+                border: isDone ? `0.5px solid ${theme.border}` : 'none',
+                color: isDone ? theme.text2 : '#fff', fontSize: 14.5, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                boxShadow: isDone ? 'none' : `0 6px 20px ${c.to}55`,
+              }}>
+                <UIIcon name="check" size={16} color={isDone ? theme.text2 : '#fff'} strokeWidth={2.4}/>
+                {isDone ? 'Reabrir' : 'Completar'}
+              </button>
+            </div>
           </div>
         )}
-
-        {/* Action buttons */}
-        <div style={{ '--i': 4, display: 'flex', gap: 10, marginTop: 14 }}>
-          <button onClick={snooze} className="lo-press lo-lift" style={{
-            flex: 1, padding: '14px 12px', borderRadius: 16,
-            background: theme.surface, border: `0.5px solid ${theme.border}`,
-            color: theme.text, fontSize: 14, fontWeight: 600,
-            cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-            fontFamily: 'inherit',
-          }}>
-            <UIIcon name="clock" size={16} color={theme.text}/> +30 min
-          </button>
-          <button onClick={() => { if (onComplete) onComplete(); }} className="lo-press lo-lift" style={{
-            flex: 1, padding: '14px 12px', borderRadius: 16,
-            background: isDone ? theme.surface : `linear-gradient(135deg, ${c.from}, ${c.to})`,
-            border: isDone ? `0.5px solid ${theme.border}` : 'none',
-            color: isDone ? theme.text2 : '#fff', fontSize: 14, fontWeight: 700,
-            cursor: 'pointer',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-            fontFamily: 'inherit',
-            boxShadow: isDone ? 'none' : `0 6px 20px ${c.to}55`,
-            transition: 'all .3s var(--ease-smooth)',
-          }}>
-            <UIIcon name="check" size={16} color={isDone ? theme.text2 : '#fff'} strokeWidth={2.4}/>
-            {isDone ? 'Reabrir' : 'Completar'}
-          </button>
-        </div>
       </div>
     </div>
   );
@@ -1573,218 +1591,143 @@ const detailRowBtn = { display: 'block', width: '100%', background: 'transparent
 
 
 // ──────────────────────────────────────────────────────────────
-// AI Planner — premium chat with typing indicator + rich suggestions
+// Planner — write (or dictate) a phrase and it becomes a task. It is a rule-based reader,
+// not a language model: every reply states what was really done, and what it did can be undone.
 // ──────────────────────────────────────────────────────────────
-function AIScreen({ theme, onBack, embedded }) {
-  const chips = ['Gym mañana 7am 1h', 'Estudiar inglés hoy 2pm 90 min', 'Reunión con Ana el lunes 10am', 'Llamar a mamá cada día 8pm'];
-  const INITIAL_MSGS = [
-    { from: 'ai', text: 'Soy tu planner. Dime qué quieres agendar en lenguaje natural — ej: "gym mañana 7am 1h" o "estudiar inglés el lunes 2pm 90 min" — y lo agrego a tu día. También puedo completar, mover o borrar tareas.' },
-  ];
+const PLANNER_EXAMPLES = ['Gym mañana 7am 1h', 'Dentista el viernes a las 4', 'Leer cada día 10pm', '¿Qué tengo mañana?'];
+const PLANNER_HELLO = { from: 'ai', text: 'Escribe lo que quieres agendar con tus palabras: qué, cuándo y cuánto dura. También puedo decirte qué tienes un día, y completar, mover o borrar tareas.' };
+
+function AIScreen({ theme, onOpenTask }) {
   const [input, setInput] = React.useState('');
-  const [thinking, setThinking] = React.useState(false);
   const [listening, setListening] = React.useState(false);
-  const [messages, setMessages] = React.useState(INITIAL_MSGS);
+  const [messages, setMessages] = React.useState([PLANNER_HELLO]);
   const recogRef = React.useRef(null);
   const scrollRef = React.useRef(null);
+  const inputRef = React.useRef(null);
+  const nextId = React.useRef(1);
+  useStoreVersion();
 
   React.useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-  }, [messages, thinking]);
+  }, [messages]);
 
-  // Smart local fallback — covers common intents without requiring a backend
-  const AI_PATTERNS = [
-    { re: /cómo uso|cómo funciona|qué puedo|cómo se usa|ayuda|tutorial|manual/i,
-      reply: 'Toca + para crear tareas con hora, ícono y color. La pestaña Agenda muestra el calendario mensual. Stats registra tu progreso. Para rutinas rápidas (Pomodoro, Día de estudio), mantén presionado el +. ¿En qué más te ayudo?' },
-    { re: /agend[ae]|cre[ae] una|añad[ei]|ponme|pong[ao]|guard[ae]/i,
-      replies: ['Listo, lo agendo ahora. También puedes hacerlo manualmente con el botón + desde la pantalla principal.', 'Anotado. Para que quede en tu timeline, toca + y llena los detalles de la tarea.'] },
-    { re: /muev[ae]|cambi[ae] la hora|desplaz[ae]|posterg[ae]/i,
-      reply: 'Para mover una tarea, ábrela tocándola y edita la hora. Pronto podrás decírmelo directamente.' },
-    { re: /bor[ar]|elimin[ae]|quita|suprim/i,
-      reply: 'Abre la tarea tocándola y toca el ícono de borrar. Ojo que no se puede deshacer.' },
-    { re: /hábito|rutina/i,
-      reply: 'Para rutinas predefinidas, mantén presionado el + abajo. Están Pomodoro, Día de clases, Mañana activa y más — se agregan a tu timeline de una.' },
-    { re: /pomodoro|focus|enfoque|concentra/i,
-      reply: 'El modo enfoque se activa desde el detalle de cualquier tarea (toca la tarea). Te da un temporizador con la duración que definiste, pantalla limpia, sin distracciones.' },
-    { re: /stats|estadístic|progreso|racha/i,
-      reply: 'En la pestaña Stats ves las tareas completadas por semana, tu racha diaria y el tiempo de enfoque acumulado. Cualquier cosa que completes hoy suma al registro.' },
-    { re: /agenda|calendario|mes|semana/i,
-      reply: 'La pestaña Agenda muestra el mes completo. Toca cualquier día para ver sus tareas de ese día.' },
-    { re: /hola|buenos|hey|qué tal|buenas/i,
-      replies: ['¡Hola! Soy tu asistente de LifeOS. Puedo explicarte cómo usar la app o ayudarte a planear el día. ¿Qué necesitas?', '¡Hola! Pregúntame cómo usar cualquier función o cuéntame qué quieres agendar.'] },
-    { re: /gracias|perfecto|genial|excelente|listo/i,
-      replies: ['¡Con gusto! ¿Algo más?', 'Para eso estoy. ¿Necesitas algo más?'] },
-  ];
-
-  function localReply(text) {
-    for (const p of AI_PATTERNS) {
-      if (p.re.test(text)) {
-        const opts = p.replies || [p.reply];
-        return opts[Math.floor(Math.random() * opts.length)];
-      }
-    }
-    const fallbacks = [
-      'Entendido. Para eso, toca + en la pantalla principal. ¿Necesitas más detalles?',
-      'Buena pregunta. La app está pensada para ser simple: + para crear, el timeline para ver tu día, Agenda para el mes.',
-      'Puedo ayudarte con eso. ¿Quieres que te explique paso a paso cómo funciona esa sección?',
-    ];
-    return fallbacks[Math.floor(Math.random() * fallbacks.length)];
-  }
-
-  const send = async (txt) => {
-    const text = (txt || input).trim();
-    if (!text || thinking) return;
+  const send = (txt) => {
+    const text = (txt ?? input).trim();
+    if (!text) return;
     setInput('');
-    setMessages(m => [...m, { from: 'user', text }]);
-    setThinking(true);
-
-    await new Promise(r => setTimeout(r, 350 + Math.random() * 350)); // feels considered
-
+    // Whatever the phrase changes can be undone: keep the data as it was before.
+    const before = LOStore.snapshot();
+    let result;
     try {
-      // 1) Parse the message into a real action against the task store.
-      const parsed = loParseCommand(text);
-      if (parsed.intent === 'create' || parsed.intent === 'delete' || parsed.intent === 'complete' || parsed.intent === 'move') {
-        const result = loExecuteCommand(parsed);
-        if (result) {
-          setMessages(m => [...m, { from: 'ai', text: result.reply, task: result.task || null }]);
-          setThinking(false);
-          return;
-        }
-      }
-      // 2) Help / smalltalk → the local knowledge base.
-      setMessages(m => [...m, { from: 'ai', text: localReply(text) }]);
+      result = loExecuteCommand(loParseCommand(text));
     } catch {
-      setMessages(m => [...m, { from: 'ai', text: localReply(text) }]);
-    } finally {
-      setThinking(false);
+      result = { reply: 'No pude guardar ese cambio. Tus datos siguen como estaban.' };
     }
+    const after = LOStore.snapshot();
+    const changed = Object.keys(before).some((key) => before[key] !== after[key]);
+    setMessages(m => [...m,
+      { id: nextId.current++, from: 'user', text },
+      { id: nextId.current++, from: 'ai', text: result.reply, task: result.task || null, tasks: result.tasks || null, undo: changed ? before : null },
+    ]);
+  };
+  const undo = (message) => {
+    LOStore.restore(message.undo);
+    setMessages(m => m.map(x => (x.id === message.id ? { ...x, undone: true, undo: null } : x)));
   };
 
-  // Voice dictation (Structured-style) via the Web Speech API.
+  // Dictation through the browser's speech recognition, where it exists.
   const startVoice = () => {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SR) { toast('Tu navegador no soporta dictado por voz', { icon: 'mic' }); return; }
+    if (!SR) { toast('Este navegador no tiene dictado por voz', { icon: 'mic' }); return; }
     if (listening) { try { recogRef.current && recogRef.current.stop(); } catch {} return; }
     const r = new SR(); recogRef.current = r;
-    r.lang = 'es-ES'; r.interimResults = false; r.maxAlternatives = 1;
-    r.onresult = (e) => { const txt = e.results[0][0].transcript; setInput(txt); setTimeout(() => send(txt), 250); };
+    r.lang = /^es\b/i.test(navigator.language || '') ? navigator.language : 'es-ES';
+    r.interimResults = false; r.maxAlternatives = 1;
+    r.onresult = (e) => { const said = e.results[0][0].transcript; setInput(said); setTimeout(() => send(said), 250); };
     r.onend = () => setListening(false);
     r.onerror = () => setListening(false);
     setListening(true); try { r.start(); } catch { setListening(false); }
   };
-  const clearChat = () => { setMessages(INITIAL_MSGS); setInput(''); };
+  const clearChat = () => { setMessages([PLANNER_HELLO]); setInput(''); inputRef.current?.focus(); };
+  const canSend = !!input.trim();
 
   return (
     <div data-screen-label="AI Planner" style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 }}>
-      <div style={{ flexShrink: 0 }}>
-        <ScreenTopBar theme={theme} title="IA Planner" onBack={onBack} embedded={embedded}
-          trailing={<button onClick={clearChat} title="Limpiar conversación" className="lo-press" style={{ width: 36, height: 36, borderRadius: 18, background: theme.surface, border: `0.5px solid ${theme.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+      <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '4px 16px 12px' }}>
+        <div style={{ minWidth: 0 }}>
+          <h1 className="lo-display" style={{ margin: 0, fontSize: 30, fontWeight: 600, color: theme.text, letterSpacing: -0.5 }}>Planner</h1>
+          <div style={{ fontSize: 12.5, color: theme.text3, marginTop: 1 }}>Entiende frases simples. Funciona sin conexión.</div>
+        </div>
+        {messages.length > 1 && (
+          <button onClick={clearChat} aria-label="Limpiar conversación" title="Limpiar conversación" className="lo-press" style={{ width: 36, height: 36, borderRadius: 18, background: theme.surface, border: `0.5px solid ${theme.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 }}>
             <UIIcon name="trash" size={16} color={theme.text2}/>
-          </button>}/>
+          </button>
+        )}
       </div>
 
-      <div ref={scrollRef} style={{ flex: 1, overflowY: 'auto', padding: '0 16px', minHeight: 0 }}>
-        {/* Hero */}
-        <div className="lo-scale-in" style={{
-          background: `linear-gradient(135deg, ${LIFE_PALETTE.lavender.from}22, ${LIFE_PALETTE.sky.to}18)`,
-          border: `0.5px solid ${theme.border}`,
-          borderRadius: 22, padding: 18,
-          display: 'flex', alignItems: 'center', gap: 14,
-          marginTop: 4,
-        }}>
-          <div className="lo-breath" style={{ filter: `drop-shadow(0 6px 16px ${LIFE_PALETTE.lavender.to}66)` }}>
-            <LifeIcon name="sparkle" color="lavender" size={48} shape="squircle"/>
-          </div>
-          <div style={{ flex: 1 }}>
-            <h2 style={{ margin: 0, fontSize: 19, fontWeight: 700, color: theme.text, letterSpacing: -0.3 }}>
-              ¿En qué te ayudo hoy?
-            </h2>
-            <p style={{ margin: '3px 0 0', fontSize: 12.5, color: theme.text2, lineHeight: 1.4 }}>
-              Agendo tareas, sugiero descansos y respondo dudas de la app.
-            </p>
-          </div>
-        </div>
-
-        {/* Conversation */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 18 }}>
+      <div ref={scrollRef} role="log" aria-live="polite" style={{ flex: 1, overflowY: 'auto', padding: '0 16px', minHeight: 0 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, paddingTop: 2 }}>
           {messages.map((m, i) => (
-            <React.Fragment key={i}>
+            <React.Fragment key={m.id || i}>
               <Bubble theme={theme} side={m.from === 'user' ? 'right' : 'left'}>{m.text}</Bubble>
-              {m.task && <AITaskCard theme={theme} task={m.task}/>}
+              {m.tasks && m.tasks.map(t => <AITaskCard key={t.id} theme={theme} task={LOStore.getTask(t.id) || t} onOpen={onOpenTask}/>)}
+              {m.task && !m.undone && <AITaskCard theme={theme} task={LOStore.getTask(m.task.id) || m.task} onOpen={onOpenTask}/>}
+              {m.undo && (
+                <button onClick={() => undo(m)} className="lo-press" style={{
+                  alignSelf: 'flex-start', border: `0.5px solid ${theme.border}`, background: theme.surface, color: theme.accent,
+                  padding: '7px 13px', borderRadius: 999, fontSize: 12.5, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
+                }}>Deshacer</button>
+              )}
+              {m.undone && <div style={{ alignSelf: 'flex-start', fontSize: 12, color: theme.text3, padding: '0 6px' }}>Deshecho.</div>}
             </React.Fragment>
           ))}
-          {thinking && (
-            <div style={{ alignSelf: 'flex-start' }}>
-              <div style={{
-                background: theme.surface, border: `0.5px solid ${theme.border}`,
-                borderRadius: 18, borderBottomLeftRadius: 6,
-                padding: '12px 14px', display: 'inline-flex', gap: 4, alignItems: 'center',
-              }}>
-                {[0, 1, 2].map(i => (
-                  <span key={i} style={{
-                    width: 6, height: 6, borderRadius: 3, background: theme.text3,
-                    animation: `lo-breath 1.4s var(--ease-smooth) ${i * 0.15}s infinite`,
-                  }}/>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
 
-        {/* Quick chips — show when convo is short */}
-        {messages.length <= 2 && !thinking && (
-          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 18, paddingBottom: 12 }}>
-            {chips.map((c) => (
-              <button key={c} onClick={() => send(c)} className="lo-press" style={{
-                background: theme.surface, border: `0.5px solid ${theme.border}`, color: theme.text,
-                padding: '8px 13px', borderRadius: 999, fontSize: 12, fontWeight: 500, cursor: 'pointer',
-                display: 'inline-flex', alignItems: 'center', gap: 5,
-                fontFamily: 'inherit',
-              }}>
-                <UIIcon name="sparkle" size={11} color={theme.accent} strokeWidth={2}/> {c}
-              </button>
-            ))}
+        {/* Examples — while the conversation is still empty */}
+        {messages.length <= 1 && (
+          <div style={{ marginTop: 18 }}>
+            <div style={{ fontSize: 10.5, fontWeight: 700, color: theme.text3, letterSpacing: 1, textTransform: 'uppercase', margin: '0 4px 9px' }}>Prueba con</div>
+            <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap' }}>
+              {PLANNER_EXAMPLES.map((example) => (
+                <button key={example} onClick={() => send(example)} className="lo-press" style={{
+                  background: theme.surface, border: `0.5px solid ${theme.border}`, color: theme.text,
+                  padding: '9px 14px', borderRadius: 999, fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit',
+                }}>{example}</button>
+              ))}
+            </div>
           </div>
         )}
         <div style={{ height: 12 }}/>
       </div>
 
-      {/* Fixed input bar */}
-      <div style={{
-        flexShrink: 0,
-        padding: '10px 16px 12px',
-        background: theme.bg,
-        borderTop: `0.5px solid ${theme.border}`,
-      }}>
+      <div style={{ flexShrink: 0, padding: '10px 16px 12px', borderTop: `0.5px solid ${theme.border}` }}>
         <div style={{
           display: 'flex', alignItems: 'center', gap: 6,
           background: theme.surface, border: `0.5px solid ${theme.border}`,
-          borderRadius: 26, padding: 6,
-          boxShadow: `0 4px 16px rgba(0,0,0,0.2)`,
+          borderRadius: 26, padding: 6, boxShadow: `0 4px 16px rgba(0,0,0,0.2)`,
         }}>
-          <button onClick={startVoice} title="Dictar por voz" className={listening ? 'lo-press lo-pulse' : 'lo-press'} style={{
-            width: 36, height: 36, borderRadius: 18, border: 'none', cursor: 'pointer',
-            background: listening ? theme.accent : 'transparent',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            '--pulse-c': theme.accent + '88', '--pulse-c-end': theme.accent + '00',
-          }}>
+          <button onClick={startVoice} aria-label={listening ? 'Detener dictado' : 'Dictar por voz'} title="Dictar por voz" aria-pressed={listening}
+            className={listening ? 'lo-press lo-pulse' : 'lo-press'} style={{
+              width: 38, height: 38, borderRadius: 19, border: 'none', cursor: 'pointer', flexShrink: 0,
+              background: listening ? theme.accent : 'transparent',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              '--pulse-c': theme.accent + '88', '--pulse-c-end': theme.accent + '00',
+            }}>
             <UIIcon name="mic" size={18} color={listening ? '#fff' : theme.text2} strokeWidth={2}/>
           </button>
-          <input value={input} onChange={(e) => setInput(e.target.value)}
+          <input ref={inputRef} value={input} onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter') send(); }}
-            placeholder="Pregúntame lo que sea…" style={{
-            flex: 1, background: 'transparent', border: 'none', outline: 'none',
-            color: theme.text, fontSize: 14, padding: '0 4px',
-            fontFamily: 'inherit',
-          }}/>
-          <button onClick={() => send()} className="lo-press" disabled={!input.trim() || thinking} style={{
-            width: 38, height: 38, borderRadius: 19,
-            background: input.trim() && !thinking ? `linear-gradient(135deg, ${theme.accent}, ${theme.accent}DD)` : theme.rail,
-            border: 'none', cursor: input.trim() && !thinking ? 'pointer' : 'default',
+            placeholder={listening ? 'Te escucho…' : 'Escribe una frase…'} aria-label="Frase para el planner" maxLength={200} enterKeyHint="send"
+            style={{ flex: 1, minWidth: 0, background: 'transparent', border: 'none', outline: 'none', color: theme.text, fontSize: 15, padding: '0 4px', fontFamily: 'inherit' }}/>
+          <button onClick={() => send()} aria-label="Enviar" className="lo-press" disabled={!canSend} style={{
+            width: 38, height: 38, borderRadius: 19, flexShrink: 0,
+            background: canSend ? `linear-gradient(135deg, ${theme.accent}, ${theme.accent}DD)` : theme.rail,
+            border: 'none', cursor: canSend ? 'pointer' : 'default',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            boxShadow: input.trim() && !thinking ? `0 4px 12px ${theme.accent}55` : 'none',
-            transition: 'all .2s var(--ease-smooth)',
+            boxShadow: canSend ? `0 4px 12px ${theme.accent}55` : 'none',
+            transition: 'background .2s var(--ease-smooth), box-shadow .2s',
           }}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M5 12 L19 12 M13 6 L19 12 L13 18"/>
             </svg>
           </button>
@@ -1793,26 +1736,26 @@ function AIScreen({ theme, onBack, embedded }) {
     </div>
   );
 }
-function AITaskCard({ theme, task }) {
-  const c = LIFE_PALETTE[task.color] || LIFE_PALETTE.mint;
-  const when = task.recur
-    ? (task.recur.freq === 'daily' ? 'Cada día' : task.recur.freq === 'weekdays' ? 'Entre semana' : 'Cada semana')
-    : `${fmt12(task.start)} · ${task.durationMin} min`;
+
+// A task inside the conversation: tap to open it.
+function AITaskCard({ theme, task, onOpen }) {
+  const c = pal(task.color);
+  const isDone = task.status === 'done';
+  const hour = task.allDay ? 'Todo el día' : `${fmt12(task.start)} · ${lengthLabel(task.durationMin)}`;
+  const when = task.recur ? `${loRecurLabel(task.recur, task.date)} · ${hour}` : `${loDayLabel(task.date)} · ${hour}`;
   return (
-    <div className="lo-scale-in" style={{
-      alignSelf: 'flex-start', maxWidth: '88%',
-      display: 'flex', alignItems: 'center', gap: 11, padding: 10,
-      background: `linear-gradient(135deg, ${c.from}1A, ${theme.surface} 75%)`,
-      border: `0.5px solid ${c.to}44`, borderRadius: 16,
-    }}>
-      <TaskGlyph icon={task.icon} color={task.color} size={38} shape="rounded"/>
-      <div style={{ minWidth: 0 }}>
-        <div style={{ fontSize: 14, fontWeight: 600, color: theme.text, letterSpacing: -0.1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{task.title}</div>
-        <div style={{ fontSize: 11.5, color: theme.text2, marginTop: 1, fontVariantNumeric: 'tabular-nums' }}>{when}</div>
-      </div>
-      <div style={{ marginLeft: 6, display: 'inline-flex', alignItems: 'center', gap: 4, color: c.to, fontSize: 11, fontWeight: 700 }}>
-        <UIIcon name="check" size={13} color={c.to} strokeWidth={2.6}/> Agendada
-      </div>
+    <div className="lo-scale-in" style={{ alignSelf: 'flex-start', maxWidth: '92%', display: 'flex', alignItems: 'center', gap: 8 }}>
+      <button onClick={() => onOpen && onOpen(task)} className="lo-press lo-card" style={{
+        minWidth: 0, display: 'flex', alignItems: 'center', gap: 11, padding: '9px 13px 9px 9px', textAlign: 'left',
+        background: `linear-gradient(135deg, ${c.from}1A, ${theme.surface} 75%)`, cursor: 'pointer', fontFamily: 'inherit',
+        border: `0.5px solid ${c.to}44`, borderRadius: 16, opacity: isDone ? 0.6 : 1,
+      }}>
+        <TaskGlyph icon={task.icon} color={task.color} size={36} shape="rounded"/>
+        <span style={{ minWidth: 0 }}>
+          <span style={{ display: 'block', fontSize: 14, fontWeight: 600, color: theme.text, letterSpacing: -0.1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', textDecoration: isDone ? 'line-through' : 'none' }}>{task.title}</span>
+          <span style={{ display: 'block', fontSize: 11.5, color: theme.text2, marginTop: 1, fontVariantNumeric: 'tabular-nums' }}>{when}</span>
+        </span>
+      </button>
     </div>
   );
 }
@@ -1853,7 +1796,11 @@ function InboxScreen({ theme, onBack, onSchedule }) {
     if (onSchedule) onSchedule(it);
     else { LOStore.addTask({ title: it.text, date: loDateStr() }); }
     inbox.remove(it.id);
-    toast('Movida a tu día', { tone: 'success', icon: 'check' });
+  };
+  const discard = (it) => {
+    const snapshot = LOStore.snapshot();
+    inbox.remove(it.id);
+    toast('Pendiente eliminado', { icon: 'trash', duration: 6000, action: { label: 'Deshacer', run: () => LOStore.restore(snapshot) } });
   };
 
   return (
@@ -1881,11 +1828,11 @@ function InboxScreen({ theme, onBack, onSchedule }) {
           </div>
           <input ref={inputRef} value={draft} onChange={(e) => setDraft(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter') capture(); }}
-            placeholder="Escribe cualquier idea, recado o pendiente…" style={{
+            placeholder="Escribe cualquier idea, recado o pendiente…" aria-label="Nuevo pendiente" maxLength={240} style={{
             flex: 1, background: 'transparent', border: 'none', outline: 'none',
             color: theme.text, fontSize: 14, fontFamily: 'inherit',
           }}/>
-          <button className="lo-press" onClick={capture} disabled={!draft.trim()} style={{
+          <button className="lo-press" onClick={capture} disabled={!draft.trim()} aria-label="Guardar en la bandeja" style={{
             width: 36, height: 36, borderRadius: 12, flexShrink: 0, border: 'none',
             background: draft.trim() ? theme.accent : theme.rail, cursor: draft.trim() ? 'pointer' : 'default',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -1918,7 +1865,7 @@ function InboxScreen({ theme, onBack, onSchedule }) {
                   background: theme.accent + '1F', color: theme.accent, fontWeight: 700, fontSize: 11.5,
                   padding: '7px 11px', borderRadius: 999, display: 'inline-flex', alignItems: 'center', gap: 5,
                 }}><UIIcon name="calendar" size={13} color={theme.accent} strokeWidth={2}/> Agendar</button>
-                <button className="lo-press" onClick={() => inbox.remove(it.id)} title="Eliminar" style={{
+                <button className="lo-press" onClick={() => discard(it)} title="Eliminar" aria-label={`Eliminar "${it.text}"`} style={{
                   flexShrink: 0, width: 30, height: 30, borderRadius: 9, border: 'none', cursor: 'pointer',
                   background: 'transparent', color: theme.text3, display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}><UIIcon name="trash" size={15} color={theme.text3} strokeWidth={2}/></button>
@@ -1933,20 +1880,26 @@ function InboxScreen({ theme, onBack, onSchedule }) {
 
 
 // ──────────────────────────────────────────────────────────────
-// Settings — profile hero · pro card · grouped lists with badges
+// Ajustes — profile, notifications, appearance and the data on this device
 // ──────────────────────────────────────────────────────────────
-function SettingsScreen({ theme, onBack, embedded, user, onEditName, userTasks = [], t = {}, setTweak }) {
+const ACCENTS = [['#E0241B', 'Rojo'], ['#9B6DFF', 'Violeta'], ['#F5A623', 'Ámbar'], ['#22B8A0', 'Esmeralda'], ['#3C8DF0', 'Azul']];
+const sizeLabel = (bytes) => (bytes < 1024 * 1024 ? `${Math.max(1, Math.round(bytes / 1024))} KB` : `${(bytes / 1024 / 1024).toFixed(1)} MB`);
+// Browsers give a site about 5 MB of this kind of storage.
+const STORAGE_BUDGET = 5 * 1024 * 1024;
+
+function SettingsScreen({ theme, user, onEditName, t = {}, setTweak }) {
+  useStoreVersion();
   const name = (user && user.name) || 'Tú';
-  const totalTasks = userTasks.length;
-  const doneTasks = userTasks.filter(t => t.status === 'done').length;
-  const completedDays = new Set(userTasks.filter(t => t.status === 'done' && t.targetDate).map(t => t.targetDate));
-  const today = new Date();
-  let settingsStreak = 0;
-  for (let i = 0; i < 366; i++) {
-    const d = new Date(today); d.setDate(today.getDate() - i);
-    if (completedDays.has(loDateStr(d))) settingsStreak++;
-    else if (i > 0) break;
-  }
+  const tasks = LOStore.allTasks().filter(x => !x._deleted);
+  const doneTasks = tasks.filter(x => x.status === 'done').length;
+  const planned = tasks.filter(x => !x._from).length;
+  const habitCount = LOStore.allHabits().length;
+  const usage = LOStore.storageUsage();
+  const lastBackup = LOStore.lastBackupAt();
+  const backupAge = lastBackup ? Math.floor((Date.now() - lastBackup) / 86400000) : null;
+  const backupLabel = lastBackup == null ? 'Todavía no has guardado un respaldo'
+    : backupAge === 0 ? 'Último respaldo: hoy' : backupAge === 1 ? 'Último respaldo: ayer' : `Último respaldo: hace ${backupAge} días`;
+  const backupStale = tasks.length + habitCount > 0 && (lastBackup == null || backupAge > 30);
 
   const exportData = () => {
     try {
@@ -1956,127 +1909,133 @@ function SettingsScreen({ theme, onBack, embedded, user, onEditName, userTasks =
       a.href = url; a.download = `lifeos-backup-${loDateStr()}.json`;
       document.body.appendChild(a); a.click(); a.remove();
       setTimeout(() => URL.revokeObjectURL(url), 1000);
+      LOStore.markBackup();
       toast('Respaldo descargado', { tone: 'success', icon: 'check' });
     } catch { toast('No se pudo exportar', { tone: 'error' }); }
   };
-  const resetApp = () => {
-    if (typeof window !== 'undefined' && !window.confirm('Esto borra TODAS tus tareas, hábitos y datos de este dispositivo. ¿Seguro?')) return;
+  const resetApp = async () => {
+    const ok = await confirmAsk('¿Borrar todos tus datos?', {
+      body: 'Se eliminan tus tareas, hábitos, rutinas y la bandeja de este dispositivo. No se puede deshacer; exporta un respaldo antes si quieres conservarlos.',
+      confirm: 'Borrar todo', danger: true,
+    });
+    if (!ok) return;
     try {
-      [LO_KEYS.tasks, LO_KEYS.habits, LO_KEYS.inbox, LO_KEYS.routines, USER_KEY, 'lifeos.user_tasks'].forEach(k => localStorage.removeItem(k));
+      [LO_KEYS.tasks, LO_KEYS.habits, LO_KEYS.inbox, LO_KEYS.routines, USER_KEY, LAST_BACKUP_KEY, 'lifeos.user_tasks'].forEach(k => localStorage.removeItem(k));
       notifyStoreChange();
       location.reload();
     } catch {}
   };
 
-  // Data sovereignty — import a backup (export already defined above). No lock-in.
+  // Data sovereignty — import a backup. Its contents are validated as a whole before anything
+  // is written (see LOStore.importAll), so a damaged file leaves the data untouched.
   const importRef = React.useRef(null);
   const importData = (file) => {
     const reader = new FileReader();
-    reader.onload = () => {
+    reader.onerror = () => toast('No se pudo leer el archivo', { tone: 'error' });
+    reader.onload = async () => {
       try {
         const data = JSON.parse(reader.result);
-        if (!window.confirm('Esto reemplazará tus datos actuales con los del respaldo. ¿Continuar?')) return;
+        const ok = await confirmAsk('¿Reemplazar tus datos?', {
+          body: 'Lo que tienes ahora en este dispositivo se sustituye por el contenido del respaldo.',
+          confirm: 'Reemplazar mis datos', danger: true,
+        });
+        if (!ok) return;
         const n = LOStore.importAll(data);
         toast(`Importado: ${n.tasks} tareas, ${n.habits} hábitos`, { tone: 'success', icon: 'check' });
         setTimeout(() => location.reload(), 800);
-      } catch (e) { toast(e.message || 'Archivo inválido', { tone: 'error' }); }
+      } catch (e) { toast(e instanceof SyntaxError ? 'Ese archivo no es un respaldo de LifeOS' : (e.message || 'Archivo inválido'), { tone: 'error', duration: 5000 }); }
     };
     reader.readAsText(file);
   };
 
+  const group = { background: theme.surface, borderRadius: 18, border: `0.5px solid ${theme.border}`, overflow: 'hidden' };
+  const dataBtn = {
+    background: 'rgba(0,0,0,0.2)', border: '0.5px solid rgba(255,255,255,0.22)', color: '#fff',
+    padding: '9px 15px', borderRadius: 999, fontSize: 13, fontWeight: 600,
+    cursor: 'pointer', fontFamily: 'inherit', display: 'inline-flex', alignItems: 'center', gap: 6,
+  };
+
   return (
     <div data-screen-label="Settings">
-      <ScreenTopBar theme={theme} title="Ajustes" onBack={onBack} embedded={embedded}/>
+      <div style={{ padding: '4px 16px 10px' }}>
+        <h1 className="lo-display" style={{ margin: 0, fontSize: 30, fontWeight: 600, color: theme.text, letterSpacing: -0.5 }}>Ajustes</h1>
+      </div>
       <div style={{ padding: '0 16px 24px' }}>
-        {/* Profile hero */}
-        <button onClick={onEditName} className="lo-press lo-scale-in" style={{
-          position: 'relative', borderRadius: 22, overflow: 'hidden', marginBottom: 14,
-          border: 'none', cursor: 'pointer', width: '100%', textAlign: 'left',
-          padding: 0, fontFamily: 'inherit',
+        {/* Profile */}
+        <button onClick={onEditName} aria-label={`Cambiar nombre, ${name}`} className="lo-press lo-card" style={{
+          position: 'relative', borderRadius: 22, overflow: 'hidden', marginBottom: 12,
+          border: `0.5px solid ${theme.border}`, cursor: 'pointer', width: '100%', textAlign: 'left',
+          padding: 0, fontFamily: 'inherit', background: 'transparent',
         }}>
-          <div style={{ position: 'absolute', inset: 0,
-            background: `linear-gradient(135deg, ${LIFE_PALETTE.coral.from}40, ${LIFE_PALETTE.plum.to}30, ${theme.surface} 80%)` }}/>
-          <div style={{ position: 'relative', padding: '20px 16px', display: 'flex', alignItems: 'center', gap: 14 }}>
+          <div aria-hidden="true" style={{ position: 'absolute', inset: 0,
+            background: `linear-gradient(135deg, ${theme.accent}40, ${LIFE_PALETTE.plum.to}30, ${theme.surface} 80%)` }}/>
+          <div style={{ position: 'relative', padding: '18px 16px', display: 'flex', alignItems: 'center', gap: 14 }}>
             <div style={{
-              width: 64, height: 64, borderRadius: 32,
-              background: `linear-gradient(135deg, ${LIFE_PALETTE.coral.from}, ${LIFE_PALETTE.plum.to})`,
+              width: 58, height: 58, borderRadius: 29, flexShrink: 0,
+              background: `linear-gradient(135deg, ${theme.accent}, ${LIFE_PALETTE.plum.to})`,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: '#fff', fontSize: 26, fontWeight: 700, letterSpacing: -0.5,
-              boxShadow: `0 8px 20px ${LIFE_PALETTE.plum.to}55`,
+              color: '#fff', fontSize: 24, fontWeight: 700, letterSpacing: -0.5,
             }}>{avatarLetter(name)}</div>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 19, fontWeight: 700, color: theme.text, letterSpacing: -0.3 }}>{name}</div>
-              <div style={{ fontSize: 12, color: theme.text2, marginTop: 2 }}>Toca para editar tu nombre</div>
+              <div style={{ fontSize: 19, fontWeight: 700, color: theme.text, letterSpacing: -0.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</div>
+              <div style={{ fontSize: 12, color: theme.text2, marginTop: 2 }}>Toca para cambiar tu nombre</div>
             </div>
             <UIIcon name="chevronR" size={16} color={theme.text3}/>
           </div>
         </button>
 
-        {/* Quick stats strip */}
-        <div style={{ display: 'flex', gap: 8, marginBottom: 14 }}>
-          {[
-            { label: 'Tareas', value: String(totalTasks) },
-            { label: 'Racha', value: `${settingsStreak}d` },
-            { label: 'Hechas', value: String(doneTasks) },
-          ].map((s, i) => (
-            <div key={i} className="lo-lift" style={{
-              flex: 1, padding: 12, background: theme.surface,
-              border: `0.5px solid ${theme.border}`, borderRadius: 14,
-              textAlign: 'center',
-            }}>
-              <div className="lo-display" style={{ fontSize: 21, fontWeight: 600, color: theme.text, letterSpacing: -0.4, fontVariantNumeric: 'tabular-nums' }}>{s.value}</div>
-              <div style={{ fontSize: 10, color: theme.text3, fontWeight: 600, letterSpacing: 0.4, textTransform: 'uppercase', marginTop: 2 }}>{s.label}</div>
+        <div style={{ display: 'flex', gap: 8, marginBottom: 6 }}>
+          {[['Tareas', planned], ['Completadas', doneTasks], ['Hábitos', habitCount]].map(([label, value]) => (
+            <div key={label} style={{ flex: 1, padding: 12, background: theme.surface, border: `0.5px solid ${theme.border}`, borderRadius: 14, textAlign: 'center' }}>
+              <div className="lo-display" style={{ fontSize: 21, fontWeight: 600, color: theme.text, letterSpacing: -0.4, fontVariantNumeric: 'tabular-nums' }}>{value}</div>
+              <div style={{ fontSize: 10, color: theme.text3, fontWeight: 600, letterSpacing: 0.4, textTransform: 'uppercase', marginTop: 2 }}>{label}</div>
             </div>
           ))}
         </div>
 
-        <SectionLabel theme={theme}>General</SectionLabel>
-        <div style={{ background: theme.surface, borderRadius: 18, border: `0.5px solid ${theme.border}`, overflow: 'hidden' }}>
+        <SectionLabel theme={theme}>Avisos</SectionLabel>
+        <div style={group}>
           <NotifSettingsRow theme={theme}/>
-          <Divider theme={theme}/>
-          <SettingsRow theme={theme} icon="calendar" tint="mint" label="Sync entre dispositivos" trail="Pronto"/>
         </div>
 
         <SectionLabel theme={theme}>Apariencia</SectionLabel>
-        <div style={{ background: theme.surface, borderRadius: 18, border: `0.5px solid ${theme.border}`, overflow: 'hidden' }}>
-          {/* Dark mode — real toggle */}
+        <div style={group}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '13px 14px' }}>
             <SettingsIconBadge name="moon" color="slate" size={32}/>
             <span style={{ flex: 1, fontSize: 14.5, color: theme.text, letterSpacing: -0.1 }}>Modo oscuro</span>
-            <Toggle on={!!t.dark} theme={theme} onChange={(v) => setTweak && setTweak('dark', v)}/>
+            <Toggle on={!!t.dark} theme={theme} label="Modo oscuro" onChange={(v) => setTweak && setTweak('dark', v)}/>
           </div>
           <Divider theme={theme}/>
-          {/* Accent swatches */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '13px 14px' }}>
             <SettingsIconBadge name="sparkle" color="plum" size={32}/>
             <span style={{ fontSize: 14.5, color: theme.text, letterSpacing: -0.1 }}>Acento</span>
-            <div style={{ flex: 1, display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
-              {['#E0241B', '#9B6DFF', '#F5A623', '#22B8A0', '#3C8DF0'].map((c) => {
-                const active = (t.accent || '').toLowerCase() === c.toLowerCase();
+            <div role="radiogroup" aria-label="Color de acento" style={{ flex: 1, display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+              {ACCENTS.map(([hex, label]) => {
+                const active = (t.accent || '').toLowerCase() === hex.toLowerCase();
                 return (
-                  <button key={c} className="lo-press" onClick={() => setTweak && setTweak('accent', c)} style={{
-                    width: 26, height: 26, borderRadius: 13, background: c, border: 'none', cursor: 'pointer', padding: 0,
-                    boxShadow: active ? `0 0 0 2px ${theme.surface}, 0 0 0 4px ${c}` : 'none',
-                    transition: 'box-shadow .15s',
-                  }} aria-label={`Acento ${c}`}/>
+                  <button key={hex} className="lo-press" role="radio" aria-checked={active} aria-label={label} title={label}
+                    onClick={() => setTweak && setTweak('accent', hex)} style={{
+                      width: 28, height: 28, borderRadius: 14, background: hex, border: 'none', cursor: 'pointer', padding: 0,
+                      boxShadow: active ? `0 0 0 2px ${theme.surface}, 0 0 0 4px ${hex}` : 'none',
+                      transition: 'box-shadow .15s',
+                    }}/>
                 );
               })}
             </div>
           </div>
           <Divider theme={theme}/>
-          {/* Density segmented control */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '13px 14px' }}>
             <SettingsIconBadge name="grip" color="coral" size={32}/>
             <span style={{ flex: 1, fontSize: 14.5, color: theme.text, letterSpacing: -0.1 }}>Densidad</span>
-            <div style={{ display: 'flex', background: theme.rail, borderRadius: 10, padding: 2 }}>
+            <div role="radiogroup" aria-label="Densidad" style={{ display: 'flex', background: theme.rail, borderRadius: 10, padding: 2 }}>
               {[['comfy', 'Cómoda'], ['compact', 'Compacta']].map(([id, lbl]) => {
                 const active = (t.density || 'comfy') === id;
                 return (
-                  <button key={id} className="lo-press" onClick={() => setTweak && setTweak('density', id)} style={{
+                  <button key={id} className="lo-press" role="radio" aria-checked={active} onClick={() => setTweak && setTweak('density', id)} style={{
                     border: 'none', cursor: 'pointer', padding: '6px 12px', borderRadius: 8, fontSize: 12.5, fontWeight: 600,
                     fontFamily: 'inherit', background: active ? theme.surface : 'transparent',
                     color: active ? theme.text : theme.text3,
-                    boxShadow: active ? '0 1px 4px rgba(0,0,0,0.18)' : 'none', transition: 'all .15s',
+                    boxShadow: active ? '0 1px 4px rgba(0,0,0,0.18)' : 'none',
                   }}>{lbl}</button>
                 );
               })}
@@ -2084,43 +2043,41 @@ function SettingsScreen({ theme, onBack, embedded, user, onEditName, userTasks =
           </div>
         </div>
 
-        {/* Data card — honest, local-first, with a real export */}
-        <div className="lo-lift" style={{
-          marginTop: 18, position: 'relative', overflow: 'hidden', borderRadius: 22,
+        {/* Data — local-first, with a real export */}
+        <SectionLabel theme={theme}>Tus datos</SectionLabel>
+        <div style={{
+          position: 'relative', overflow: 'hidden', borderRadius: 22,
           background: `linear-gradient(135deg, ${LIFE_PALETTE.lavender.from} 0%, ${LIFE_PALETTE.plum.to} 100%)`,
           padding: 18, color: '#fff',
-          boxShadow: `0 12px 32px ${LIFE_PALETTE.plum.to}55`,
         }}>
-          <div style={{ position: 'absolute', top: -30, right: -20, width: 120, height: 120, borderRadius: '50%',
+          <div aria-hidden="true" style={{ position: 'absolute', top: -30, right: -20, width: 120, height: 120, borderRadius: '50%',
             background: 'radial-gradient(circle, rgba(255,255,255,0.18), transparent 70%)' }}/>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
-            <UIIcon name="sparkle" size={18} color="#fff" strokeWidth={2}/>
-            <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1.2, textTransform: 'uppercase' }}>Tus datos, tuyos</span>
+          <div style={{ fontSize: 19, fontWeight: 700, letterSpacing: -0.4 }}>Todo vive en este dispositivo</div>
+          <div style={{ fontSize: 13, opacity: 0.92, marginTop: 4, lineHeight: 1.45 }}>
+            Sin cuentas ni servidores. Si borras los datos del navegador o cambias de teléfono, lo único que los trae de vuelta es un respaldo.
           </div>
-          <div style={{ fontSize: 19, fontWeight: 700, letterSpacing: -0.4 }}>Todo vive en tu dispositivo</div>
-          <div style={{ fontSize: 12.5, opacity: 0.88, marginTop: 4, lineHeight: 1.4 }}>
-            Sin cuentas ni servidores. Exporta un respaldo o impórtalo en otro teléfono; la sync en la nube llega pronto.
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 12, fontSize: 12.5, fontWeight: 600 }}>
+            {backupStale && <span aria-hidden="true" style={{ width: 8, height: 8, borderRadius: 4, background: '#FFD166', flexShrink: 0 }}/>}
+            <span>{backupLabel}{backupStale && lastBackup != null ? ' · conviene hacer otro' : ''}</span>
           </div>
-          <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
-            <button onClick={exportData} className="lo-press" style={{
-              background: 'rgba(0,0,0,0.18)', backdropFilter: 'blur(20px)',
-              border: '0.5px solid rgba(255,255,255,0.2)', color: '#fff',
-              padding: '8px 14px', borderRadius: 999, fontSize: 12, fontWeight: 600,
-              cursor: 'pointer', fontFamily: 'inherit', display: 'inline-flex', alignItems: 'center', gap: 6,
-            }}><UIIcon name="inbox" size={14} color="#fff" strokeWidth={2}/> Exportar</button>
-            <button onClick={() => importRef.current && importRef.current.click()} className="lo-press" style={{
-              background: 'rgba(0,0,0,0.18)', backdropFilter: 'blur(20px)',
-              border: '0.5px solid rgba(255,255,255,0.2)', color: '#fff',
-              padding: '8px 14px', borderRadius: 999, fontSize: 12, fontWeight: 600,
-              cursor: 'pointer', fontFamily: 'inherit', display: 'inline-flex', alignItems: 'center', gap: 6,
-            }}><UIIcon name="plus" size={14} color="#fff" strokeWidth={2}/> Importar</button>
-            <input ref={importRef} type="file" accept="application/json,.json" style={{ display: 'none' }}
+          <div style={{ display: 'flex', gap: 8, marginTop: 12, flexWrap: 'wrap' }}>
+            <button onClick={exportData} className="lo-press" style={dataBtn}><UIIcon name="inbox" size={14} color="#fff" strokeWidth={2}/> Exportar</button>
+            <button onClick={() => importRef.current && importRef.current.click()} className="lo-press" style={dataBtn}><UIIcon name="plus" size={14} color="#fff" strokeWidth={2}/> Importar</button>
+            <input ref={importRef} type="file" accept="application/json,.json" aria-label="Archivo de respaldo" style={{ display: 'none' }}
               onChange={(e) => { const f = e.target.files && e.target.files[0]; if (f) importData(f); e.target.value = ''; }}/>
+          </div>
+          <div style={{ marginTop: 14 }}>
+            <div style={{ height: 4, borderRadius: 2, background: 'rgba(0,0,0,0.22)', overflow: 'hidden' }}>
+              <div style={{ width: `${Math.min(100, Math.max(1.5, (usage.bytes / STORAGE_BUDGET) * 100))}%`, height: '100%', background: 'rgba(255,255,255,0.85)', borderRadius: 2 }}/>
+            </div>
+            <div style={{ fontSize: 11.5, opacity: 0.85, marginTop: 5 }}>
+              {sizeLabel(usage.bytes)} usados de unos 5 MB disponibles
+            </div>
           </div>
         </div>
 
         <SectionLabel theme={theme}>Cuenta</SectionLabel>
-        <div style={{ background: theme.surface, borderRadius: 18, border: `0.5px solid ${theme.border}`, overflow: 'hidden' }}>
+        <div style={group}>
           <SettingsRow theme={theme} icon="pencil" tint="sky" label="Cambiar nombre" trail={name} onClick={onEditName}/>
           <Divider theme={theme}/>
           <button onClick={resetApp} className="lo-press" style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '13px 14px', background: 'transparent', border: 'none', width: '100%', textAlign: 'left', cursor: 'pointer', fontFamily: 'inherit' }}>
